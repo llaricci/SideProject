@@ -1,4 +1,4 @@
-# Soundtrackr 🔊
+# SideProject
 Welcome to **SideProject!** 
 
 ## Overview
