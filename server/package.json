@@ -4,8 +4,15 @@
   "description": "CS-554 Final Project Server - npm init to win it ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "seed": "node ./tasks/seed.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^4.9.3",
+    "graphql": "^16.8.1",
+    "mongodb": "^6.1.0",
+    "uuid": "^9.0.1"
+  }
 }
