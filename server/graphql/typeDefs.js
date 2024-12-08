@@ -46,29 +46,29 @@ export const typeDefs = `#graphql
         OTHER
     }
     type Project {
-        _id: String
-        name: String 
-        Technologies: [Technology]
-        Bio: String
-        Creator: User
-        comments: [Comment]
-        Favorites: [User]
+        _id: String!
+        name: String! 
+        technologies: [Technology!]!
+        bio: String!
+        creator: User!
+        comments: [Comment!]!
+        favorites: [User!]!
         numOfFavorites: Int
     }
     type User {
-        _id: String
-        firstName: String
-        lastName: String
-        email: String
-        description: String
-        password: String
-        projects: [Project]
-        FavoriteProjects: [Project]
-        ProfLanguages: [Technology]
+        _id: String!
+        firstName: String!
+        lastName: String!
+        email: String!
+        description: String!
+        password: String!
+        projects: [Project!]!
+        favoriteProjects: [Project!]
+        profLanguages: [Technology!]!
     }
     type Comment {
-        _id: String
-        user: User
-        comment: String
-        project: Project
+        _id: String!
+        user: User!
+        comment: String!
+        project: Project!
     }`;
