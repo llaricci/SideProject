@@ -33,8 +33,13 @@ function Header()
                     <Button color="inherit">View Favorites</Button>
                     <br />
                     <Button color="inherit">
-                        <Link href = "/users">
+                        <Link href = "/users/testuser">
                             View Test Profile
+                        </Link>
+                    </Button>
+                     <Button color="inherit">
+                        <Link href = "/projects/testproject">
+                            View Test Project
                         </Link>
                     </Button>
                     </Toolbar>
