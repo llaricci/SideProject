@@ -14,8 +14,8 @@ import Divider from '@mui/material/Divider';
 function Profile({ user }) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'stretch', height: '100vh' }}>
-      <Card variant="outlined" sx={{ maxWidth: 1000, width: '100%', display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <CardContent sx={{ flexGrow: 1 }}>
+      <Card variant="outlined" sx={{ maxWidth: 1000, width: '100%', flexDirection: 'column' }}>
+        <CardContent sx={{}}>
           <Typography variant="h2" component="div">
             {user.name}
           </Typography>

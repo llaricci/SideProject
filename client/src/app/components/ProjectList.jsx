@@ -14,7 +14,7 @@ function ProjectList({projectList})
         <Typography 
             variant="h2" 
             gutterBottom 
-            sx={{ textAlign: 'center', fontWeight: 'bold' }}
+            sx={{ textAlign: 'center', fontWeight: 'bold', marginTop: 2 }}
         >
             Project List:
         </Typography>
