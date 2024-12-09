@@ -1,11 +1,11 @@
 export const typeDefs = `#graphql
     type Query {
         projects: [Project]
-        getProjectById(id: ID!): Project
+        getProjectById(_id: String!): Project
         users: [User]
-        getUserById(id: ID!): User
+        getUserById(_id: String!): User
         comments: [Comment]
-        getCommentsById(id: ID!): Comment
+        getCommentsById(_id: String!): Comment
         getProjectsbyTechnology(technology: Technology!): [Project]
         searchUserByName(searchTerm: String!): [User]
         searchProjectByName(searchTerm: String!): [Project]

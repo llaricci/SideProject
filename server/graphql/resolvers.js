@@ -1,4 +1,5 @@
 import { GraphQLError } from "graphql";
+import { ObjectId } from "mongodb";
 import { Projects, Users, Comments } from "../config/mongoCollections.js";
 
 export const resolvers = {
@@ -15,7 +16,7 @@ export const resolvers = {
     },
     getUserById: async (_, args) => {
       const users = await Users();
-      const user = await users.findOne({ _id: args.id });
+      const user = await users.findOne({ _id: new ObjectId(args._id) });
       if (!user)
         throw new GraphQLError("User not found", {
           extensions: { code: "NOT_FOUND" },
@@ -34,7 +35,7 @@ export const resolvers = {
     },
     getProjectById: async (_, args) => {
       const projects = await Projects();
-      const project = await projects.findOne({ _id: args.id });
+      const project = await projects.findOne({ _id: new ObjectId(args._id) });
       if (!project)
         throw new GraphQLError("Project not found", {
           extensions: { code: "NOT_FOUND" },
@@ -53,7 +54,7 @@ export const resolvers = {
     },
     getCommentsById: async (_, args) => {
       const comments = await Comments();
-      const comment = await comments.findOne({ _id: args.id });
+      const comment = await comments.findOne({ _id: new ObjectId(args.id) });
       if (!comment)
         throw new GraphQLError("Comment not found", {
           extensions: { code: "NOT_FOUND" },
@@ -101,16 +102,62 @@ export const resolvers = {
       console.log(parentValue);
       const users = await Users();
       const creator = await users.find({
-        projects: { $in: [parentValue.creator] },
+        projects: { $in: [new ObjectId(parentValue._id)] },
       });
       return creator;
     },
     favoritedBy: async (parentValue) => {
       const users = await Users();
-      const favorites = await users
-        .find({ favorites: parentValue._id })
+      const favoritedby = await users
+        .find({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
         .toArray();
-      return favorites;
+      return favoritedby;
+    },
+    comments: async (parentValue) => {
+      const comments = await Comments();
+      const projectComments = await comments
+        .find({ project: new ObjectId(parentValue._id) })
+        .toArray();
+      return projectComments;
+    },
+    numOfFavorites: async (parentValue) => {
+      const users = await Users();
+      const numOfFavorites = await users
+        .count({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
+        .count();
+      return numOfFavorites;
     },
   },
+  User: {
+    projects: async (parentValue) => {
+      const projects = await Projects();
+      const usersProjects = await projects
+        .find({ creator: new ObjectId(parentValue._id) })
+        .toArray();
+      return usersProjects;
+    },
+    favoriteProjects: async (parentValue) => {
+      const projects = await Projects();
+      const usersFavoriteProjects = await projects
+        .find({ favoritedBy: { $in: [new ObjectId(parentValue._id)] } })
+        .toArray();
+    },
+  },
+  Comment: {
+    user: async (parentValue) => {
+      const users = await Users();
+      const commenter = await users.findOne({
+        _id: new ObjectId(parentValue.user),
+      });
+      return commenter;
+    },
+    project: async (parentValue) => {
+      const projects = await Projects();
+      const project = await projects.findOne({
+        id_: new ObjectId(parentValue.project),
+      });
+      return project;
+    },
+  },
+  Mutation: {},
 };
