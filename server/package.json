@@ -1,5 +1,6 @@
 {
   "name": "server",
+  "type": "module",
   "version": "1.0.0",
   "description": "CS-554 Final Project Server - npm init to win it ",
   "main": "index.js",
@@ -11,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@apollo/server": "^4.9.3",
+    "bcrypt": "^5.1.1",
     "graphql": "^16.8.1",
     "mongodb": "^6.1.0",
     "uuid": "^9.0.1"

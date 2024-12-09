@@ -1,11 +1,14 @@
 export const typeDefs = `#graphql
     type Query {
         projects: [Project]
-        project(id: ID!): Project
+        getProjectById(id: ID!): Project
         users: [User]
-        user(id: ID!): User
+        getUserById(id: ID!): User
         comments: [Comment]
-        comment(id: ID!): Comment
+        getCommentsById(id: ID!): Comment
+        getProjectsbyTechnology(technology: Technology!): [Project]
+        searchUserByName(searchTerm: String!): [User]
+        searchProjectByName(searchTerm: String!): [Project]
     }
     enum Technology {
         JAVASCRIPT
@@ -52,7 +55,7 @@ export const typeDefs = `#graphql
         bio: String!
         creator: User!
         comments: [Comment!]!
-        favorites: [User!]!
+        favoritedBy: [User!]!
         numOfFavorites: Int
     }
     type User {
@@ -71,4 +74,61 @@ export const typeDefs = `#graphql
         user: User!
         comment: String!
         project: Project!
-    }`;
+    }
+    type Mutation {
+        addUser(
+            firstName: String!
+            lastName: String!
+            email: String!
+            description: String!
+            password: String!
+            profLanguages: [Technology!]!
+        ): User
+        addProject(
+            name: String!
+            technologies: [Technology!]!
+            bio: String!
+            creator: String!
+        ): Project
+        addComment(
+            userId: String!
+            comment: String!
+            projectId: String!
+        ): Comment
+        addFavoritedProject(
+            userId: String!
+            projectId: String!
+        ): Project
+        removeFavoritedProject(
+            userId: String!
+            projectId: String!
+        ): Project
+        editUser(
+            _id: String!
+            firstName: String
+            lastName: String
+            email: String
+            description: String
+            password: String
+            profLanguages: [Technology!]
+        ): User
+        editProject(
+            _id: String!
+            name: String! 
+            technologies: [Technology!]!
+            bio: String!
+            creatorId: String! 
+        ): Project
+        deleteUser(
+            _id: String!
+        ): User
+        deleteProject(
+            _id: String!
+        ): Project
+        deleteComment(
+            _id: String!
+        ): Comment
+    }
+    
+    
+    `;

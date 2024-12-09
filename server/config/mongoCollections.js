@@ -13,6 +13,6 @@ const getCollectionFn = (collection) => {
   };
 };
 
-export const Project = getCollectionFn("projects");
-export const User = getCollectionFn("users");
-export const Comment = getCollectionFn("comments");
+export const Projects = getCollectionFn("projects");
+export const Users = getCollectionFn("users");
+export const Comments = getCollectionFn("comments");
