@@ -40,7 +40,11 @@ function ProjectList({projectList})
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Button size="small">View Details</Button>
+                    <Button size="large">View Details</Button>
+                </CardActions>
+                <CardActions>
+                    <Button size="large">Edit Project</Button>
+                    <Button size="large">Delete Project</Button>
                 </CardActions>
                 </Card>
             ))}
