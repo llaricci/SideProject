@@ -1,6 +1,7 @@
 import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import { Projects, Users, Comments } from "../config/mongoCollections.js";
+import validation from "./validation.js";
 
 export const resolvers = {
   Query: {
@@ -32,32 +33,42 @@ export const resolvers = {
     },
     getUserById: async (_, args) => {
       try{
-        
-      }
-      catch(e){
-        
-      }
-      const users = await Users();
-      const user = await users.findOne({ _id: new ObjectId(args._id) });
-      if (!user)
-        throw new GraphQLError("User not found", {
-          extensions: { code: "NOT_FOUND" },
-        });
-      return user;
-    },
-    projects: async () => {
-      try{
-        const projects = await Projects();
-        const allProjects = await projects.find({}).toArray();
-        if (!allProjects) {
-          throw new GraphQLError("Internal Server Error", {
-            extensions: { code: "INTERNAL_SERVER_ERROR" },
+        const users = await Users();
+        const user = await users.findOne({ _id: new ObjectId(args._id) });
+        if (!user)
+          throw new GraphQLError("User not found", {
+            extensions: { code: "NOT_FOUND" },
           });
-        }
-        return allProjects;
+        return user;
       }
       catch(e){
         
+      }
+    },
+    projects: async (_, __, contextValue) => {
+      try{
+        const client = contextValue.redisClient;
+        const projectsCache = await client.json.get(`projects`, '$')
+        // If projects cache is empty then fetch from db
+        if(!projectsCache || projectsCache.length === 0) {
+          const allProjects = await Projects();
+          const projects = await allProjects.find({}).toArray();
+          console.log(projects)
+          if(!projects){
+            throw new GraphQLError(`Internal Server Error`, {
+              extensions: {code: 'INTERNAL_SERVER_ERROR'}
+          });
+          }
+          await client.json.set(`projects`, '$', projects);
+          await client.expire(`projects`, 3600);
+          return projects;
+        }
+        return projectsCache;
+      }
+      catch(e){
+        throw new GraphQLError(`Error fetching projects: ${e.message}`,{
+          extensions: {code: 'INTERNAL_SERVER_ERROR'}
+        });
       }
     },
     getProjectById: async (_, args) => {
@@ -73,23 +84,32 @@ export const resolvers = {
       catch(e){
         
       }
-
     },
     comments: async () => {
       try{
-        const comments = await Comments();
-        const allComments = await comments.find({}).toArray();
-        if (!allComments) {
-          throw new GraphQLError("Internal Server Error", {
-            extensions: { code: "INTERNAL_SERVER_ERROR" },
+        const client = contextValue.redisClient;
+        const commentsCache = await client.json.get(`comments`, '$')
+        // If projects cache is empty then fetch from db
+        if(!commentsCache || commentsCache.length === 0) {
+          const allComments = await Comments();
+          const comments = await allComments.find({}).toArray();
+          console.log(comments)
+          if(!comments){
+            throw new GraphQLError(`Internal Server Error`, {
+              extensions: {code: 'INTERNAL_SERVER_ERROR'}
           });
+          }
+          await client.json.set(`comments`, '$', comments);
+          await client.expire(`comments`, 3600);
+          return comments;
         }
-        return allComments;
+        return commentsCache;
       }
       catch(e){
-        
+        throw new GraphQLError(`Error fetching comments: ${e.message}`,{
+          extensions: {code: 'INTERNAL_SERVER_ERROR'}
+        });
       }
-      
     },
     getCommentsById: async (_, args) => {
       try{
@@ -104,7 +124,6 @@ export const resolvers = {
       catch(e){
         
       }
-  
     },
     getProjectsbyTechnology: async (_, args) => {
       try{
@@ -117,7 +136,6 @@ export const resolvers = {
       catch(e){
         
       }
-
     },
     searchUserByName: async (_, args) => {
       try{
@@ -163,9 +181,8 @@ export const resolvers = {
       try{
         console.log(parentValue);
         const users = await Users();
-        const creator = await users.find({
-          projects: { $in: [new ObjectId(parentValue._id)] },
-        });
+        const creator = await users.findOne({_id: new ObjectId(parentValue.creatorId)});
+        console.log(creator)
         return creator;
       }
       catch(e){
@@ -175,92 +192,166 @@ export const resolvers = {
     },
     favoritedBy: async (parentValue) => {
       try{
-        
+        const users = await Users();
+        const favoritedby = await users
+          .find({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
+          .toArray();
+        return favoritedby;
       }
       catch(e){
         
       }
-      const users = await Users();
-      const favoritedby = await users
-        .find({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
-        .toArray();
-      return favoritedby;
+
     },
     comments: async (parentValue) => {
       try{
-        
+        const comments = await Comments();
+        const projectComments = await comments
+          .find({ project: new ObjectId(parentValue._id) })
+          .toArray();
+        return projectComments;
       }
       catch(e){
         
       }
-      const comments = await Comments();
-      const projectComments = await comments
-        .find({ project: new ObjectId(parentValue._id) })
-        .toArray();
-      return projectComments;
+
     },
     numOfFavorites: async (parentValue) => {
       try{
-        
+        const users = await Users();
+        const numOfFavorites = await users
+          .count({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
+          .count();
+        return numOfFavorites;
       }
       catch(e){
         
       }
-      const users = await Users();
-      const numOfFavorites = await users
-        .count({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
-        .count();
-      return numOfFavorites;
     },
   },
   User: {
     projects: async (parentValue) => {
       try{
-        
+        const projects = await Projects();
+        const usersProjects = await projects
+          .find({ creatorId: new ObjectId(parentValue._id) })
+          .toArray();
+        return usersProjects;
       }
       catch(e){
         
       }
-      const projects = await Projects();
-      const usersProjects = await projects
-        .find({ creator: new ObjectId(parentValue._id) })
-        .toArray();
-      return usersProjects;
     },
     favoriteProjects: async (parentValue) => {
-      const projects = await Projects();
-      const usersFavoriteProjects = await projects
-        .find({ favoritedBy: { $in: [new ObjectId(parentValue._id)] } })
-        .toArray();
+      try{
+        const projects = await Projects();
+        const usersFavoriteProjects = await projects
+          .find({ favoritedBy: { $in: [new ObjectId(parentValue._id)] } })
+          .toArray();
+        return usersFavoriteProjects;
+      }
+      catch(e){
+        
+      }
+
     },
   },
   Comment: {
     user: async (parentValue) => {
       try{
-        
+        const users = await Users();
+        const commenter = await users.findOne({
+          _id: new ObjectId(parentValue.userId),
+        });
+        return commenter;
       }
       catch(e){
         
       }
-      const users = await Users();
-      const commenter = await users.findOne({
-        _id: new ObjectId(parentValue.user),
-      });
-      return commenter;
     },
     project: async (parentValue) => {
       try{
-        
+        const projects = await Projects();
+        const project = await projects.findOne({
+          id_: new ObjectId(parentValue.projectId),
+        });
+        return project;
       }
       catch(e){
         
       }
-      const projects = await Projects();
-      const project = await projects.findOne({
-        id_: new ObjectId(parentValue.project),
-      });
-      return project;
     },
   },
-  Mutation: {},
+  Mutation: {
+    addUser: async (_, args, contextValue) => {
+      try{
+         args.firstName = validation.checkAlphabet(args.firstName, 'firstName')
+         if(args.bio !== null && args.bio){ 
+             args.bio = validation.checkString(args.bio, 'bio')
+         }
+
+         //TODO: Input validation
+
+         const users = await Users();
+         const newUser = {
+             _id: new ObjectId(),
+             firstName: args.firstName,
+             lastName: args.lastName,
+             bio: args.bio,
+             password: args.password,
+             description: args.description,
+             favorites: [],
+             profLanguages: []
+         };
+         let insertedUser = await users.insertOne(newUser);
+         if(!insertedUser.acknowledged || !insertedUser.insertedId){
+             throw new GraphQLError(`Could not add User`, {
+                 extensions: {code: 'NOT_FOUND'}
+             });
+         }
+         // Add to cache
+         const client = contextValue.redisClient;
+         await client.del(`authors`, '$');
+         await client.json.set(`author_${newUser._id}`, '$', newUser);
+         return newUser;
+      }
+      catch(e){
+         throw(e)
+      }
+    },
+
+    addProject: async (_, args, contextValue) => {
+      try{
+          args.name = validation.checkString(args.name, 'name');
+          
+          //TODO: Input validation
+
+          const projects = await Projects();
+          const newProject = {
+              _id: new ObjectId(),
+              name: args.name,
+              technologies: args.technologies,
+              description: args.description,
+              creatorId: args.creatorId,
+              comments: [],
+              favoritedBy: [],
+              numOfFavorites: 0
+      }
+          let insertedProject = await projects.insertOne(newProject);
+          if(!insertedProject){
+              throw new GraphQLError(`Could not add project`, {
+                  extensions: {code: 'NOT_FOUND'}
+              });
+          }
+          //Flush and add to cache
+          const client = contextValue.redisClient;
+          await client.flushDb();
+          await client.json.set(`book_${newProject._id}`, '$', newProject);
+          return newProject;
+      }
+      catch(e){
+          throw(e)
+      }
+  },
+  },
 };

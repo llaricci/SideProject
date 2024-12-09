@@ -10,6 +10,7 @@ export const typeDefs = `#graphql
         searchUserByName(searchTerm: String!): [User]
         searchProjectByName(searchTerm: String!): [Project]
     }
+
     enum Technology {
         JAVASCRIPT
         PYTHON
@@ -48,83 +49,96 @@ export const typeDefs = `#graphql
         GITHUB
         OTHER
     }
+
     type Project {
         _id: String!
         name: String! 
         technologies: [Technology!]!
-        bio: String!
+        description: String!
         creator: User!
         comments: [Comment!]!
         favoritedBy: [User!]!
         numOfFavorites: Int
     }
+
     type User {
         _id: String!
         firstName: String!
         lastName: String!
         email: String!
-        description: String!
+        bio: String!
         password: String!
         projects: [Project!]!
         favoriteProjects: [Project!]
         profLanguages: [Technology!]!
     }
+        
     type Comment {
         _id: String!
         user: User!
         comment: String!
         project: Project!
     }
+
     type Mutation {
         addUser(
             firstName: String!
             lastName: String!
             email: String!
-            description: String!
+            bio: String!
             password: String!
             profLanguages: [Technology!]!
         ): User
+
         addProject(
             name: String!
             technologies: [Technology!]!
-            bio: String!
-            creator: String!
+            description: String!
+            creatorId: String!
         ): Project
+        
         addComment(
             userId: String!
             comment: String!
             projectId: String!
         ): Comment
+
         addFavoritedProject(
             userId: String!
             projectId: String!
         ): Project
+
         removeFavoritedProject(
             userId: String!
             projectId: String!
         ): Project
+
         editUser(
             _id: String!
             firstName: String
             lastName: String
             email: String
-            description: String
+            bio: String
             password: String
             profLanguages: [Technology!]
         ): User
+
         editProject(
             _id: String!
             name: String! 
             technologies: [Technology!]!
-            bio: String!
+            description: String!
             creatorId: String! 
         ): Project
+
         deleteUser(
             _id: String!
         ): User
+
         deleteProject(
             _id: String!
         ): Project
+
         deleteComment(
             _id: String!
         ): Comment
