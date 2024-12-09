@@ -12,11 +12,20 @@
     "@emotion/cache": "^11.13.5",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
+    "@mui/icons-material": "^6.1.10",
     "@mui/material": "^6.1.10",
     "@mui/material-nextjs": "^6.1.9",
+    "@nextui-org/react": "^2.6.5",
+    "@nextui-org/skeleton": "^2.2.3",
+    "@nextui-org/system": "^2.4.4",
+    "@nextui-org/theme": "^2.4.1",
+    "@nextui-org/user": "^2.2.4",
+    "framer-motion": "^11.13.1",
+    "mui-markdown": "^1.2.3",
     "next": "15.0.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "prism-react-renderer": "^2.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "eslint": "^8",
