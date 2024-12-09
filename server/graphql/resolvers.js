@@ -85,7 +85,7 @@ export const resolvers = {
         
       }
     },
-    comments: async () => {
+    comments: async (_, __, contextValue) => {
       try{
         const client = contextValue.redisClient;
         const commentsCache = await client.json.get(`comments`, '$')
@@ -207,7 +207,7 @@ export const resolvers = {
       try{
         const comments = await Comments();
         const projectComments = await comments
-          .find({ project: new ObjectId(parentValue._id) })
+          .find({ projectId: new ObjectId(parentValue._id) })
           .toArray();
         return projectComments;
       }
@@ -272,9 +272,7 @@ export const resolvers = {
     project: async (parentValue) => {
       try{
         const projects = await Projects();
-        const project = await projects.findOne({
-          id_: new ObjectId(parentValue.projectId),
-        });
+        const project = await projects.findOne({ _id: new ObjectId(parentValue.projectId)});
         return project;
       }
       catch(e){
@@ -316,7 +314,6 @@ export const resolvers = {
          return newUser;
       }
       catch(e){
-         throw(e)
       }
     },
 
@@ -332,7 +329,7 @@ export const resolvers = {
               name: args.name,
               technologies: args.technologies,
               description: args.description,
-              creatorId: args.creatorId,
+              creatorId: new ObjectId(args.creatorId),
               comments: [],
               favoritedBy: [],
               numOfFavorites: 0
@@ -350,8 +347,37 @@ export const resolvers = {
           return newProject;
       }
       catch(e){
-          throw(e)
       }
-  },
+    },
+
+
+
+    addComment: async (_, args, contextValue) => {
+      try{
+        //TODO: Input validation
+
+        const comments = await Comments();
+        const newComment = {
+          _id: new ObjectId(),
+          userId: new ObjectId(args.userId),
+          comment: args.comment,
+          projectId: new ObjectId(args.projectId)
+        }
+        let insertedComment = await comments.insertOne(newComment);
+        if(!insertedComment){
+            throw new GraphQLError(`Could not add project`, {
+                extensions: {code: 'NOT_FOUND'}
+            });
+        }
+        //Flush and add to cache
+        const client = contextValue.redisClient;
+        await client.flushDb();
+        await client.json.set(`book_${newComment._id}`, '$', newComment);
+        return newComment;
+      }
+      catch(e){
+      }
+
+    }
   },
 };
