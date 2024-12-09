@@ -34,6 +34,10 @@ function ProjectList({projectList})
                     {project.description}
                     <br />
                     </Typography>
+                    <br />  
+                    <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
+                        Favorited by: {project.comments.map(comment => comment.user).join(", ")}
+                    </Typography>
                 </CardContent>
                 <CardActions>
                     <Button size="small">View Details</Button>
