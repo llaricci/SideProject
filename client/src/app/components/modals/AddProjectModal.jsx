@@ -28,6 +28,12 @@ function AddProjectModal(props) {
     fetchPolicy: "cache-and-network",
   });
   const [addProject] = useMutation(queries.addProject, {
+    refetchQueries: [
+      {
+          query: queries.getUserById,
+          variables: { id: props.user._id }
+      }
+  ],
     onError: (error) => {
       alert("Error adding project" + error);
       console.log(error);
