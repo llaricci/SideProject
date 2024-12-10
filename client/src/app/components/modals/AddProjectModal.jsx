@@ -24,9 +24,7 @@ const customStyles = {
 
 function AddProjectModal(props) {
   const [showAddModal, setShowAddModal] = useState(props.isOpen);
-  const { data, error, loading } = useQuery(queries.users, {
-    fetchPolicy: "cache-and-network",
-  });
+  const { data, error, loading } = useQuery(queries.users);
   const [addProject] = useMutation(queries.addProject, {
     onError: (error) => {
       alert("Error adding project" + error);
@@ -107,9 +105,10 @@ function AddProjectModal(props) {
             </label>
           </div>
           <div className="form-group">
-            <label htmlFor="technology">Technologies:</label>
+            <label>Technologies:</label>
             {technologies.map((technology, index) => (
               <select
+                key={index}
                 id="technology"
                 name="technology"
                 onChange={(e) =>
