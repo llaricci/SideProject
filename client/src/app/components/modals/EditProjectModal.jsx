@@ -59,11 +59,15 @@ function EditProjectModal(props)
 
         console.log(obj);*/
 
+        projectName = projectName.trim();
+
         if (projectName.length < 2 || projectName.length > 50)
         {
             setError("Project Name must be between 2 and 50 characters!");
             return;
         }
+
+        projectDescription = projectDescription.trim();
 
         if (projectDescription.length == 0)
             {
