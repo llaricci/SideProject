@@ -334,6 +334,42 @@ export const resolvers = {
         console.log(e);
       }
     },
+    addComment: async (_, args, contextValue) => {
+      try {
+        //TODO: Input validation
+
+        const comments = await Comments();
+        const newComment = {
+          _id: new ObjectId(),
+          userId: new ObjectId(args.userId),
+          comment: args.comment,
+          projectId: new ObjectId(args.projectId),
+        };
+        let insertedComment = await comments.insertOne(newComment);
+        if (!insertedComment) {
+          throw new GraphQLError(`Could not add project`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //Flush and add to cache
+        const client = contextValue.redisClient;
+        await client.flushDb();
+        await client.json.set(`comment_${newComment._id}`, "$", newComment);
+        return newComment;
+      } catch (e) {}
+    },
+
+    addFavoritedProject: async (_, args, contextValue) => {
+      try {
+
+      } catch (e) {
+        console.error(e);
+        throw new GraphQLError(`Failed to add project to favorites`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
+    },
+
     editProject: async (_, args, contextValue) => {
       const projects = await Projects();
       const project = await projects.findOne({ _id: new ObjectId(args._id) });
@@ -410,40 +446,48 @@ export const resolvers = {
       await client.json.set(`project_${args._id}`, "$", args);
       return newProject;
     },
-    addComment: async (_, args, contextValue) => {
-      try {
-        //TODO: Input validation
 
-        const comments = await Comments();
-        const newComment = {
-          _id: new ObjectId(),
-          userId: new ObjectId(args.userId),
-          comment: args.comment,
-          projectId: new ObjectId(args.projectId),
-        };
-        let insertedComment = await comments.insertOne(newComment);
-        if (!insertedComment) {
-          throw new GraphQLError(`Could not add project`, {
-            extensions: { code: "NOT_FOUND" },
-          });
-        }
-        //Flush and add to cache
-        const client = contextValue.redisClient;
-        await client.flushDb();
-        await client.json.set(`comment_${newComment._id}`, "$", newComment);
-        return newComment;
-      } catch (e) {}
+    editUser: async(_, args, contextValue) => {
+      try{}
+      catch(e){
+
+      }
     },
 
-    addFavoritedProject: async (_, args, contextValue) => {
-      try {
+    editComment: async(_, args, contextValue) => {
+      try{}
+      catch(e){
 
-      } catch (e) {
-        console.error(e);
-        throw new GraphQLError(`Failed to add project to favorites`, {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
-        });
       }
-    }
+    },
+
+    deleteUser: async(_, args, contextValue) => {
+      try{}
+      catch(e){
+
+      }
+    },
+
+
+    deleteProject: async(_, args, contextValue) => {
+      try{}
+      catch(e){
+
+      }
+    },
+
+    deleteComment: async(_, args, contextValue) => {
+      try{}
+      catch(e){
+
+      }
+    },
+    
+    removeFavoritedProject: async(_, args, contextValue) => {
+      try{}
+      catch(e){
+
+      }
+    },
   },
 };
