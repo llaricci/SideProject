@@ -76,16 +76,16 @@ function Profile({ user }) {
           <Button size="large">Delete Profile</Button>
         </CardActions>
         <Button size="large" onClick={() => handleOpenAddModal()}>
-            Add Project
-          </Button>
+          Add Project
+        </Button>
 
-          {showAddModal && (
-            <AddProjectModal
-              user={user}
-              isOpen={showAddModal}
-              handleClose={handleCloseModals}
-            />
-          )}
+        {showAddModal && (
+          <AddProjectModal
+            user={user}
+            isOpen={showAddModal}
+            handleClose={handleCloseModals}
+          />
+        )}
       </Card>
     </Box>
   );

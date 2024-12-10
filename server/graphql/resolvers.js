@@ -270,12 +270,11 @@ export const resolvers = {
         }
         // Add to cache
         const client = contextValue.redisClient;
-        await client.del(`authors`, "$");
-        await client.json.set(`author_${newUser._id}`, "$", newUser);
+        await client.del(`users`, "$");
+        await client.json.set(`user_${newUser._id}`, "$", newUser);
         return newUser;
       } catch (e) {}
     },
-
     addProject: async (_, args, contextValue) => {
       try {
         args.name = validation.checkString(args.name, "name");
@@ -283,17 +282,36 @@ export const resolvers = {
         //TODO: Input validation
 
         const projects = await Projects();
+        const users = await Users();
+        const creator = await users.findOne({
+          _id: new ObjectId(args.creatorId),
+        });
+        if (!creator) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+
         const newProject = {
           _id: new ObjectId(),
           name: args.name,
           technologies: args.technologies,
           description: args.description,
-          creatorId: new ObjectId(args.creatorId),
+          creatorId: new ObjectId(creator._id),
           comments: [],
           favoritedBy: [],
           numOfFavorites: 0,
         };
         let insertedProject = await projects.insertOne(newProject);
+        let updatedUser = await users.updateOne(
+          { _id: new ObjectId(args.creatorId) },
+          { $push: { projects: newProject._id } }
+        );
+        if (!updatedUser) {
+          throw new GraphQLError(`Could not add project to user`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
         if (!insertedProject) {
           throw new GraphQLError(`Could not add project`, {
             extensions: { code: "NOT_FOUND" },
@@ -302,7 +320,7 @@ export const resolvers = {
         //Flush and add to cache
         const client = contextValue.redisClient;
         await client.flushDb();
-        await client.json.set(`book_${newProject._id}`, "$", newProject);
+        await client.json.set(`project_${newProject._id}`, "$", newProject);
         return newProject;
       } catch (e) {
         console.log(e);
@@ -329,7 +347,7 @@ export const resolvers = {
         //Flush and add to cache
         const client = contextValue.redisClient;
         await client.flushDb();
-        await client.json.set(`book_${newComment._id}`, "$", newComment);
+        await client.json.set(`comment_${newComment._id}`, "$", newComment);
         return newComment;
       } catch (e) {}
     },

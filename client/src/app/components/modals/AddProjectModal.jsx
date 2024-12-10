@@ -24,7 +24,7 @@ const customStyles = {
 
 function AddProjectModal(props) {
   const [showAddModal, setShowAddModal] = useState(props.isOpen);
-  const { data, error, loading } = useQuery(queries.users);
+
   const [addProject] = useMutation(queries.addProject, {
     onError: (error) => {
       alert("Error adding project" + error);
@@ -34,15 +34,6 @@ function AddProjectModal(props) {
       alert("Project added successfully");
       console.log(data);
       props.handleClose();
-    },
-    update(cache, { data: { addProject } }) {
-      const { projects } = cache.readQuery({
-        query: queries.projects,
-      });
-      cache.writeQuery({
-        query: queries.projects,
-        data: { projects: [...projects, addProject] },
-      });
     },
   });
   const handleCloseModal = () => {
@@ -59,15 +50,6 @@ function AddProjectModal(props) {
   const addTechnology = () => {
     setTechnologies([...technologies, ""]);
   };
-  if (data) {
-    var { users } = data;
-  }
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-  if (error) {
-    return <p>Error</p>;
-  }
   return (
     <div>
       <ReactModal

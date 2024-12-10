@@ -5,7 +5,7 @@ import ProjectList from "../../components/ProjectList";
 
 export default function ProfilePage() {
   const testUser = {
-    _id: "TestID123",
+    _id: "67582c401c7c352be7eb9661",
     firstName: "Fuecoco",
     lastName: "FireCroc",
     email: "fuecoco@example.com",
