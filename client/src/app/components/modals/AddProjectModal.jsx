@@ -26,6 +26,12 @@ function AddProjectModal(props) {
   const [showAddModal, setShowAddModal] = useState(props.isOpen);
 
   const [addProject] = useMutation(queries.addProject, {
+    refetchQueries: [
+      {
+          query: queries.getUserById,
+          variables: { id: props.user._id }
+      }
+  ],
     onError: (error) => {
       alert("Error adding project" + error);
       console.log(error);
