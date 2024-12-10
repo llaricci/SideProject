@@ -408,7 +408,7 @@ export const resolvers = {
       const client = contextValue.redisClient;
       await client.flushDb();
       await client.json.set(`project_${args._id}`, "$", args);
-      return updatedProject;
+      return newProject;
     },
     addComment: async (_, args, contextValue) => {
       try {
