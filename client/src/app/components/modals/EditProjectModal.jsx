@@ -3,7 +3,7 @@ import ReactModal from "react-modal";
 import { useMutation } from "@apollo/client";
 import queries from "../../queries";
 
-ReactModal.setAppElement("body");
+ReactModal.setAppElement("#__next");
 const customStyles = {
   content: {
     top: "50%",

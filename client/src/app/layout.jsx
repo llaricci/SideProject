@@ -28,8 +28,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
-        <ApolloWrapper>{children}</ApolloWrapper>
+        <div id="__next">
+          <Header />
+          <ApolloWrapper>{children}</ApolloWrapper>
+        </div>
       </body>
     </html>
   );

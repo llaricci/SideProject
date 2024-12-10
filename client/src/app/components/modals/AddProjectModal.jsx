@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import ReactModal from "react-modal";
 import queries from "../../queries";
 
-ReactModal.setAppElement("body");
+ReactModal.setAppElement("#__next");
 
 const customStyles = {
   content: {
@@ -30,10 +30,10 @@ function AddProjectModal(props) {
   const [addProject] = useMutation(queries.addProject, {
     refetchQueries: [
       {
-          query: queries.getUserById,
-          variables: { id: props.user._id }
-      }
-  ],
+        query: queries.getUserById,
+        variables: { id: props.user._id },
+      },
+    ],
     onError: (error) => {
       alert("Error adding project" + error);
       console.log(error);

@@ -8,23 +8,29 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
 import EditProjectModal from "./modals/EditProjectModal";
+import DeleteProjectModal from "./modals/DeleteProjectModal";
 
 function ProjectList(props) {
   const projectList = props.projectList;
   const [editForm, showEditForm] = useState(false);
   const [editProject, setEditProject] = useState(null);
 
-  //const [deleteForm, showDeleteForm] = useState(false);
-  //const [deleteProject, deleteProject] = useState(false);
+  const [deleteForm, showDeleteForm] = useState(false);
+  const [deleteProject, setdeleteProject] = useState(false);
 
   const handleOpenEditModal = (project) => {
     showEditForm(true);
     setEditProject(project);
   };
 
+  const handleOpenDeleteModal = (project) => {
+    showDeleteForm(true);
+    setdeleteProject(project);
+  };
+
   const handleCloseModals = () => {
     showEditForm(false);
-    //showDeleteForm(false);
+    showDeleteForm(false);
   };
 
   return (
@@ -83,7 +89,14 @@ function ProjectList(props) {
               >
                 Edit Project
               </Button>
-              <Button size="large">Delete Project</Button>
+              <Button
+                size="large"
+                onClick={() => {
+                  handleOpenDeleteModal({ project });
+                }}
+              >
+                Delete Project
+              </Button>
             </CardActions>
           </Card>
         ))}
@@ -93,6 +106,13 @@ function ProjectList(props) {
             isOpen={editForm}
             user={props.user}
             project={editProject}
+            handleClose={handleCloseModals}
+          />
+        )}
+        {deleteForm && deleteProject && (
+          <DeleteProjectModal
+            isOpen={deleteForm}
+            project={deleteProject}
             handleClose={handleCloseModals}
           />
         )}
