@@ -44,7 +44,7 @@ function Profile({ user }) {
       >
         <CardContent sx={{}}>
           <Typography variant="h2" component="div">
-            {user.name}
+            {user.firstName} {user.lastName}
           </Typography>
           <br />
           <Typography variant="overline" gutterBottom sx={{ display: "block" }}>
@@ -74,7 +74,7 @@ function Profile({ user }) {
         <CardActions sx={{ marginTop: "auto" }}>
           <Button size="large">Edit Profile</Button>
           <Button size="large">Delete Profile</Button>
-          <Button size="large" onClick={() => handleOpenAddModal()}>
+          {/*<Button size="large" onClick={() => handleOpenAddModal()}>
             Add Profile
           </Button>
 
@@ -84,7 +84,7 @@ function Profile({ user }) {
               isOpen={showAddModal}
               handleClose={handleCloseModals}
             />
-          )}
+          )}*/}
         </CardActions>
       </Card>
     </Box>

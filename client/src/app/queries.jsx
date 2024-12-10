@@ -111,8 +111,12 @@ const getUserById = gql`
       email
       bio
       password
-      projects {
+      projects 
+      {
         _id
+        name
+        technologies
+        description
       }
       favoriteProjects {
         _id

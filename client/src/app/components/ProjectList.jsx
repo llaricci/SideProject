@@ -36,8 +36,17 @@ function ProjectList({projectList})
                     </Typography>
                     <br />  
                     <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
-                        Favorited by: {project.comments.map(comment => comment.user).join(", ")}
+                        Favorited by: {project.favoritedBy && project.favoritedBy.length > 0 
+                            ? project.favoritedBy.map(user => user.firstName + " " + user.lastName).join(", ")
+                            : "No one yet"}
                     </Typography>
+
+                    <Typography sx={{ color: 'text.secondary', mb: 1.5 }}>
+                        Comments: {project.comments && project.comments.length > 0 
+                            ? project.comments.map(comment => comment.user).join(", ")
+                            : "No comments yet"}
+                    </Typography>
+
                 </CardContent>
                 <CardActions>
                     <Button size="large">View Details</Button>
