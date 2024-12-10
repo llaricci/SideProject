@@ -1,4 +1,4 @@
-function editProfileModal()
+function EditProfileModal()
 {
     return (
         <div>
@@ -7,4 +7,4 @@ function editProfileModal()
     )
 }
 
-export default editProfileModal;
+export default EditProfileModal;

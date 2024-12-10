@@ -6,7 +6,8 @@ import ProjectList from "../../components/ProjectList";
 export default function ProfilePage() {
   const testUser = {
     _id: "TestID123",
-    name: "Fuecoco FireCroc",
+    firstName: "Fuecoco",
+    lastName: "FireCroc",
     email: "fuecoco@example.com",
     bio: "A fire croc looking for a job! Have 5+ years of experience with React and 2 years with NextJS!",
     profLanguages: [
