@@ -7,6 +7,8 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
+import Link from 'next/link';
+
 import EditProjectModal from './modals/EditProjectModal';
 
 function ProjectList({projectList})
@@ -69,7 +71,11 @@ function ProjectList({projectList})
 
                 </CardContent>
                 <CardActions>
-                    <Button size="large">View Details</Button>
+                    <Button size="large">
+                        <Link href = {`/projects/${project._id}`}>
+                            View Details
+                        </Link>
+                    </Button>
                 </CardActions>
                 <CardActions>
                     <Button size="large"

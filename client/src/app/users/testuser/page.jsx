@@ -25,7 +25,7 @@ export default function ProfilePage() {
 
   const projectList = [
     {
-      _id: "1",
+      _id: "testproject",
       name: "Roommate Roulette",
       technologies: ["HTML", "CSS", "Javascript"],
       description:
