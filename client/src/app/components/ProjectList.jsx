@@ -9,7 +9,8 @@ import Typography from "@mui/material/Typography";
 
 import EditProjectModal from "./modals/EditProjectModal";
 
-function ProjectList({ projectList }) {
+function ProjectList(props) {
+  const projectList = props.projectList;
   const [editForm, showEditForm] = useState(false);
   const [editProject, setEditProject] = useState(null);
 
@@ -90,6 +91,7 @@ function ProjectList({ projectList }) {
         {editForm && editProject && (
           <EditProjectModal
             isOpen={editForm}
+            user={props.user}
             project={editProject}
             handleClose={handleCloseModals}
           />

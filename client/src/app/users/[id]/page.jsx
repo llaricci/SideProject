@@ -33,7 +33,7 @@ export default function ProfilePage() {
         </div>
 
         <div className="w-2/3 h-screen bg-blue-500 overflow-y-auto flex flex-col">
-          <ProjectList projectList={projects} />
+          <ProjectList user = {user} projectList={projects} />
         </div>
       </div>
     );

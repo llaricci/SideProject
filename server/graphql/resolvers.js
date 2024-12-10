@@ -326,7 +326,82 @@ export const resolvers = {
         console.log(e);
       }
     },
+    editProject: async (_, args, contextValue) => {
+      const projects = await Projects();
+      const project = await projects.findOne({ _id: new ObjectId(args._id) });
+      if (!project) {
+        throw new GraphQLError(`Project not found`, {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+      if (args.name) {
+        //Project Name between 2 - 50 characters (Not only special characters / only numbers)
+        if (
+          args.name.trim() === "" ||
+          !/^(?![\s\d\W]*$)(?![\s\W]*$)[\w\W]{2,50}$/.test(args.name)
+        ) {
+          throw new GraphQLError(
+            `Project Name must be between 2 - 50 characters (Not only special characters / only numbers)`,
+            {
+              extensions: { code: "BAD_USER_INPUT" },
+            }
+          );
+        }
+        args.name = args.name.trim();
+      }
+      if (args.technologies) {
+        //Technologies must be an array of strings
+        if (
+          !Array.isArray(args.technologies) ||
+          args.technologies.length === 0
+        ) {
+          throw new GraphQLError(`Technologies must be an array of strings`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        args.technologies = args.technologies.map((tech) => tech.trim());
+      }
+      if (args.description) {
+        //Description must be a string
+        if (
+          args.description.trim() === "" ||
+          !/^(?![\s\d\W]*$)(?![\s\W]*$)[\w\W]{1,200}$/.test(args.description)
+        ) {
+          throw new GraphQLError(
+            `Description must be between 1 - 200 characters (Not only special characters / only numbers)`,
+            {
+              extensions: { code: "BAD_USER_INPUT" },
+            }
+          );
+        }
+        args.description = args.description.trim();
+      }
+      const newProject = {
+        _id: new ObjectId(args._id),
+        name: args.name || project.name,
+        technologies: args.technologies || project.technologies,
+        description: args.description || project.description,
+        creatorId: new ObjectId(project.creatorId),
+        comments: project.comments,
+        favoritedBy: project.favoritedBy,
+        numOfFavorites: project.numOfFavorites,
+      };
 
+      const updatedProject = await projects.updateOne(
+        { _id: new ObjectId(args._id) },
+        { $set: newProject }
+      );
+      if (!updatedProject) {
+        throw new GraphQLError(`Could not update project`, {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+      //Flush and add to cache
+      const client = contextValue.redisClient;
+      await client.flushDb();
+      await client.json.set(`project_${args._id}`, "$", args);
+      return updatedProject;
+    },
     addComment: async (_, args, contextValue) => {
       try {
         //TODO: Input validation

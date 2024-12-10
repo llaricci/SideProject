@@ -93,6 +93,7 @@ const users = gql`
       password
       projects {
         _id
+        creatorId
       }
       favoriteProjects {
         _id
@@ -111,8 +112,7 @@ const getUserById = gql`
       email
       bio
       password
-      projects 
-      {
+      projects {
         _id
         name
         technologies
