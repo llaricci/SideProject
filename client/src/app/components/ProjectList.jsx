@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useState} from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -6,11 +7,30 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
+import EditProjectModal from './modals/EditProjectModal';
+
 function ProjectList({projectList})
 {
+    const [editForm, showEditForm] = useState(false);
+    const [editProject, setEditProject] = useState(null);
+
+    //const [deleteForm, showDeleteForm] = useState(false);
+    //const [deleteProject, deleteProject] = useState(false);
+
+    const handleOpenEditModal = (project) => 
+    {
+        showEditForm(true);
+        setEditProject(project);
+    };
+
+    const handleCloseModals = () => 
+    {
+        showEditForm(false);
+        //showDeleteForm(false);
+    };
+    
     return (
         <div>
-
         <Typography 
             variant="h2" 
             gutterBottom 
@@ -52,11 +72,23 @@ function ProjectList({projectList})
                     <Button size="large">View Details</Button>
                 </CardActions>
                 <CardActions>
-                    <Button size="large">Edit Project</Button>
+                    <Button size="large"
+                        onClick={() => {
+                            handleOpenEditModal({project});
+                        }}
+                        >Edit Project
+                    </Button>
                     <Button size="large">Delete Project</Button>
                 </CardActions>
                 </Card>
             ))}
+
+            {editForm && editProject && (
+                    <EditProjectModal
+                        isOpen={editForm}
+                        project={editProject}
+                        handleClose={handleCloseModals}
+                    />)}
         </div>
 
     
