@@ -5,7 +5,7 @@ export const typeDefs = `#graphql
         users: [User]
         getUserById(_id: String!): User
         comments: [Comment]
-        getCommentsById(_id: String!): Comment
+        getCommentById(_id: String!): Comment
         getProjectsbyTechnology(technology: Technology!): [Project]
         searchUserByName(searchTerm: String!): [User]
         searchProjectByName(searchTerm: String!): [Project]

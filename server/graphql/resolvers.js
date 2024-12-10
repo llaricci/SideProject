@@ -67,6 +67,7 @@ export const resolvers = {
       }
     },
     getProjectById: async (_, args) => {
+      //TODO: Input validation
       try {
         const projects = await Projects();
         const project = await projects.findOne({ _id: new ObjectId(args._id) });
@@ -102,10 +103,10 @@ export const resolvers = {
         });
       }
     },
-    getCommentsById: async (_, args) => {
+    getCommentById: async (_, args) => {
       try {
         const comments = await Comments();
-        const comment = await comments.findOne({ _id: new ObjectId(args.id) });
+        const comment = await comments.findOne({ _id: new ObjectId(args._id) });
         if (!comment)
           throw new GraphQLError("Comment not found", {
             extensions: { code: "NOT_FOUND" },
@@ -213,12 +214,20 @@ export const resolvers = {
     },
     favoriteProjects: async (parentValue) => {
       try {
-        const projects = await Projects();
-        const usersFavoriteProjects = await projects
-          .find({ favoritedBy: { $in: [new ObjectId(parentValue._id)] } })
+        const projectsCollection = await Projects();
+        if (!parentValue.favoriteProjects || parentValue.favoriteProjects.length === 0) {
+          return [];
+        }
+        const usersFavoriteProjects = await projectsCollection
+          .find({ _id: { $in: parentValue.favoriteProjects.map((id) => new ObjectId(id)) } })
           .toArray();
         return usersFavoriteProjects;
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+        throw new GraphQLError(`Failed to fetch favorite projects`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
     },
   },
   Comment: {
@@ -258,8 +267,8 @@ export const resolvers = {
           lastName: args.lastName,
           bio: args.bio,
           password: args.password,
-          description: args.description,
-          favorites: [],
+          projects: [],
+          favoriteProjects: [],
           profLanguages: [],
         };
         let insertedUser = await users.insertOne(newUser);
@@ -291,7 +300,6 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
-
         const newProject = {
           _id: new ObjectId(),
           name: args.name,
@@ -426,5 +434,16 @@ export const resolvers = {
         return newComment;
       } catch (e) {}
     },
+
+    addFavoritedProject: async (_, args, contextValue) => {
+      try {
+
+      } catch (e) {
+        console.error(e);
+        throw new GraphQLError(`Failed to add project to favorites`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
+    }
   },
 };
