@@ -74,8 +74,9 @@ function Profile({ user }) {
         <CardActions sx={{ marginTop: "auto" }}>
           <Button size="large">Edit Profile</Button>
           <Button size="large">Delete Profile</Button>
-          {/*<Button size="large" onClick={() => handleOpenAddModal()}>
-            Add Profile
+        </CardActions>
+        <Button size="large" onClick={() => handleOpenAddModal()}>
+            Add Project
           </Button>
 
           {showAddModal && (
@@ -84,8 +85,7 @@ function Profile({ user }) {
               isOpen={showAddModal}
               handleClose={handleCloseModals}
             />
-          )}*/}
-        </CardActions>
+          )}
       </Card>
     </Box>
   );
