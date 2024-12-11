@@ -486,11 +486,6 @@ export const resolvers = {
       } catch (e) {}
     },
 
-    editComment: async (_, args, contextValue) => {
-      try {
-      } catch (e) {}
-    },
-
     deleteUser: async (_, args, contextValue) => {
       try {
       } catch (e) {}
@@ -498,6 +493,67 @@ export const resolvers = {
 
     deleteProject: async (_, args, contextValue) => {
       try {
+        const projects = await Projects();
+        const projectToDelete = await projects.findOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!projectToDelete) {
+          throw new GraphQLError(`Project not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const deletedProject = await projects.deleteOne({
+          _id: new ObjectId(args._id),
+        });
+        //remove project from user's projects list
+        const users = await Users();
+        const user = await users.findOne({
+          _id: new ObjectId(projectToDelete.creatorId),
+        });
+        if (!user) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const updatedUser = await users.updateOne(
+          { _id: new ObjectId(user._id) },
+          { $pull: { projects: new ObjectId(projectToDelete._id) } }
+        );
+        if (!updatedUser) {
+          throw new GraphQLError(`Could not remove project from user`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //remove project from favorites list of users who favorited the project
+        const usersWhoFavorited = await users
+          .find({
+            favoriteProjects: { $in: [new ObjectId(projectToDelete._id)] },
+          })
+          .toArray();
+        for (let user of usersWhoFavorited) {
+          const updatedUser = await users.updateOne(
+            { _id: new ObjectId(user._id) },
+            { $pull: { favoriteProjects: new ObjectId(projectToDelete._id) } }
+          );
+          if (!updatedUser) {
+            throw new GraphQLError(`Could not remove project from user`, {
+              extensions: { code: "NOT_FOUND" },
+            });
+          }
+        }
+        //remove comments that have the project id
+        const comments = await Comments();
+        const deletedComments = await comments.deleteMany({
+          projectId: new ObjectId(projectToDelete._id),
+        });
+        if (!deletedComments) {
+          throw new GraphQLError(`Could not delete comments`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const client = contextValue.redisClient;
+        await client.flushDb();
+        return projectToDelete;
       } catch (e) {}
     },
 
