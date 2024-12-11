@@ -39,8 +39,7 @@ function AddProjectModal(props) {
       console.log(error);
     },
     onCompleted: (data) => {
-      alert("Project added successfully");
-      console.log(data);
+      console.log("Project added successfully", data);
       props.handleClose();
     },
     update(cache, { data: { addProject } }) {

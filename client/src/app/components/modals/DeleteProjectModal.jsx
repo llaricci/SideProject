@@ -25,6 +25,12 @@ function DeleteProjectModal(props) {
   const [showDeleteModal, setShowDeleteModal] = useState(props.isOpen);
   const [Project, setProject] = useState(props.project.project);
   const [deleteProject] = useMutation(queries.deleteProject, {
+    refetchQueries: [
+      {
+        query: queries.getUserById,
+        variables: { id: props.user._id },
+      },
+    ],
     update(cache) {
       cache.modify({
         fields: {

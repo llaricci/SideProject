@@ -85,7 +85,7 @@ function EditProjectModal(props) {
         },
       });
 
-      alert("Project successfully edited");
+      console.log("Project successfully edited");
       setError("");
       props.handleClose();
     } catch (e) {

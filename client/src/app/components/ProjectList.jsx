@@ -113,6 +113,7 @@ function ProjectList(props) {
           <DeleteProjectModal
             isOpen={deleteForm}
             project={deleteProject}
+            user={props.user}
             handleClose={handleCloseModals}
           />
         )}
