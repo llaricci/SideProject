@@ -372,16 +372,19 @@ export const resolvers = {
           projectId: new ObjectId(args.projectId),
         };
         let insertedComment = await comments.insertOne(newComment);
-        let updatedProject = await projects.updateOne(_id: new ObjectId(args.projectId), { $push: { comments: newComment._id } });
+        let updatedProject = await projects.updateOne(
+          { _id: new ObjectId(args.projectId) },
+          { $push: { comments: newComment._id } }
+        );
         if (!insertedComment) {
           throw new GraphQLError(`Could not add project`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-          if (!updatedProject) {
-            throw new GraphQLError(`Could not add comment to project`, {
-              extensions: { code: "NOT_FOUND" },
-            });
+        if (!updatedProject) {
+          throw new GraphQLError(`Could not add comment to project`, {
+            extensions: { code: "NOT_FOUND" },
+          });
         }
         //Flush and add to cache
         const client = contextValue.redisClient;
