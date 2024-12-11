@@ -215,11 +215,18 @@ export const resolvers = {
     favoriteProjects: async (parentValue) => {
       try {
         const projectsCollection = await Projects();
-        if (!parentValue.favoriteProjects || parentValue.favoriteProjects.length === 0) {
+        if (
+          !parentValue.favoriteProjects ||
+          parentValue.favoriteProjects.length === 0
+        ) {
           return [];
         }
         const usersFavoriteProjects = await projectsCollection
-          .find({ _id: { $in: parentValue.favoriteProjects.map((id) => new ObjectId(id)) } })
+          .find({
+            _id: {
+              $in: parentValue.favoriteProjects.map((id) => new ObjectId(id)),
+            },
+          })
           .toArray();
         return usersFavoriteProjects;
       } catch (e) {
@@ -339,6 +346,25 @@ export const resolvers = {
         //TODO: Input validation
 
         const comments = await Comments();
+        //Check if user exists
+        const users = await Users();
+        const user = await users.findOne({ _id: new ObjectId(args.userId) });
+        if (!user) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //Check if project exists
+        const projects = await Projects();
+        const project = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
+        if (!project) {
+          throw new GraphQLError(`Project not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+
         const newComment = {
           _id: new ObjectId(),
           userId: new ObjectId(args.userId),
@@ -346,10 +372,16 @@ export const resolvers = {
           projectId: new ObjectId(args.projectId),
         };
         let insertedComment = await comments.insertOne(newComment);
+        let updatedProject = await projects.updateOne(_id: new ObjectId(args.projectId), { $push: { comments: newComment._id } });
         if (!insertedComment) {
           throw new GraphQLError(`Could not add project`, {
             extensions: { code: "NOT_FOUND" },
           });
+        }
+          if (!updatedProject) {
+            throw new GraphQLError(`Could not add comment to project`, {
+              extensions: { code: "NOT_FOUND" },
+            });
         }
         //Flush and add to cache
         const client = contextValue.redisClient;
@@ -361,7 +393,6 @@ export const resolvers = {
 
     addFavoritedProject: async (_, args, contextValue) => {
       try {
-
       } catch (e) {
         console.error(e);
         throw new GraphQLError(`Failed to add project to favorites`, {
@@ -447,47 +478,34 @@ export const resolvers = {
       return newProject;
     },
 
-    editUser: async(_, args, contextValue) => {
-      try{}
-      catch(e){
-
-      }
+    editUser: async (_, args, contextValue) => {
+      try {
+      } catch (e) {}
     },
 
-    editComment: async(_, args, contextValue) => {
-      try{}
-      catch(e){
-
-      }
+    editComment: async (_, args, contextValue) => {
+      try {
+      } catch (e) {}
     },
 
-    deleteUser: async(_, args, contextValue) => {
-      try{}
-      catch(e){
-
-      }
+    deleteUser: async (_, args, contextValue) => {
+      try {
+      } catch (e) {}
     },
 
-
-    deleteProject: async(_, args, contextValue) => {
-      try{}
-      catch(e){
-
-      }
+    deleteProject: async (_, args, contextValue) => {
+      try {
+      } catch (e) {}
     },
 
-    deleteComment: async(_, args, contextValue) => {
-      try{}
-      catch(e){
-
-      }
+    deleteComment: async (_, args, contextValue) => {
+      try {
+      } catch (e) {}
     },
-    
-    removeFavoritedProject: async(_, args, contextValue) => {
-      try{}
-      catch(e){
 
-      }
+    removeFavoritedProject: async (_, args, contextValue) => {
+      try {
+      } catch (e) {}
     },
   },
 };
