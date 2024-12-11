@@ -396,6 +396,63 @@ export const resolvers = {
 
     addFavoritedProject: async (_, args, contextValue) => {
       try {
+        const users = await Users();
+        const projects = await Projects();
+        const user = await users.findOne({ _id: new ObjectId(args.userId) });
+        if (!user) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const project = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
+        if (!project) {
+          throw new GraphQLError(`Project not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //Check if project is already favorited
+
+        if (
+          user.favoriteProjects &&
+          user.favoriteProjects.includes(args.projectId)
+        ) {
+          throw new GraphQLError(`Project already favorited`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        //check that project is not users own project
+        if (project.creatorId.toString() === user._id.toString()) {
+          throw new GraphQLError(`Cannot favorite own project`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        //Add project to user's favorites
+        let updatedUser = await users.updateOne(
+          { _id: new ObjectId(args.userId) },
+          { $push: { favoriteProjects: new ObjectId(args.projectId) } }
+        );
+        if (!updatedUser) {
+          throw new GraphQLError(`Could not add project to favorites`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //Add user to project's favoritedBy
+        let updatedProject = await projects.updateOne(
+          { _id: new ObjectId(args.projectId) },
+          { $push: { favoritedBy: new ObjectId(args.userId) } }
+        );
+        if (!updatedProject) {
+          throw new GraphQLError(
+            `Could not add user to project's favoritedBy`,
+            {
+              extensions: { code: "NOT_FOUND" },
+            }
+          );
+        }
+        // TODO : HANDLE CACHE
+        return project;
       } catch (e) {
         console.error(e);
         throw new GraphQLError(`Failed to add project to favorites`, {

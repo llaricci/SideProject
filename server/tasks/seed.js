@@ -47,7 +47,7 @@ const main = async () => {
       creatorId: user1Id,
       comments: [],
       favoritedBy: [],
-      numOfFavorites: 0,
+      
     },
     {
       _id: new ObjectId(),
@@ -57,7 +57,7 @@ const main = async () => {
       creatorId: user1Id,
       comments: [],
       favoritedBy: [],
-      numOfFavorites: 0,
+      
     },
     {
       _id: new ObjectId(),
@@ -67,7 +67,7 @@ const main = async () => {
       creatorId: user2Id,
       comments: [],
       favoritedBy: [],
-      numOfFavorites: 0,
+      
     },
     {
       _id: new ObjectId(),
@@ -77,7 +77,7 @@ const main = async () => {
       creatorId: user2Id,
       comments: [],
       favoritedBy: [],
-      numOfFavorites: 0,
+      
     },
   ]);
 
