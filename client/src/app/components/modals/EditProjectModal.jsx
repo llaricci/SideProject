@@ -55,19 +55,23 @@ function EditProjectModal(props) {
 
         console.log(obj);*/
 
-    projectName = projectName.trim();
+    
 
-    if (projectName.length < 2 || projectName.length > 50) {
+    if (projectName.trim().length < 2 || projectName.trim().length > 50) 
+    {
       setError("Project Name must be between 2 and 50 characters!");
       return;
     }
 
-    projectDescription = projectDescription.trim();
+    projectName = projectName.trim();
 
-    if (projectDescription.length == 0) {
+    if (projectDescription.trim().length == 0) 
+        {
       setError("Project Description must not be empty!");
       return;
     }
+
+    projectDescription = projectDescription.trim();
 
     if (selectedTechnologies.length <= 0) {
       setError("At least one technology must be checked!");
@@ -155,7 +159,7 @@ function EditProjectModal(props) {
             {error}
           </h3>
           <form id="editProject" onSubmit={projectSubmit} className="space-y-4">
-            <label className="text-xl font- mb-1"> Name: </label>
+            <label className="text-xl font- mb-1"> Project Name: </label>
             <input
               id="name"
               defaultValue={project.name}
@@ -181,7 +185,7 @@ function EditProjectModal(props) {
             </div>
 
             <br />
-            <label className="text-xl font- mb-1"> Description </label>
+            <label className="text-xl font- mb-1"> Project Description: </label>
             <textarea
               id="description"
               defaultValue={project.description}
