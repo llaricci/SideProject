@@ -1,6 +1,7 @@
 import { dbConnection, closeConnection } from "../config/mongoConnection.js";
 import { Users, Projects, Comments } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
+import bcrypt from 'bcrypt'; // Import bcrypt for password hashing
 
 const main = async () => {
   const db = await dbConnection();
@@ -16,9 +17,9 @@ const main = async () => {
     lastName: "Hill",
     email: "patrickhill@gmail.com",
     bio: "User bio",
-    password: "password",
+    password: await bcrypt.hash('password', 10), // Hash the password
     projects: [],
-    favorites: [],
+    favoriteProjects: [], // Use favoriteProjects as per schema
     profLanguages: ["JAVA", "NEXT_JS"],
   };
 
@@ -28,9 +29,9 @@ const main = async () => {
     lastName: "Man",
     email: "email@gmail.com",
     bio: "User bio",
-    password: "password",
+    password: await bcrypt.hash('password', 10), // Hash the password
     projects: [],
-    favorites: [],
+    favoriteProjects: [], // Use favoriteProjects as per schema
     profLanguages: ["CPLUSPLUS", "REACT"],
   };
 
@@ -47,7 +48,7 @@ const main = async () => {
       creatorId: user1Id,
       comments: [],
       favoritedBy: [],
-      
+      numOfFavorites: 0, // Include numOfFavorites
     },
     {
       _id: new ObjectId(),
@@ -57,7 +58,7 @@ const main = async () => {
       creatorId: user1Id,
       comments: [],
       favoritedBy: [],
-      
+      numOfFavorites: 0, // Include numOfFavorites
     },
     {
       _id: new ObjectId(),
@@ -67,7 +68,7 @@ const main = async () => {
       creatorId: user2Id,
       comments: [],
       favoritedBy: [],
-      
+      numOfFavorites: 0, // Include numOfFavorites
     },
     {
       _id: new ObjectId(),
@@ -77,7 +78,7 @@ const main = async () => {
       creatorId: user2Id,
       comments: [],
       favoritedBy: [],
-      
+      numOfFavorites: 0, // Include numOfFavorites
     },
   ]);
 
@@ -94,6 +95,22 @@ const main = async () => {
     { _id: user2Id },
     { $push: { projects: { $each: [project3Id, project4Id] } } }
   );
+
+  // Add comments
+  const insertedComments = await comments.insertMany([
+    {
+      _id: new ObjectId(),
+      userId: user1Id,
+      comment: "Damn this project sucks!",
+      projectId: project1Id,
+    },
+    {
+      _id: new ObjectId(),
+      userId: user2Id,
+      comment: "This is a really cool project!",
+      projectId: project2Id,
+    },
+  ]);
 
   console.log("Done seeding database");
   await closeConnection();

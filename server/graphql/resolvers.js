@@ -118,7 +118,9 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         return project;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     comments: async (_, __, contextValue) => {
       try {
@@ -140,9 +142,7 @@ export const resolvers = {
         }
         return commentsCache;
       } catch (e) {
-        throw new GraphQLError(`Error fetching comments: ${e.message}`, {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
-        });
+        throw e;
       }
     },
     getCommentById: async (_, args) => {
@@ -154,7 +154,9 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         return comment;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     getProjectsbyTechnology: async (_, args) => {
       try {
@@ -163,7 +165,9 @@ export const resolvers = {
           .find({ technologies: args.technology })
           .toArray();
         return projectsByTechnology;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     searchUserByName: async (_, args) => {
       try {
@@ -182,7 +186,9 @@ export const resolvers = {
           .find({ name: { $regex: pattern } })
           .toArray();
         return searchResults;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     searchProjectByName: async (_, args) => {
       try {
@@ -201,7 +207,9 @@ export const resolvers = {
           .find({ name: { $regex: pattern } })
           .toArray();
         return searchResults;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
   },
   Project: {
@@ -214,7 +222,9 @@ export const resolvers = {
         });
         console.log(creator);
         return creator;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     favoritedBy: async (parentValue) => {
       try {
@@ -223,7 +233,9 @@ export const resolvers = {
           .find({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
           .toArray();
         return favoritedby;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     comments: async (parentValue) => {
       try {
@@ -232,16 +244,21 @@ export const resolvers = {
           .find({ projectId: new ObjectId(parentValue._id) })
           .toArray();
         return projectComments;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     numOfFavorites: async (parentValue) => {
       try {
         const users = await Users();
-        const numOfFavorites = await users
-          .count({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
-          .count();
+        const numOfFavorites = await users.count({
+          favoriteProjects: { $in: [new ObjectId(parentValue._id)] },
+        });
+
         return numOfFavorites;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
   },
   User: {
@@ -275,9 +292,7 @@ export const resolvers = {
         return usersFavoriteProjects;
       } catch (e) {
         console.error(e);
-        throw new GraphQLError(`Failed to fetch favorite projects`, {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
-        });
+        throw e;
       }
     },
   },
@@ -492,14 +507,13 @@ export const resolvers = {
         }
         //Check if project is already favorited
 
-        if (
-          user.favoriteProjects &&
-          user.favoriteProjects.includes(args.projectId)
-        ) {
-          throw new GraphQLError(`Project already favorited`, {
-            extensions: { code: "BAD_USER_INPUT" },
-          });
-        }
+        user.favoriteProjects.forEach((project) => {
+          if (project.toString() === args.projectId) {
+            throw new GraphQLError(`Project already favorited`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+        });
         //check that project is not users own project
         if (project.creatorId.toString() === user._id.toString()) {
           throw new GraphQLError(`Cannot favorite own project`, {
@@ -533,9 +547,7 @@ export const resolvers = {
         return project;
       } catch (e) {
         console.error(e);
-        throw new GraphQLError(`Failed to add project to favorites`, {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
-        });
+        throw e;
       }
     },
 
@@ -708,7 +720,48 @@ export const resolvers = {
 
     deleteUser: async (_, args, contextValue) => {
       try {
-      } catch (e) {}
+        const users = await Users();
+        const userToDelete = await users.findOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!userToDelete) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const deletedUser = await users.deleteOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!deletedUser) {
+          throw new GraphQLError(`Could not delete user`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const projects = await Projects();
+        //check if user has projects
+        const userProjects = await projects
+          .find({
+            creatorId: new ObjectId(args._id),
+          })
+          .toArray();
+        if (userProjects.length > 0) {
+          userProjects.forEach(async (project) => {
+            await projects.updateMany({
+              $pull: { favoriteProjects: new ObjectId(project._id) },
+            });
+          });
+        }
+        const deletedProjects = await projects.deleteMany({
+          creatorId: new ObjectId(args._id),
+        });
+        const comments = await Comments();
+        const deletedComments = await comments.deleteMany({
+          userId: new ObjectId(args._id),
+        });
+        return userToDelete;
+      } catch (e) {
+        throw e;
+      }
     },
 
     deleteProject: async (_, args, contextValue) => {
@@ -781,12 +834,16 @@ export const resolvers = {
 
     deleteComment: async (_, args, contextValue) => {
       try {
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
 
     removeFavoritedProject: async (_, args, contextValue) => {
       try {
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
   },
 };
