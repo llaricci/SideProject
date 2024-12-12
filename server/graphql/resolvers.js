@@ -2,7 +2,49 @@ import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import { Projects, Users, Comments } from "../config/mongoCollections.js";
 import validation from "./validation.js";
+import validator from "validator";
+import bcrypt from "bcrypt";
 
+const saltRounds = 10;
+
+const Technologies = [
+  "JAVASCRIPT",
+  "PYTHON",
+  "JAVA",
+  "CSHARP",
+  "CPLUSPLUS",
+  "RUBY",
+  "PHP",
+  "TYPESCRIPT",
+  "SWIFT",
+  "KOTLIN",
+  "GO",
+  "RUST",
+  "HTML",
+  "CSS",
+  "SQL",
+  "GRAPHQL",
+  "NODE_JS",
+  "REACT",
+  "ANGULAR",
+  "VUE",
+  "NEXT_JS",
+  "SVELTE",
+  "TAILWINDCSS",
+  "BOOTSTRAP",
+  "AWS",
+  "GOOGLE_CLOUD",
+  "ORACLE_CLOUD",
+  "DOCKER",
+  "KUBERNETES",
+  "MONGODB",
+  "POSTGRESQL",
+  "REDIS",
+  "FIREBASE",
+  "GIT",
+  "GITHUB",
+  "OTHER",
+];
 export const resolvers = {
   Query: {
     users: async (_, __, contextValue) => {
@@ -210,7 +252,9 @@ export const resolvers = {
           .find({ creatorId: new ObjectId(parentValue._id) })
           .toArray();
         return usersProjects;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     favoriteProjects: async (parentValue) => {
       try {
@@ -245,7 +289,9 @@ export const resolvers = {
           _id: new ObjectId(parentValue.userId),
         });
         return commenter;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     project: async (parentValue) => {
       try {
@@ -254,29 +300,57 @@ export const resolvers = {
           _id: new ObjectId(parentValue.projectId),
         });
         return project;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
   },
   Mutation: {
     addUser: async (_, args, contextValue) => {
       try {
+        const users = await Users();
         args.firstName = validation.checkAlphabet(args.firstName, "firstName");
+        args.lastName = validation.checkAlphabet(args.lastName, "lastName");
+
+        if (validator.isEmail(args.email)) {
+          args.email = validator.normalizeEmail(args.email);
+          const emailExists = await users.findOne({ email: args.email });
+          if (emailExists) {
+            throw new GraphQLError(`Email already in use`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+        } else {
+          throw new GraphQLError(`Invalid email`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+
         if (args.bio !== null && args.bio) {
           args.bio = validation.checkString(args.bio, "bio");
         }
-
+        args.password = validation.checkString(args.password);
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const password = bcrypt.hashSync(args.password, salt);
+        args.profLanguages.forEach((element) => {
+          if (!Technologies.includes(element)) {
+            throw new GraphQLError(`Invalid Technology`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+        });
         //TODO: Input validation
 
-        const users = await Users();
         const newUser = {
           _id: new ObjectId(),
           firstName: args.firstName,
           lastName: args.lastName,
+          email: args.email,
           bio: args.bio,
-          password: args.password,
+          password: password,
           projects: [],
           favoriteProjects: [],
-          profLanguages: [],
+          profLanguages: args.profLanguages,
         };
         let insertedUser = await users.insertOne(newUser);
         if (!insertedUser.acknowledged || !insertedUser.insertedId) {
@@ -289,7 +363,9 @@ export const resolvers = {
         await client.del(`users`, "$");
         await client.json.set(`user_${newUser._id}`, "$", newUser);
         return newUser;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     addProject: async (_, args, contextValue) => {
       try {
@@ -338,7 +414,7 @@ export const resolvers = {
         await client.json.set(`project_${newProject._id}`, "$", newProject);
         return newProject;
       } catch (e) {
-        console.log(e);
+        throw e;
       }
     },
     addComment: async (_, args, contextValue) => {
@@ -391,7 +467,9 @@ export const resolvers = {
         await client.flushDb();
         await client.json.set(`comment_${newComment._id}`, "$", newComment);
         return newComment;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
 
     addFavoritedProject: async (_, args, contextValue) => {
@@ -540,7 +618,92 @@ export const resolvers = {
 
     editUser: async (_, args, contextValue) => {
       try {
-      } catch (e) {}
+        const user = await Users();
+        const userToUpdate = await user.findOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!userToUpdate) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        if (args.firstName) {
+          args.firstName = validation.checkAlphabet(
+            args.firstName,
+            "firstName"
+          );
+        }
+        if (args.lastName) {
+          args.lastName = validation.checkAlphabet(args.lastName, "lastName");
+        }
+        if (args.bio) {
+          args.bio = validation.checkString(args.bio, "bio");
+        }
+        if (args.email) {
+          if (validator.isEmail(args.email)) {
+            args.email = validator.normalizeEmail(args.email);
+          } else {
+            throw new GraphQLError(`Invalid email`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+          //check that email is not already in use
+          const emailExists = await user.findOne({ email: args.email });
+          if (emailExists) {
+            throw new GraphQLError(`Email already in use`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+        }
+        let password = userToUpdate.password;
+        if (args.password) {
+          args.password = validation.checkString(args.password);
+          const salt = bcrypt.genSaltSync(saltRounds);
+          password = bcrypt.hashSync(args.password, salt);
+          if (bcrypt.compareSync(args.password, userToUpdate.password)) {
+            throw new GraphQLError(
+              `Password cannot be the same as the current password`,
+              {
+                extensions: { code: "BAD_USER_INPUT" },
+              }
+            );
+          }
+        }
+        if (args.profLanguages) {
+          args.profLanguages.forEach((element) => {
+            if (!Technologies.includes(element)) {
+              throw new GraphQLError(`Invalid Technology`, {
+                extensions: { code: "BAD_USER_INPUT" },
+              });
+            }
+          });
+        }
+        const newUser = {
+          _id: new ObjectId(args._id),
+          firstName: args.firstName || userToUpdate.firstName,
+          lastName: args.lastName || userToUpdate.lastName,
+          email: args.email || userToUpdate.email,
+          bio: args.bio || userToUpdate.bio,
+          password: password || userToUpdate.password,
+          projects: userToUpdate.projects,
+          favoriteProjects: userToUpdate.favoriteProjects,
+          profLanguages: args.profLanguages || userToUpdate.profLanguages,
+        };
+        let updatedUser = await user.updateOne(
+          { _id: new ObjectId(args._id) },
+          { $set: newUser }
+        );
+        if (!updatedUser) {
+          throw new GraphQLError(`Could not update User`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //TODO ADD REDIS CACHE
+
+        return newUser;
+      } catch (e) {
+        throw e;
+      }
     },
 
     deleteUser: async (_, args, contextValue) => {
@@ -611,7 +774,9 @@ export const resolvers = {
         const client = contextValue.redisClient;
         await client.flushDb();
         return projectToDelete;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
 
     deleteComment: async (_, args, contextValue) => {
