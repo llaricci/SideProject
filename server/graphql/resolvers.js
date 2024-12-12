@@ -2,7 +2,49 @@ import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import { Projects, Users, Comments } from "../config/mongoCollections.js";
 import validation from "./validation.js";
+import validator from "validator";
+import bcrypt from "bcrypt";
 
+const saltRounds = 10;
+
+const Technologies = [
+  "JAVASCRIPT",
+  "PYTHON",
+  "JAVA",
+  "CSHARP",
+  "CPLUSPLUS",
+  "RUBY",
+  "PHP",
+  "TYPESCRIPT",
+  "SWIFT",
+  "KOTLIN",
+  "GO",
+  "RUST",
+  "HTML",
+  "CSS",
+  "SQL",
+  "GRAPHQL",
+  "NODE_JS",
+  "REACT",
+  "ANGULAR",
+  "VUE",
+  "NEXT_JS",
+  "SVELTE",
+  "TAILWINDCSS",
+  "BOOTSTRAP",
+  "AWS",
+  "GOOGLE_CLOUD",
+  "ORACLE_CLOUD",
+  "DOCKER",
+  "KUBERNETES",
+  "MONGODB",
+  "POSTGRESQL",
+  "REDIS",
+  "FIREBASE",
+  "GIT",
+  "GITHUB",
+  "OTHER",
+];
 export const resolvers = {
   Query: {
     users: async (_, __, contextValue) => {
@@ -67,6 +109,7 @@ export const resolvers = {
       }
     },
     getProjectById: async (_, args) => {
+      //TODO: Input validation
       try {
         const projects = await Projects();
         const project = await projects.findOne({ _id: new ObjectId(args._id) });
@@ -75,7 +118,9 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         return project;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     comments: async (_, __, contextValue) => {
       try {
@@ -97,21 +142,21 @@ export const resolvers = {
         }
         return commentsCache;
       } catch (e) {
-        throw new GraphQLError(`Error fetching comments: ${e.message}`, {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
-        });
+        throw e;
       }
     },
-    getCommentsById: async (_, args) => {
+    getCommentById: async (_, args) => {
       try {
         const comments = await Comments();
-        const comment = await comments.findOne({ _id: new ObjectId(args.id) });
+        const comment = await comments.findOne({ _id: new ObjectId(args._id) });
         if (!comment)
           throw new GraphQLError("Comment not found", {
             extensions: { code: "NOT_FOUND" },
           });
         return comment;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     getProjectsbyTechnology: async (_, args) => {
       try {
@@ -120,7 +165,9 @@ export const resolvers = {
           .find({ technologies: args.technology })
           .toArray();
         return projectsByTechnology;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     searchUserByName: async (_, args) => {
       try {
@@ -139,7 +186,9 @@ export const resolvers = {
           .find({ name: { $regex: pattern } })
           .toArray();
         return searchResults;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     searchProjectByName: async (_, args) => {
       try {
@@ -158,7 +207,9 @@ export const resolvers = {
           .find({ name: { $regex: pattern } })
           .toArray();
         return searchResults;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
   },
   Project: {
@@ -171,7 +222,9 @@ export const resolvers = {
         });
         console.log(creator);
         return creator;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     favoritedBy: async (parentValue) => {
       try {
@@ -180,7 +233,9 @@ export const resolvers = {
           .find({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
           .toArray();
         return favoritedby;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     comments: async (parentValue) => {
       try {
@@ -189,16 +244,21 @@ export const resolvers = {
           .find({ projectId: new ObjectId(parentValue._id) })
           .toArray();
         return projectComments;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     numOfFavorites: async (parentValue) => {
       try {
         const users = await Users();
-        const numOfFavorites = await users
-          .count({ favoriteProjects: { $in: [new ObjectId(parentValue._id)] } })
-          .count();
+        const numOfFavorites = await users.count({
+          favoriteProjects: { $in: [new ObjectId(parentValue._id)] },
+        });
+
         return numOfFavorites;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
   },
   User: {
@@ -209,16 +269,31 @@ export const resolvers = {
           .find({ creatorId: new ObjectId(parentValue._id) })
           .toArray();
         return usersProjects;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     favoriteProjects: async (parentValue) => {
       try {
-        const projects = await Projects();
-        const usersFavoriteProjects = await projects
-          .find({ favoritedBy: { $in: [new ObjectId(parentValue._id)] } })
+        const projectsCollection = await Projects();
+        if (
+          !parentValue.favoriteProjects ||
+          parentValue.favoriteProjects.length === 0
+        ) {
+          return [];
+        }
+        const usersFavoriteProjects = await projectsCollection
+          .find({
+            _id: {
+              $in: parentValue.favoriteProjects.map((id) => new ObjectId(id)),
+            },
+          })
           .toArray();
         return usersFavoriteProjects;
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
     },
   },
   Comment: {
@@ -229,7 +304,9 @@ export const resolvers = {
           _id: new ObjectId(parentValue.userId),
         });
         return commenter;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     project: async (parentValue) => {
       try {
@@ -238,29 +315,57 @@ export const resolvers = {
           _id: new ObjectId(parentValue.projectId),
         });
         return project;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
   },
   Mutation: {
     addUser: async (_, args, contextValue) => {
       try {
+        const users = await Users();
         args.firstName = validation.checkAlphabet(args.firstName, "firstName");
+        args.lastName = validation.checkAlphabet(args.lastName, "lastName");
+
+        if (validator.isEmail(args.email)) {
+          args.email = validator.normalizeEmail(args.email);
+          const emailExists = await users.findOne({ email: args.email });
+          if (emailExists) {
+            throw new GraphQLError(`Email already in use`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+        } else {
+          throw new GraphQLError(`Invalid email`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+
         if (args.bio !== null && args.bio) {
           args.bio = validation.checkString(args.bio, "bio");
         }
-
+        args.password = validation.checkString(args.password);
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const password = bcrypt.hashSync(args.password, salt);
+        args.profLanguages.forEach((element) => {
+          if (!Technologies.includes(element)) {
+            throw new GraphQLError(`Invalid Technology`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+        });
         //TODO: Input validation
 
-        const users = await Users();
         const newUser = {
           _id: new ObjectId(),
           firstName: args.firstName,
           lastName: args.lastName,
+          email: args.email,
           bio: args.bio,
-          password: args.password,
-          description: args.description,
-          favorites: [],
-          profLanguages: [],
+          password: password,
+          projects: [],
+          favoriteProjects: [],
+          profLanguages: args.profLanguages,
         };
         let insertedUser = await users.insertOne(newUser);
         if (!insertedUser.acknowledged || !insertedUser.insertedId) {
@@ -273,7 +378,9 @@ export const resolvers = {
         await client.del(`users`, "$");
         await client.json.set(`user_${newUser._id}`, "$", newUser);
         return newUser;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
     },
     addProject: async (_, args, contextValue) => {
       try {
@@ -291,7 +398,6 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
-
         const newProject = {
           _id: new ObjectId(),
           name: args.name,
@@ -323,15 +429,39 @@ export const resolvers = {
         await client.json.set(`project_${newProject._id}`, "$", newProject);
         return newProject;
       } catch (e) {
-        console.log(e);
+        throw e;
       }
     },
-
     addComment: async (_, args, contextValue) => {
       try {
         //TODO: Input validation
 
         const comments = await Comments();
+        //Check if user exists
+        const users = await Users();
+        const user = await users.findOne({ _id: new ObjectId(args.userId) });
+        if (!user) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //Check if project exists
+        const projects = await Projects();
+        const project = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
+        if (!project) {
+          throw new GraphQLError(`Project not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //check that project is not users own project
+        if (project.creatorId.toString() === user._id.toString()) {
+          throw new GraphQLError(`Cannot comment on own project`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+
         const newComment = {
           _id: new ObjectId(),
           userId: new ObjectId(args.userId),
@@ -339,8 +469,17 @@ export const resolvers = {
           projectId: new ObjectId(args.projectId),
         };
         let insertedComment = await comments.insertOne(newComment);
+        let updatedProject = await projects.updateOne(
+          { _id: new ObjectId(args.projectId) },
+          { $push: { comments: newComment._id } }
+        );
         if (!insertedComment) {
           throw new GraphQLError(`Could not add project`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        if (!updatedProject) {
+          throw new GraphQLError(`Could not add comment to project`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
@@ -349,7 +488,475 @@ export const resolvers = {
         await client.flushDb();
         await client.json.set(`comment_${newComment._id}`, "$", newComment);
         return newComment;
-      } catch (e) {}
+      } catch (e) {
+        throw e;
+      }
+    },
+
+    addFavoritedProject: async (_, args, contextValue) => {
+      try {
+        const users = await Users();
+        const projects = await Projects();
+        const user = await users.findOne({ _id: new ObjectId(args.userId) });
+        if (!user) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const project = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
+        if (!project) {
+          throw new GraphQLError(`Project not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //Check if project is already favorited
+
+        user.favoriteProjects.forEach((project) => {
+          if (project.toString() === args.projectId) {
+            throw new GraphQLError(`Project already favorited`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+        });
+        //check that project is not users own project
+        if (project.creatorId.toString() === user._id.toString()) {
+          throw new GraphQLError(`Cannot favorite own project`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        //Add project to user's favorites
+        let updatedUser = await users.updateOne(
+          { _id: new ObjectId(args.userId) },
+          { $push: { favoriteProjects: new ObjectId(args.projectId) } }
+        );
+        if (!updatedUser) {
+          throw new GraphQLError(`Could not add project to favorites`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //Add user to project's favoritedBy
+        let updatedProject = await projects.updateOne(
+          { _id: new ObjectId(args.projectId) },
+          { $push: { favoritedBy: new ObjectId(args.userId) } }
+        );
+        if (!updatedProject) {
+          throw new GraphQLError(
+            `Could not add user to project's favoritedBy`,
+            {
+              extensions: { code: "NOT_FOUND" },
+            }
+          );
+        }
+        // TODO : HANDLE CACHE
+        return project;
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    },
+
+    editProject: async (_, args, contextValue) => {
+      const projects = await Projects();
+      const project = await projects.findOne({ _id: new ObjectId(args._id) });
+      if (!project) {
+        throw new GraphQLError(`Project not found`, {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+      if (args.name) {
+        //Project Name between 2 - 50 characters (Not only special characters / only numbers)
+        if (
+          args.name.trim() === "" ||
+          !/^(?![\s\d\W]*$)(?![\s\W]*$)[\w\W]{2,50}$/.test(args.name)
+        ) {
+          throw new GraphQLError(
+            `Project Name must be between 2 - 50 characters (Not only special characters / only numbers)`,
+            {
+              extensions: { code: "BAD_USER_INPUT" },
+            }
+          );
+        }
+        args.name = args.name.trim();
+      }
+      if (args.technologies) {
+        //Technologies must be an array of strings
+        if (
+          !Array.isArray(args.technologies) ||
+          args.technologies.length === 0
+        ) {
+          throw new GraphQLError(`Technologies must be an array of strings`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        args.technologies = args.technologies.map((tech) => tech.trim());
+      }
+      if (args.description) {
+        //Description must be a string
+        if (
+          args.description.trim() === "" ||
+          !/^(?![\s\d\W]*$)(?![\s\W]*$)[\w\W]{1,200}$/.test(args.description)
+        ) {
+          throw new GraphQLError(
+            `Description must be between 1 - 200 characters (Not only special characters / only numbers)`,
+            {
+              extensions: { code: "BAD_USER_INPUT" },
+            }
+          );
+        }
+        args.description = args.description.trim();
+      }
+      const newProject = {
+        _id: new ObjectId(args._id),
+        name: args.name || project.name,
+        technologies: args.technologies || project.technologies,
+        description: args.description || project.description,
+        creatorId: new ObjectId(project.creatorId),
+        comments: project.comments,
+        favoritedBy: project.favoritedBy,
+        numOfFavorites: project.numOfFavorites,
+      };
+
+      const updatedProject = await projects.updateOne(
+        { _id: new ObjectId(args._id) },
+        { $set: newProject }
+      );
+      if (!updatedProject) {
+        throw new GraphQLError(`Could not update project`, {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+      //Flush and add to cache
+      const client = contextValue.redisClient;
+      await client.flushDb();
+      await client.json.set(`project_${args._id}`, "$", args);
+      return newProject;
+    },
+
+    editUser: async (_, args, contextValue) => {
+      try {
+        const user = await Users();
+        const userToUpdate = await user.findOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!userToUpdate) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        if (args.firstName) {
+          args.firstName = validation.checkAlphabet(
+            args.firstName,
+            "firstName"
+          );
+        }
+        if (args.lastName) {
+          args.lastName = validation.checkAlphabet(args.lastName, "lastName");
+        }
+        if (args.bio) {
+          args.bio = validation.checkString(args.bio, "bio");
+        }
+        if (args.email) {
+          if (validator.isEmail(args.email)) {
+            args.email = validator.normalizeEmail(args.email);
+          } else {
+            throw new GraphQLError(`Invalid email`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+          //check that email is not already in use
+          const emailExists = await user.findOne({ email: args.email });
+          if (emailExists) {
+            throw new GraphQLError(`Email already in use`, {
+              extensions: { code: "BAD_USER_INPUT" },
+            });
+          }
+        }
+        let password = userToUpdate.password;
+        if (args.password) {
+          args.password = validation.checkString(args.password);
+          const salt = bcrypt.genSaltSync(saltRounds);
+          password = bcrypt.hashSync(args.password, salt);
+          if (bcrypt.compareSync(args.password, userToUpdate.password)) {
+            throw new GraphQLError(
+              `Password cannot be the same as the current password`,
+              {
+                extensions: { code: "BAD_USER_INPUT" },
+              }
+            );
+          }
+        }
+        if (args.profLanguages) {
+          args.profLanguages.forEach((element) => {
+            if (!Technologies.includes(element)) {
+              throw new GraphQLError(`Invalid Technology`, {
+                extensions: { code: "BAD_USER_INPUT" },
+              });
+            }
+          });
+        }
+        const newUser = {
+          _id: new ObjectId(args._id),
+          firstName: args.firstName || userToUpdate.firstName,
+          lastName: args.lastName || userToUpdate.lastName,
+          email: args.email || userToUpdate.email,
+          bio: args.bio || userToUpdate.bio,
+          password: password || userToUpdate.password,
+          projects: userToUpdate.projects,
+          favoriteProjects: userToUpdate.favoriteProjects,
+          profLanguages: args.profLanguages || userToUpdate.profLanguages,
+        };
+        let updatedUser = await user.updateOne(
+          { _id: new ObjectId(args._id) },
+          { $set: newUser }
+        );
+        if (!updatedUser) {
+          throw new GraphQLError(`Could not update User`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //TODO ADD REDIS CACHE
+
+        return newUser;
+      } catch (e) {
+        throw e;
+      }
+    },
+
+    deleteUser: async (_, args, contextValue) => {
+      try {
+        const users = await Users();
+        const userToDelete = await users.findOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!userToDelete) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const deletedUser = await users.deleteOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!deletedUser) {
+          throw new GraphQLError(`Could not delete user`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const projects = await Projects();
+        //check if user has projects
+        const userProjects = await projects
+          .find({
+            creatorId: new ObjectId(args._id),
+          })
+          .toArray();
+        //remove user from list of favoritedBy in projects
+        const projectsToUpdate = await projects
+          .find({
+            favoritedBy: { $in: [new ObjectId(args._id)] },
+          })
+          .toArray();
+        projectsToUpdate.forEach(async (project) => {
+          const updatedProject = await projects.updateOne(
+            { _id: project._id },
+            { $pull: { favoritedBy: new ObjectId(args._id) } }
+          );
+        });
+
+        const deletedProjects = await projects.deleteMany({
+          creatorId: new ObjectId(args._id),
+        });
+        const comments = await Comments();
+        const commentsToDelete = await comments
+          .find({
+            userId: new ObjectId(args._id),
+          })
+          .toArray();
+        const deletedComments = await comments.deleteMany({
+          userId: new ObjectId(args._id),
+        });
+        //remove comments from projects
+        if (commentsToDelete.length > 0) {
+          for (let comment of commentsToDelete) {
+            const updatedProject = await projects.updateOne(
+              { _id: comment.projectId },
+              { $pull: { comments: comment._id } }
+            );
+          }
+        }
+        return userToDelete;
+      } catch (e) {
+        throw e;
+      }
+    },
+
+    deleteProject: async (_, args, contextValue) => {
+      try {
+        const projects = await Projects();
+        const projectToDelete = await projects.findOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!projectToDelete) {
+          throw new GraphQLError(`Project not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const deletedProject = await projects.deleteOne({
+          _id: new ObjectId(args._id),
+        });
+        //remove project from user's projects list
+        const users = await Users();
+        const user = await users.findOne({
+          _id: new ObjectId(projectToDelete.creatorId),
+        });
+        if (!user) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const updatedUser = await users.updateOne(
+          { _id: new ObjectId(user._id) },
+          { $pull: { projects: new ObjectId(projectToDelete._id) } }
+        );
+        if (!updatedUser) {
+          throw new GraphQLError(`Could not remove project from user`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //remove project from favorites list of users who favorited the project
+        const usersWhoFavorited = await users
+          .find({
+            favoriteProjects: { $in: [new ObjectId(projectToDelete._id)] },
+          })
+          .toArray();
+        for (let user of usersWhoFavorited) {
+          const updatedUser = await users.updateOne(
+            { _id: new ObjectId(user._id) },
+            { $pull: { favoriteProjects: new ObjectId(projectToDelete._id) } }
+          );
+          if (!updatedUser) {
+            throw new GraphQLError(`Could not remove project from user`, {
+              extensions: { code: "NOT_FOUND" },
+            });
+          }
+        }
+        //remove comments that have the project id
+        const comments = await Comments();
+        const deletedComments = await comments.deleteMany({
+          projectId: projectToDelete._id,
+        });
+        if (!deletedComments) {
+          throw new GraphQLError(`Could not delete comments`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const client = contextValue.redisClient;
+        await client.flushDb();
+        return projectToDelete;
+      } catch (e) {
+        throw e;
+      }
+    },
+
+    deleteComment: async (_, args, contextValue) => {
+      try {
+        const comments = await Comments();
+        const commentToDelete = await comments.findOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!commentToDelete) {
+          throw new GraphQLError(`Comment not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const deletedComment = await comments.deleteOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!deletedComment) {
+          throw new GraphQLError(`Could not delete comment`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const projects = await Projects();
+        const updatedProject = await projects.updateOne(
+          { _id: new ObjectId(commentToDelete.projectId) },
+          { $pull: { comments: new ObjectId(commentToDelete._id) } }
+        );
+        if (!updatedProject) {
+          throw new GraphQLError(`Could not remove comment from project`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //TODO : HANDLE CACHE
+
+        return commentToDelete;
+      } catch (e) {
+        throw e;
+      }
+    },
+
+    removeFavoritedProject: async (_, args, contextValue) => {
+      try {
+        const users = await Users();
+        const projects = await Projects();
+        const user = await users.findOne({ _id: new ObjectId(args.userId) });
+        if (!user) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const project = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
+        if (!project) {
+          throw new GraphQLError(`Project not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        let favoriteProjects = [];
+        user.favoriteProjects.forEach((project) => {
+          favoriteProjects.push(project.toString());
+        });
+        if (!favoriteProjects.includes(args.projectId)) {
+          throw new GraphQLError(`Project not favorited`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        //check that project is not users own project
+        if (project.creatorId.toString() === user._id.toString()) {
+          throw new GraphQLError(`Cannot Un-favorite own project`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        //Remove project from user's favorites
+        let updatedUser = await users.updateOne(
+          { _id: new ObjectId(args.userId) },
+          { $pull: { favoriteProjects: new ObjectId(args.projectId) } }
+        );
+        if (!updatedUser) {
+          throw new GraphQLError(`Could not remove project from favorites`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //Remove user from project's favoritedBy
+        let updatedProject = await projects.updateOne(
+          { _id: new ObjectId(args.projectId) },
+          { $pull: { favoritedBy: new ObjectId(args.userId) } }
+        );
+        if (!updatedProject) {
+          throw new GraphQLError(
+            `Could not remove user from project's favoritedBy`,
+            {
+              extensions: { code: "NOT_FOUND" },
+            }
+          );
+        }
+        // TODO : HANDLE CACHE
+        return project;
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
     },
   },
 };

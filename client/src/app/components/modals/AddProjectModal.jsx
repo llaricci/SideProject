@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import ReactModal from "react-modal";
 import queries from "../../queries";
 
-ReactModal.setAppElement("body");
+ReactModal.setAppElement("#__next");
 
 const customStyles = {
   content: {
@@ -24,22 +24,32 @@ const customStyles = {
 
 function AddProjectModal(props) {
   const [showAddModal, setShowAddModal] = useState(props.isOpen);
-
+  const { data, loading, error } = useQuery(queries.projects, {
+    fetchPolicy: "cache-and-network",
+  });
   const [addProject] = useMutation(queries.addProject, {
     refetchQueries: [
       {
-          query: queries.getUserById,
-          variables: { id: props.user._id }
-      }
-  ],
+        query: queries.getUserById,
+        variables: { id: props.user._id },
+      },
+    ],
     onError: (error) => {
       alert("Error adding project" + error);
       console.log(error);
     },
     onCompleted: (data) => {
-      alert("Project added successfully");
-      console.log(data);
+      console.log("Project added successfully", data);
       props.handleClose();
+    },
+    update(cache, { data: { addProject } }) {
+      const { projects } = cache.readQuery({
+        query: queries.projects,
+      });
+      cache.writeQuery({
+        query: queries.projects,
+        data: { projects: [...projects, addProject] },
+      });
     },
   });
   const handleCloseModal = () => {
