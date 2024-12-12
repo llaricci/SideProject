@@ -455,6 +455,12 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
+        //check that project is not users own project
+        if (project.creatorId.toString() === user._id.toString()) {
+          throw new GraphQLError(`Cannot comment on own project`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
 
         const newComment = {
           _id: new ObjectId(),
@@ -744,20 +750,40 @@ export const resolvers = {
             creatorId: new ObjectId(args._id),
           })
           .toArray();
-        if (userProjects.length > 0) {
-          userProjects.forEach(async (project) => {
-            await projects.updateMany({
-              $pull: { favoriteProjects: new ObjectId(project._id) },
-            });
-          });
-        }
+        //remove user from list of favoritedBy in projects
+        const projectsToUpdate = await projects
+          .find({
+            favoritedBy: { $in: [new ObjectId(args._id)] },
+          })
+          .toArray();
+        projectsToUpdate.forEach(async (project) => {
+          const updatedProject = await projects.updateOne(
+            { _id: project._id },
+            { $pull: { favoritedBy: new ObjectId(args._id) } }
+          );
+        });
+
         const deletedProjects = await projects.deleteMany({
           creatorId: new ObjectId(args._id),
         });
         const comments = await Comments();
+        const commentsToDelete = await comments
+          .find({
+            userId: new ObjectId(args._id),
+          })
+          .toArray();
         const deletedComments = await comments.deleteMany({
           userId: new ObjectId(args._id),
         });
+        //remove comments from projects
+        if (commentsToDelete.length > 0) {
+          for (let comment of commentsToDelete) {
+            const updatedProject = await projects.updateOne(
+              { _id: comment.projectId },
+              { $pull: { comments: comment._id } }
+            );
+          }
+        }
         return userToDelete;
       } catch (e) {
         throw e;
@@ -817,7 +843,7 @@ export const resolvers = {
         //remove comments that have the project id
         const comments = await Comments();
         const deletedComments = await comments.deleteMany({
-          projectId: new ObjectId(projectToDelete._id),
+          projectId: projectToDelete._id,
         });
         if (!deletedComments) {
           throw new GraphQLError(`Could not delete comments`, {
@@ -834,6 +860,36 @@ export const resolvers = {
 
     deleteComment: async (_, args, contextValue) => {
       try {
+        const comments = await Comments();
+        const commentToDelete = await comments.findOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!commentToDelete) {
+          throw new GraphQLError(`Comment not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const deletedComment = await comments.deleteOne({
+          _id: new ObjectId(args._id),
+        });
+        if (!deletedComment) {
+          throw new GraphQLError(`Could not delete comment`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const projects = await Projects();
+        const updatedProject = await projects.updateOne(
+          { _id: new ObjectId(commentToDelete.projectId) },
+          { $pull: { comments: new ObjectId(commentToDelete._id) } }
+        );
+        if (!updatedProject) {
+          throw new GraphQLError(`Could not remove comment from project`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //TODO : HANDLE CACHE
+
+        return commentToDelete;
       } catch (e) {
         throw e;
       }
@@ -841,7 +897,64 @@ export const resolvers = {
 
     removeFavoritedProject: async (_, args, contextValue) => {
       try {
+        const users = await Users();
+        const projects = await Projects();
+        const user = await users.findOne({ _id: new ObjectId(args.userId) });
+        if (!user) {
+          throw new GraphQLError(`User not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        const project = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
+        if (!project) {
+          throw new GraphQLError(`Project not found`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        let favoriteProjects = [];
+        user.favoriteProjects.forEach((project) => {
+          favoriteProjects.push(project.toString());
+        });
+        if (!favoriteProjects.includes(args.projectId)) {
+          throw new GraphQLError(`Project not favorited`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        //check that project is not users own project
+        if (project.creatorId.toString() === user._id.toString()) {
+          throw new GraphQLError(`Cannot Un-favorite own project`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
+        //Remove project from user's favorites
+        let updatedUser = await users.updateOne(
+          { _id: new ObjectId(args.userId) },
+          { $pull: { favoriteProjects: new ObjectId(args.projectId) } }
+        );
+        if (!updatedUser) {
+          throw new GraphQLError(`Could not remove project from favorites`, {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        //Remove user from project's favoritedBy
+        let updatedProject = await projects.updateOne(
+          { _id: new ObjectId(args.projectId) },
+          { $pull: { favoritedBy: new ObjectId(args.userId) } }
+        );
+        if (!updatedProject) {
+          throw new GraphQLError(
+            `Could not remove user from project's favoritedBy`,
+            {
+              extensions: { code: "NOT_FOUND" },
+            }
+          );
+        }
+        // TODO : HANDLE CACHE
+        return project;
       } catch (e) {
+        console.error(e);
         throw e;
       }
     },

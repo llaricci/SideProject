@@ -1,7 +1,7 @@
 import { dbConnection, closeConnection } from "../config/mongoConnection.js";
 import { Users, Projects, Comments } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
-import bcrypt from 'bcrypt'; // Import bcrypt for password hashing
+import bcrypt from "bcrypt"; // Import bcrypt for password hashing
 
 const main = async () => {
   const db = await dbConnection();
@@ -17,7 +17,7 @@ const main = async () => {
     lastName: "Hill",
     email: "patrickhill@gmail.com",
     bio: "User bio",
-    password: await bcrypt.hash('password', 10), // Hash the password
+    password: await bcrypt.hash("password", 10), // Hash the password
     projects: [],
     favoriteProjects: [], // Use favoriteProjects as per schema
     profLanguages: ["JAVA", "NEXT_JS"],
@@ -29,7 +29,7 @@ const main = async () => {
     lastName: "Man",
     email: "email@gmail.com",
     bio: "User bio",
-    password: await bcrypt.hash('password', 10), // Hash the password
+    password: await bcrypt.hash("password", 10), // Hash the password
     projects: [],
     favoriteProjects: [], // Use favoriteProjects as per schema
     profLanguages: ["CPLUSPLUS", "REACT"],
@@ -111,6 +111,19 @@ const main = async () => {
       projectId: project2Id,
     },
   ]);
+
+  const comment1Id = insertedComments.insertedIds[0];
+  const comment2Id = insertedComments.insertedIds[1];
+
+  // Update projects with comment IDs
+  await projects.updateOne(
+    { _id: project1Id },
+    { $push: { comments: comment1Id } }
+  );
+  await projects.updateOne(
+    { _id: project2Id },
+    { $push: { comments: comment2Id } }
+  );
 
   console.log("Done seeding database");
   await closeConnection();
