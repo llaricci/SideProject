@@ -55,19 +55,23 @@ function EditProjectModal(props) {
 
         console.log(obj);*/
 
-    projectName = projectName.trim();
+    
 
-    if (projectName.length < 2 || projectName.length > 50) {
+    if (projectName.trim().length < 2 || projectName.trim().length > 50) 
+    {
       setError("Project Name must be between 2 and 50 characters!");
       return;
     }
 
-    projectDescription = projectDescription.trim();
+    projectName = projectName.trim();
 
-    if (projectDescription.length == 0) {
+    if (projectDescription.trim().length == 0) 
+        {
       setError("Project Description must not be empty!");
       return;
     }
+
+    projectDescription = projectDescription.trim();
 
     if (selectedTechnologies.length <= 0) {
       setError("At least one technology must be checked!");
@@ -85,7 +89,7 @@ function EditProjectModal(props) {
         },
       });
 
-      console.log("Project successfully edited");
+      alert("Project successfully edited");
       setError("");
       props.handleClose();
     } catch (e) {
@@ -155,16 +159,15 @@ function EditProjectModal(props) {
             {error}
           </h3>
           <form id="editProject" onSubmit={projectSubmit} className="space-y-4">
-            <label className="block text-lg font-medium mb-1"> Name: </label>
+            <label className="text-xl font- mb-1"> Project Name: </label>
             <input
               id="name"
               defaultValue={project.name}
               className=" w-full rounded-md border-2 border-blue-500 rounded-full"
             />
 
-            <label className="block text-lg font-medium mb-1">
-              Technologies Used:
-            </label>
+            <br /> <br />
+            <label className="text-xl font- mb-1"> Technologies Used: </label>
             <div className="grid grid-cols-6 gap-1">
               {technologies.map((tech) => (
                 <div key={tech} className="mb-2">
@@ -181,12 +184,8 @@ function EditProjectModal(props) {
               ))}
             </div>
 
-            <label
-              htmlFor="description"
-              className="block text-lg font-medium mb-1"
-            >
-              Description:
-            </label>
+            <br />
+            <label className="text-xl font- mb-1"> Project Description: </label>
             <textarea
               id="description"
               defaultValue={project.description}

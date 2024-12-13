@@ -14,7 +14,7 @@ const customStyles = {
     bottom: "auto",
     marginRight: "-50%",
     transform: "translate(-50%, -50%)",
-    width: "50%",
+    width: "75%",
     border: "1px solid #28547a",
     borderRadius: "4px",
     overflow: "visible",
@@ -24,40 +24,92 @@ const customStyles = {
 
 function AddProjectModal(props) {
   const [showAddModal, setShowAddModal] = useState(props.isOpen);
-  const { data, loading, error } = useQuery(queries.projects, {
-    fetchPolicy: "cache-and-network",
-  });
-  const [addProject] = useMutation(queries.addProject, {
-    refetchQueries: [
+
+  const [error, setError] = useState(false);
+
+  const [addProject] = useMutation(queries.addProject, 
+    {
+      refetchQueries: [
+        {
+          query: queries.getUserById,
+          variables: { id: props.user._id },
+        },
+      ],
+    
+      update(cache, { data: { addProject } }) 
       {
-        query: queries.getUserById,
-        variables: { id: props.user._id },
-      },
-    ],
-    onError: (error) => {
-      alert("Error adding project" + error);
-      console.log(error);
-    },
-    onCompleted: (data) => {
-      console.log("Project added successfully", data);
-      props.handleClose();
-    },
-    update(cache, { data: { addProject } }) {
-      const { projects } = cache.readQuery({
-        query: queries.projects,
-      });
-      cache.writeQuery({
-        query: queries.projects,
-        data: { projects: [...projects, addProject] },
-      });
-    },
-  });
-  const handleCloseModal = () => {
+        const existingData = cache.readQuery(
+        {
+          query: queries.getUserById,
+          variables: { id: props.user._id },
+        });
+      
+        if (existingData?.getUserById?.projects) 
+        {
+          const { getUserById } = existingData;
+      
+          cache.writeQuery(
+          {
+            query: queries.getUserById,
+            variables: { id: props.user._id },
+            data: {
+              getUserById: 
+              {
+                ...getUserById,
+                projects: [...getUserById.projects, addProject],
+              },
+            },
+          });
+        }
+      }
+    });
+  
+
+  const handleCloseModal = () => 
+  {
     setShowAddModal(false);
     props.handleClose();
   };
-  let name, description;
-  const [technologies, setTechnologies] = useState(["JAVASCRIPT"]);
+
+
+  const [technologies, setTechnologies] = useState([
+    "JAVASCRIPT",
+    "PYTHON",
+    "JAVA",
+    "CSHARP",
+    "CPLUSPLUS",
+    "RUBY",
+    "PHP",
+    "TYPESCRIPT",
+    "SWIFT",
+    "KOTLIN",
+    "GO",
+    "RUST",
+    "HTML",
+    "CSS",
+    "SQL",
+    "GRAPHQL",
+    "NODE_JS",
+    "REACT",
+    "ANGULAR",
+    "VUE",
+    "NEXT_JS",
+    "SVELTE",
+    "TAILWINDCSS",
+    "BOOTSTRAP",
+    "AWS",
+    "GOOGLE_CLOUD",
+    "ORACLE_CLOUD",
+    "DOCKER",
+    "KUBERNETES",
+    "MONGODB",
+    "POSTGRESQL",
+    "REDIS",
+    "FIREBASE",
+    "GIT",
+    "GITHUB",
+    "OTHER",
+  ]);
   const handleChangeTechnologies = (i, technology) => {
     const newTechnology = [...technologies];
     newTechnology[i] = technology;
@@ -66,119 +118,126 @@ function AddProjectModal(props) {
   const addTechnology = () => {
     setTechnologies([...technologies, ""]);
   };
+
+  const projectSubmit = async (e) => 
+  {
+    e.preventDefault();
+
+    let projectName = document.getElementById("name").value;
+    let projectDescription = document.getElementById("description").value;
+
+    // Taken from Online
+    const formData = new FormData(e.target);
+    const selectedTechnologies = formData.getAll("technologies");
+
+    if (projectName.trim().length < 2 || projectName.trim().length > 50) 
+    {
+      setError("Project Name must be between 2 and 50 characters!");
+      return;
+    }
+
+    projectName = projectName.trim();
+
+    if (projectDescription.trim().length == 0) 
+    {
+      setError("Project Description must not be empty!");
+      return;
+    }
+
+    projectDescription = projectDescription.trim();
+
+    if (selectedTechnologies.length <= 0) {
+      setError("At least one technology must be checked!");
+      return;
+    }
+
+    try {
+      await addProject({
+        variables: {
+          name: projectName,
+          technologies: selectedTechnologies,
+          description: projectDescription,
+          creatorId: props.user._id,
+        },
+      });
+
+      alert("Project successfully edited");
+      setError("");
+      props.handleClose();
+    } catch (e) {
+      setError(e.message);
+      return;
+    }
+  };
+
+
+
   return (
-    <div>
-      <ReactModal
-        name="addModal"
-        isOpen={showAddModal}
-        contentLabel="Add Project"
-        style={customStyles}
-      >
-        <form
-          className="form"
-          id="add-project"
-          onSubmit={(e) => {
-            e.preventDefault();
-            addProject({
-              variables: {
-                name: name.value,
-                technologies: technologies,
-                description: description.value,
-                creatorId: props.user._id,
-              },
-            });
-          }}
+      <div>
+        <ReactModal
+          name="editProjectModal"
+          isOpen={props.isOpen}
+          onRequestClose={props.handleClose}
+          contentLabel="Add Project"
+          style={customStyles}
         >
-          <div className="form-group">
-            <label>
-              Project Name:
-              <br />
+          <div>
+            <h1 className="text-2xl font-bold mb-4 text-center">
+              Add Project Form
+            </h1>
+            <h3 className="text-red-500 text-xl mb-4 text-center font-bold underline ">
+              {error}
+            </h3>
+            <form onSubmit={projectSubmit} className="space-y-4">
+              <label className="text-xl font- mb-1"> Project Name: </label>
               <input
-                ref={(node) => {
-                  name = node;
-                }}
-                autoFocus={true}
-                required
+                id="name"
+                className=" w-full rounded-md border-2 border-blue-500 rounded-full"
               />
-            </label>
-          </div>
-          <div className="form-group">
-            <label>Technologies:</label>
-            {technologies.map((technology, index) => (
-              <select
-                key={index}
-                id="technology"
-                name="technology"
-                onChange={(e) =>
-                  handleChangeTechnologies(index, e.target.value)
-                }
-                required
-              >
-                <option value="JAVASCRIPT">JAVASCRIPT</option>
-                <option value="PYTHON">PYTHON</option>
-                <option value="JAVA">JAVA</option>
-                <option value="CSHARP">CSHARP</option>
-                <option value="CPLUSPLUS">CPLUSPLUS</option>
-                <option value="RUBY">RUBY</option>
-                <option value="PHP">PHP</option>
-                <option value="TYPESCRIPT">TYPESCRIPT</option>
-                <option value="SWIFT">SWIFT</option>
-                <option value="KOTLIN">KOTLIN</option>
-                <option value="GO">GO</option>
-                <option value="RUST">RUST</option>
-                <option value="HTML">HTML</option>
-                <option value="CSS">CSS</option>
-                <option value="SQL">SQL</option>
-                <option value="GRAPHQL">GRAPHQL</option>
-                <option value="NODE_JS">NODE_JS</option>
-                <option value="REACT">REACT</option>
-                <option value="ANGULAR">ANGULAR</option>
-                <option value="VUE">VUE</option>
-                <option value="NEXT_JS">NEXT_JS</option>
-                <option value="SVELTE">SVELTE</option>
-                <option value="TAILWINDCSS">TAILWINDCSS</option>
-                <option value="BOOTSTRAP">BOOTSTRAP</option>
-                <option value="AWS">AWS</option>
-                <option value="GOOGLE_CLOUD">GOOGLE_CLOUD</option>
-                <option value="ORACLE_CLOUD">ORACLE_CLOUD</option>
-                <option value="DOCKER">DOCKER</option>
-                <option value="KUBERNETES">KUBERNETES</option>
-                <option value="MONGODB">MONGODB</option>
-                <option value="POSTGRESQL">POSTGRESQL</option>
-                <option value="REDIS">REDIS</option>
-                <option value="FIREBASE">FIREBASE</option>
-                <option value="GIT">GIT</option>
-                <option value="GITHUB">GITHUB</option>
-                <option value="OTHER">OTHER</option>
-              </select>
-            ))}
-            <button type="button" onClick={addTechnology}>
-              Add Technology
-            </button>
-          </div>
-          <div className="form-group">
-            <label>
-              Description:
+  
+              <br /> <br />
+              <label className="text-xl font- mb-1"> Technologies Used: </label>
+              <div className="grid grid-cols-6 gap-1">
+                {technologies.map((tech) => (
+                  <div key={tech} className="mb-2">
+                    <input
+                      type="checkbox"
+                      id={tech.toLowerCase()}
+                      name="technologies"
+                      value={tech}
+                      className="mr-2"
+                    />
+                    <label htmlFor={tech.toLowerCase()}>{tech}</label>
+                  </div>
+                ))}
+              </div>
+  
               <br />
-              <input
-                ref={(node) => {
-                  description = node;
-                }}
-                autoFocus={true}
-                required
+              <label className="text-xl font- mb-1"> Project Description: </label>
+              <textarea
+                id="description"
+                className=" w-full rounded-md border-2 border-blue-500 rounded-full"
               />
-            </label>
+              <div className="flex justify-between items-center">
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onSubmit = {projectSubmit}
+                >
+                  Add Project
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
-          <button className="button add-button" type="submit">
-            Add Project
-          </button>
-        </form>
-        <br />
-        <button className="button cancel-button" onClick={handleCloseModal}>
-          Cancel
-        </button>
-      </ReactModal>
-    </div>
-  );
+        </ReactModal>
+      </div>
+    );
 }
 export default AddProjectModal;
