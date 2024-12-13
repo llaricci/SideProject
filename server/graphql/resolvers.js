@@ -72,17 +72,36 @@ export const resolvers = {
         });
       }
     },
-    getUserById: async (_, args) => {
+    getUserById: async (_, args, contextValue) => {
+      const client = contextValue.redisClient; 
+      const cacheKey = `user_${args._id}`; 
+    
       try {
+        // Check if the user is cached
+        const cachedUser = await client.json.get(cacheKey, "$");
+        if (cachedUser) {
+          return cachedUser; 
+        }
+        // If not cached, fetch from the database
         const users = await Users();
         const user = await users.findOne({ _id: new ObjectId(args._id) });
-        if (!user)
+        if (!user) {
           throw new GraphQLError("User not found", {
             extensions: { code: "NOT_FOUND" },
           });
+        }
+        // Cache the user in Redis
+        await client.json.set(cacheKey, "$", user);
+        await client.expire(cacheKey, 3600); 
+
         return user;
-      } catch (e) {}
+      } catch (e) {
+        throw new GraphQLError(`Error fetching user: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
     },
+    
     projects: async (_, __, contextValue) => {
       try {
         const client = contextValue.redisClient;
@@ -145,70 +164,120 @@ export const resolvers = {
         throw e;
       }
     },
-    getCommentById: async (_, args) => {
+    getCommentById: async (_, args, contextValue) => {
+      const client = contextValue.redisClient;
+      const cacheKey = `comment_${args._id}`;
+    
       try {
+        const cachedComment = await client.json.get(cacheKey, "$");
+        if (cachedComment) return cachedComment;
+    
         const comments = await Comments();
         const comment = await comments.findOne({ _id: new ObjectId(args._id) });
         if (!comment)
           throw new GraphQLError("Comment not found", {
             extensions: { code: "NOT_FOUND" },
           });
+    
+        await client.json.set(cacheKey, "$", comment);
+        await client.expire(cacheKey, 3600);
+    
         return comment;
       } catch (e) {
-        throw e;
+        throw new GraphQLError(`Error fetching comment: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
-    getProjectsbyTechnology: async (_, args) => {
+    getProjectsByTechnology: async (_, args, contextValue) => {
+      const client = contextValue.redisClient;
+      const cacheKey = `projects_technology_${args.technology}`;
+    
       try {
+        const cachedProjects = await client.json.get(cacheKey, "$");
+        if (cachedProjects) return cachedProjects;
+    
         const projects = await Projects();
         const projectsByTechnology = await projects
           .find({ technologies: args.technology })
           .toArray();
+    
+        await client.json.set(cacheKey, "$", projectsByTechnology);
+        await client.expire(cacheKey, 3600);
+    
         return projectsByTechnology;
       } catch (e) {
-        throw e;
+        throw new GraphQLError(`Error fetching projects: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
-    searchUserByName: async (_, args) => {
+    searchUserByName: async (_, args, contextValue) => {
+      const client = contextValue.redisClient;
+      const cacheKey = `search_user_${args.searchTerm.trim().toLowerCase()}`;
+    
       try {
-        if (args.searchTerm.trim() === "") {
-          throw new GraphQLError(
-            `Search Term cannot be empty string or spaces`,
-            {
-              extensions: { code: "BAD_USER_INPUT" },
-            }
-          );
-        }
+        const cachedResults = await client.json.get(cacheKey, "$");
+        if (cachedResults) return cachedResults;
+    
         const searchTerm = args.searchTerm.toLowerCase().trim();
+        const terms = searchTerm.split(" ").filter((term) => term.length > 0); // Split by spaces and remove empty parts
+    
         const users = await Users();
-        const pattern = new RegExp(searchTerm, "i");
-        const searchResults = await users
-          .find({ name: { $regex: pattern } })
-          .toArray();
+    
+        let query;
+        if (terms.length === 1) {
+          // If there's only one term, search in either firstName or lastName
+          query = {
+            $or: [
+              { firstName: { $regex: new RegExp(terms[0], "i") } },
+              { lastName: { $regex: new RegExp(terms[0], "i") } },
+            ],
+          };
+        } else {
+          // If there are multiple terms, use the first for firstName and the second for lastName
+          query = {
+            $and: [
+              { firstName: { $regex: new RegExp(terms[0], "i") } },
+              { lastName: { $regex: new RegExp(terms[1], "i") } },
+            ],
+          };
+        }
+        const searchResults = await users.find(query).toArray();
+    
+        await client.json.set(cacheKey, "$", searchResults);
+        await client.expire(cacheKey, 3600);
+    
         return searchResults;
       } catch (e) {
-        throw e;
+        throw new GraphQLError(`Error searching users: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
-    searchProjectByName: async (_, args) => {
+    searchProjectByName: async (_, args, contextValue) => {
+      const client = contextValue.redisClient;
+      const cacheKey = `search_project_${args.searchTerm.trim().toLowerCase()}`;
+    
       try {
-        if (args.searchTerm.trim() === "") {
-          throw new GraphQLError(
-            `Search Term cannot be empty string or spaces`,
-            {
-              extensions: { code: "BAD_USER_INPUT" },
-            }
-          );
-        }
+        const cachedResults = await client.json.get(cacheKey, "$");
+        if (cachedResults) return cachedResults;
+    
         const searchTerm = args.searchTerm.toLowerCase().trim();
         const projects = await Projects();
         const pattern = new RegExp(searchTerm, "i");
         const searchResults = await projects
           .find({ name: { $regex: pattern } })
           .toArray();
+    
+        await client.json.set(cacheKey, "$", searchResults);
+        await client.expire(cacheKey, 3600);
+    
         return searchResults;
       } catch (e) {
-        throw e;
+        throw new GraphQLError(`Error searching projects: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
   },
@@ -254,7 +323,6 @@ export const resolvers = {
         const numOfFavorites = await users.count({
           favoriteProjects: { $in: [new ObjectId(parentValue._id)] },
         });
-
         return numOfFavorites;
       } catch (e) {
         throw e;
@@ -340,7 +408,6 @@ export const resolvers = {
             extensions: { code: "BAD_USER_INPUT" },
           });
         }
-
         if (args.bio !== null && args.bio) {
           args.bio = validation.checkString(args.bio, "bio");
         }
@@ -461,7 +528,6 @@ export const resolvers = {
             extensions: { code: "BAD_USER_INPUT" },
           });
         }
-
         const newComment = {
           _id: new ObjectId(),
           userId: new ObjectId(args.userId),
@@ -497,66 +563,56 @@ export const resolvers = {
       try {
         const users = await Users();
         const projects = await Projects();
+        const client = contextValue.redisClient;
+    
         const user = await users.findOne({ _id: new ObjectId(args.userId) });
         if (!user) {
           throw new GraphQLError(`User not found`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const project = await projects.findOne({
-          _id: new ObjectId(args.projectId),
-        });
+        const project = await projects.findOne({ _id: new ObjectId(args.projectId) });
         if (!project) {
           throw new GraphQLError(`Project not found`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        //Check if project is already favorited
-
-        user.favoriteProjects.forEach((project) => {
-          if (project.toString() === args.projectId) {
-            throw new GraphQLError(`Project already favorited`, {
-              extensions: { code: "BAD_USER_INPUT" },
-            });
-          }
-        });
-        //check that project is not users own project
+        const favoriteProjects = user.favoriteProjects || [];
+        if (favoriteProjects.some((proj) => proj.toString() === args.projectId)) {
+          throw new GraphQLError(`Project already favorited`, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
         if (project.creatorId.toString() === user._id.toString()) {
           throw new GraphQLError(`Cannot favorite own project`, {
             extensions: { code: "BAD_USER_INPUT" },
           });
         }
-        //Add project to user's favorites
-        let updatedUser = await users.updateOne(
+        await users.updateOne(
           { _id: new ObjectId(args.userId) },
           { $push: { favoriteProjects: new ObjectId(args.projectId) } }
         );
-        if (!updatedUser) {
-          throw new GraphQLError(`Could not add project to favorites`, {
-            extensions: { code: "NOT_FOUND" },
-          });
-        }
-        //Add user to project's favoritedBy
-        let updatedProject = await projects.updateOne(
+    
+        await projects.updateOne(
           { _id: new ObjectId(args.projectId) },
           { $push: { favoritedBy: new ObjectId(args.userId) } }
         );
-        if (!updatedProject) {
-          throw new GraphQLError(
-            `Could not add user to project's favoritedBy`,
-            {
-              extensions: { code: "NOT_FOUND" },
-            }
-          );
-        }
-        // TODO : HANDLE CACHE
-        return project;
+    
+        // Update Redis cache
+        const updatedUser = await users.findOne({ _id: new ObjectId(args.userId) });
+        const updatedProject = await projects.findOne({ _id: new ObjectId(args.projectId) });
+    
+        await client.flushDb();
+        await client.json.set(`user_${args.userId}`, "$", updatedUser);
+        await client.json.set(`project_${args.projectId}`, "$", updatedProject);
+    
+        return updatedProject;
       } catch (e) {
-        console.error(e);
-        throw e;
+        throw new GraphQLError(`Error adding favorited project: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
-
     editProject: async (_, args, contextValue) => {
       const projects = await Projects();
       const project = await projects.findOne({ _id: new ObjectId(args._id) });
@@ -617,7 +673,6 @@ export const resolvers = {
         favoritedBy: project.favoritedBy,
         numOfFavorites: project.numOfFavorites,
       };
-
       const updatedProject = await projects.updateOne(
         { _id: new ObjectId(args._id) },
         { $set: newProject }
@@ -633,11 +688,13 @@ export const resolvers = {
       await client.json.set(`project_${args._id}`, "$", args);
       return newProject;
     },
-
     editUser: async (_, args, contextValue) => {
       try {
-        const user = await Users();
-        const userToUpdate = await user.findOne({
+        const userCollection = await Users();
+        const client = contextValue.redisClient;
+        const cacheKey = `user_${args._id}`;
+    
+        const userToUpdate = await userCollection.findOne({
           _id: new ObjectId(args._id),
         });
         if (!userToUpdate) {
@@ -646,14 +703,13 @@ export const resolvers = {
           });
         }
         if (args.firstName) {
-          args.firstName = validation.checkAlphabet(
-            args.firstName,
-            "firstName"
-          );
+          args.firstName = validation.checkAlphabet(args.firstName, "firstName");
         }
+    
         if (args.lastName) {
           args.lastName = validation.checkAlphabet(args.lastName, "lastName");
         }
+    
         if (args.bio) {
           args.bio = validation.checkString(args.bio, "bio");
         }
@@ -665,8 +721,7 @@ export const resolvers = {
               extensions: { code: "BAD_USER_INPUT" },
             });
           }
-          //check that email is not already in use
-          const emailExists = await user.findOne({ email: args.email });
+          const emailExists = await userCollection.findOne({ email: args.email });
           if (emailExists) {
             throw new GraphQLError(`Email already in use`, {
               extensions: { code: "BAD_USER_INPUT" },
@@ -675,7 +730,7 @@ export const resolvers = {
         }
         let password = userToUpdate.password;
         if (args.password) {
-          args.password = validation.checkString(args.password);
+          args.password = validation.checkString(args.password, "password");
           const salt = bcrypt.genSaltSync(saltRounds);
           password = bcrypt.hashSync(args.password, salt);
           if (bcrypt.compareSync(args.password, userToUpdate.password)) {
@@ -707,7 +762,7 @@ export const resolvers = {
           favoriteProjects: userToUpdate.favoriteProjects,
           profLanguages: args.profLanguages || userToUpdate.profLanguages,
         };
-        let updatedUser = await user.updateOne(
+        const updatedUser = await userCollection.updateOne(
           { _id: new ObjectId(args._id) },
           { $set: newUser }
         );
@@ -716,151 +771,113 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        //TODO ADD REDIS CACHE
-
+        // Update Redis cache
+        await client.json.set(cacheKey, "$", newUser);
+        await client.expire(cacheKey, 3600);
+    
         return newUser;
       } catch (e) {
-        throw e;
+        throw new GraphQLError(`Error updating user: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
-
     deleteUser: async (_, args, contextValue) => {
       try {
         const users = await Users();
-        const userToDelete = await users.findOne({
-          _id: new ObjectId(args._id),
-        });
+        const projects = await Projects();
+        const comments = await Comments();
+        const client = contextValue.redisClient;
+    
+        const userToDelete = await users.findOne({ _id: new ObjectId(args._id) });
         if (!userToDelete) {
           throw new GraphQLError(`User not found`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const deletedUser = await users.deleteOne({
-          _id: new ObjectId(args._id),
-        });
+        const deletedUser = await users.deleteOne({ _id: new ObjectId(args._id) });
         if (!deletedUser) {
           throw new GraphQLError(`Could not delete user`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const projects = await Projects();
-        //check if user has projects
-        const userProjects = await projects
-          .find({
-            creatorId: new ObjectId(args._id),
-          })
-          .toArray();
-        //remove user from list of favoritedBy in projects
-        const projectsToUpdate = await projects
-          .find({
-            favoritedBy: { $in: [new ObjectId(args._id)] },
-          })
-          .toArray();
-        projectsToUpdate.forEach(async (project) => {
-          const updatedProject = await projects.updateOne(
+        const userProjects = await projects.find({ creatorId: new ObjectId(args._id) }).toArray();
+        const projectsToUpdate = await projects.find({
+          favoritedBy: { $in: [new ObjectId(args._id)] },
+        }).toArray();
+
+        // Remove user from favoritedBy in projects
+        for (const project of projectsToUpdate) {
+          await projects.updateOne(
             { _id: project._id },
             { $pull: { favoritedBy: new ObjectId(args._id) } }
           );
-        });
-
-        const deletedProjects = await projects.deleteMany({
-          creatorId: new ObjectId(args._id),
-        });
-        const comments = await Comments();
-        const commentsToDelete = await comments
-          .find({
-            userId: new ObjectId(args._id),
-          })
-          .toArray();
-        const deletedComments = await comments.deleteMany({
-          userId: new ObjectId(args._id),
-        });
-        //remove comments from projects
-        if (commentsToDelete.length > 0) {
-          for (let comment of commentsToDelete) {
-            const updatedProject = await projects.updateOne(
-              { _id: comment.projectId },
-              { $pull: { comments: comment._id } }
-            );
-          }
         }
+        await projects.deleteMany({ creatorId: new ObjectId(args._id) });
+        const commentsToDelete = await comments.find({ userId: new ObjectId(args._id) }).toArray();
+        await comments.deleteMany({ userId: new ObjectId(args._id) });
+        // Remove comments from projects
+        for (const comment of commentsToDelete) {
+          await projects.updateOne(
+            { _id: comment.projectId },
+            { $pull: { comments: comment._id } }
+          );
+        }
+        await client.flushDb();
         return userToDelete;
       } catch (e) {
-        throw e;
+        throw new GraphQLError(`Error deleting user: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
-
     deleteProject: async (_, args, contextValue) => {
       try {
         const projects = await Projects();
-        const projectToDelete = await projects.findOne({
-          _id: new ObjectId(args._id),
-        });
+        const users = await Users();
+        const comments = await Comments();
+        const client = contextValue.redisClient;
+        const projectToDelete = await projects.findOne({ _id: new ObjectId(args._id) });
         if (!projectToDelete) {
           throw new GraphQLError(`Project not found`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const deletedProject = await projects.deleteOne({
-          _id: new ObjectId(args._id),
-        });
-        //remove project from user's projects list
-        const users = await Users();
-        const user = await users.findOne({
-          _id: new ObjectId(projectToDelete.creatorId),
-        });
-        if (!user) {
-          throw new GraphQLError(`User not found`, {
+        // Delete the project
+        const deletedProject = await projects.deleteOne({ _id: new ObjectId(args._id) });
+        if (!deletedProject) {
+          throw new GraphQLError(`Could not delete project`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const updatedUser = await users.updateOne(
-          { _id: new ObjectId(user._id) },
+        // Remove project from creator's project list
+        await users.updateOne(
+          { _id: new ObjectId(projectToDelete.creatorId) },
           { $pull: { projects: new ObjectId(projectToDelete._id) } }
         );
-        if (!updatedUser) {
-          throw new GraphQLError(`Could not remove project from user`, {
-            extensions: { code: "NOT_FOUND" },
-          });
-        }
-        //remove project from favorites list of users who favorited the project
-        const usersWhoFavorited = await users
-          .find({
-            favoriteProjects: { $in: [new ObjectId(projectToDelete._id)] },
-          })
-          .toArray();
-        for (let user of usersWhoFavorited) {
-          const updatedUser = await users.updateOne(
-            { _id: new ObjectId(user._id) },
-            { $pull: { favoriteProjects: new ObjectId(projectToDelete._id) } }
-          );
-          if (!updatedUser) {
-            throw new GraphQLError(`Could not remove project from user`, {
-              extensions: { code: "NOT_FOUND" },
-            });
-          }
-        }
-        //remove comments that have the project id
-        const comments = await Comments();
-        const deletedComments = await comments.deleteMany({
-          projectId: projectToDelete._id,
-        });
-        if (!deletedComments) {
-          throw new GraphQLError(`Could not delete comments`, {
-            extensions: { code: "NOT_FOUND" },
-          });
-        }
-        const client = contextValue.redisClient;
-        await client.flushDb();
+        // Remove project from favoriteProjects of users who favorited it
+        await users.updateMany(
+          { favoriteProjects: { $in: [new ObjectId(projectToDelete._id)] } },
+          { $pull: { favoriteProjects: new ObjectId(projectToDelete._id) } }
+        );
+        // Delete all comments associated with the project
+        await comments.deleteMany({ projectId: new ObjectId(projectToDelete._id) });
+        // Clear Redis cache
+        await client.del(`project_${args._id}`);
+        await client.json.del(`user_${projectToDelete.creatorId}`, "$");
+
         return projectToDelete;
       } catch (e) {
-        throw e;
+        throw new GraphQLError(`Error deleting project: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
-
     deleteComment: async (_, args, contextValue) => {
       try {
         const comments = await Comments();
+        const projects = await Projects();
+        const client = contextValue.redisClient;
         const commentToDelete = await comments.findOne({
           _id: new ObjectId(args._id),
         });
@@ -877,7 +894,6 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const projects = await Projects();
         const updatedProject = await projects.updateOne(
           { _id: new ObjectId(commentToDelete.projectId) },
           { $pull: { comments: new ObjectId(commentToDelete._id) } }
@@ -887,75 +903,68 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        //TODO : HANDLE CACHE
-
+        // Handle Redis cache
+        await client.json.del(`project_${commentToDelete.projectId}`, "$");
+        await client.json.del(`comment_${args._id}`, "$");
+    
         return commentToDelete;
       } catch (e) {
-        throw e;
+        throw new GraphQLError(`Error deleting comment: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
-
     removeFavoritedProject: async (_, args, contextValue) => {
       try {
         const users = await Users();
         const projects = await Projects();
+        const client = contextValue.redisClient;
+    
         const user = await users.findOne({ _id: new ObjectId(args.userId) });
         if (!user) {
           throw new GraphQLError(`User not found`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const project = await projects.findOne({
-          _id: new ObjectId(args.projectId),
-        });
+        const project = await projects.findOne({ _id: new ObjectId(args.projectId) });
         if (!project) {
           throw new GraphQLError(`Project not found`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        let favoriteProjects = [];
-        user.favoriteProjects.forEach((project) => {
-          favoriteProjects.push(project.toString());
-        });
-        if (!favoriteProjects.includes(args.projectId)) {
+        const favoriteProjects = user.favoriteProjects || [];
+        if (!favoriteProjects.some((proj) => proj.toString() === args.projectId)) {
           throw new GraphQLError(`Project not favorited`, {
             extensions: { code: "BAD_USER_INPUT" },
           });
         }
-        //check that project is not users own project
         if (project.creatorId.toString() === user._id.toString()) {
-          throw new GraphQLError(`Cannot Un-favorite own project`, {
+          throw new GraphQLError(`Cannot un-favorite own project`, {
             extensions: { code: "BAD_USER_INPUT" },
           });
         }
-        //Remove project from user's favorites
-        let updatedUser = await users.updateOne(
+        // Remove project from user's favorites
+        await users.updateOne(
           { _id: new ObjectId(args.userId) },
           { $pull: { favoriteProjects: new ObjectId(args.projectId) } }
         );
-        if (!updatedUser) {
-          throw new GraphQLError(`Could not remove project from favorites`, {
-            extensions: { code: "NOT_FOUND" },
-          });
-        }
-        //Remove user from project's favoritedBy
-        let updatedProject = await projects.updateOne(
+        // Remove user from project's favoritedBy
+        await projects.updateOne(
           { _id: new ObjectId(args.projectId) },
           { $pull: { favoritedBy: new ObjectId(args.userId) } }
         );
-        if (!updatedProject) {
-          throw new GraphQLError(
-            `Could not remove user from project's favoritedBy`,
-            {
-              extensions: { code: "NOT_FOUND" },
-            }
-          );
-        }
-        // TODO : HANDLE CACHE
-        return project;
+        // Update Redis cache
+        const updatedUser = await users.findOne({ _id: new ObjectId(args.userId) });
+        const updatedProject = await projects.findOne({ _id: new ObjectId(args.projectId) });
+        await client.flushDb();
+        await client.json.set(`user_${args.userId}`, "$", updatedUser);
+        await client.json.set(`project_${args.projectId}`, "$", updatedProject);
+    
+        return updatedProject;
       } catch (e) {
-        console.error(e);
-        throw e;
+        throw new GraphQLError(`Error removing favorited project: ${e.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
   },

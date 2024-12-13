@@ -6,7 +6,7 @@ export const typeDefs = `#graphql
         getUserById(_id: String!): User
         comments: [Comment]
         getCommentById(_id: String!): Comment
-        getProjectsbyTechnology(technology: Technology!): [Project]
+        getProjectsByTechnology(technology: Technology!): [Project]
         searchUserByName(searchTerm: String!): [User]
         searchProjectByName(searchTerm: String!): [Project]
     }
@@ -125,10 +125,10 @@ export const typeDefs = `#graphql
 
         editProject(
             _id: String!
-            name: String! 
-            technologies: [Technology!]!
-            description: String!
-            creatorId: String! 
+            name: String 
+            technologies: [Technology!]
+            description: String
+            creatorId: String 
         ): Project
 
         deleteUser(
