@@ -44,36 +44,30 @@ function DeleteProjectModal(props) {
       });
     },
   });
-  const handleCloseDeleteModal = () => 
-  {
+  const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     props.handleClose();
   };
 
-  const projectSubmit = async(e) =>
-  {
-      e.preventDefault();
+  const projectSubmit = async (e) => {
+    //e.preventDefault();
 
-      try
-      {
-        deleteProject({
-          variables: {
-            _id: project._id,
-          },
-        });
+    try {
+      await deleteProject({
+        variables: {
+          id: project._id,
+        },
+      });
 
-        alert("Project successfully deleted");
+      // alert("Project successfully deleted");
 
-        setError('');
-        props.handleClose();
-      }
-
-      catch(e)
-      {
-        setError(e.message);
-        return;
-      }
-  }
+      setError("");
+      props.handleClose();
+    } catch (e) {
+      setError(e.message);
+      return;
+    }
+  };
 
   return (
     <div>
@@ -85,31 +79,31 @@ function DeleteProjectModal(props) {
       >
         <br />
         <h1 className="text-2xl font-bold mb-4 text-center">
-            Delete Project Form
-          </h1>
+          Delete Project Form
+        </h1>
         <h3 className="text-red-500 text-xl mb-4 text-center font-bold underline ">
-            {error}
-          </h3>
+          {error}
+        </h3>
         <label className="block text-2xl font-medium mb-1">
-              Are you sure you want to delete project: {project.name}?
+          Are you sure you want to delete project: {project.name}?
         </label>
         <br />
         <div className="flex justify-between items-center">
-              <button
-                type="submit"
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onSubmit= {projectSubmit}>
-                Delete Project
-              </button>
-              <button
-                type="button"
-                onClick={handleCloseDeleteModal}
-                className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              >
-                Cancel
-              </button>
-            </div>
-  
+          <button
+            type="submit"
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onClick={projectSubmit}
+          >
+            Delete Project
+          </button>
+          <button
+            type="button"
+            onClick={handleCloseDeleteModal}
+            className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            Cancel
+          </button>
+        </div>
       </ReactModal>
     </div>
   );
