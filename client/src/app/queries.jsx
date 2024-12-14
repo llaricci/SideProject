@@ -30,12 +30,23 @@ const GetProjectById = gql`
       description
       creator {
         _id
+        firstName
+        lastName
       }
       comments {
         _id
+        user
+        {
+          firstName
+          lastName
+          email
+        }
       }
       favoritedBy {
         _id
+        firstName
+        lastName
+        email
       }
       numOfFavorites
     }

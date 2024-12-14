@@ -21,6 +21,7 @@ function Project({project})
     
     const markdownContent = `
     # ${project.name}
+    by: ${project.creator.firstName} ${project.creator.lastName}
     ---
     ## Technologies Used
     - ${project.technologies
