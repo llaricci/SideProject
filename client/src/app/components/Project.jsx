@@ -6,23 +6,41 @@ import Comment from "../components/Comment";
 import queries from "../queries";
 import { useQuery } from "@apollo/client";
 
-let comment = {
-  user: {
-    _id: "testuser",
-    firstName: "Fuecoco",
-    lastName: "FireCroc",
-    email: "fuecoco@example.com",
-  },
-  comment: "Nice project! Great use of GraphQL and TailwindCSS!",
-};
 
-function Project({ project }) {
-  const markdownContent = `
-    # ${project.name}
-    by: ${project.creator.firstName} ${project.creator.lastName}
-    ---
-    ## Technologies Used
-    - ${project.technologies.map((technology) => `${technology}`).join(", ")}
+function Project({ project }) 
+{
+  
+    let projectTechnologies = 
+        project.technologies
+            ? `${project.technologies.join(", ")}`
+            : "No technologies listed.";
+
+    let projectFavorites = 
+        project.favorites && project.favorites.length > 0
+        ? project.favorites
+            .map(
+            (user) => `- ${user.firstName} ${user.lastName} (${user.email})`
+            )
+            .join("\n")
+        : "No users"
+
+
+
+    let comments = " ";
+
+    if (project.comments && project.comments.length === 0) 
+            comments = "No comments yet.";
+  
+  
+    const markdownContent = `
+
+# ${project.name}
+by: ${project.creator.firstName} ${project.creator.lastName}
+
+---
+
+## Technologies Used
+- ${projectTechnologies}
 
     ---
 
@@ -37,35 +55,29 @@ function Project({ project }) {
     ---  
 
     ## Favorited By
-    ${
-      project.favorites && project.favorites.length > 0
-        ? project.favorites
-            .map(
-              (user) => `- ${user.firstName} ${user.lastName} (${user.email})`
-            )
-            .join("\n")
-        : "No users"
-    }
+    - ${projectFavorites}
+
     ---
     ## Comments
+    - ${comments}
 
     `;
 
   return (
     <div
-      className="justify-items-center"
+      className="justify-items-center bg-white text-white"
       style={{
         padding: "20px",
         fontFamily: "Arial, sans-serif",
         lineHeight: "1.6",
       }}
     >
-      <div className="w-1/2">
+      <div className="w-1/2 bg-gray-300 shadow-2xl text-black rounded-xl shadow-black/50">
         <ReactMarkdown className="markdown-content prose lg:prose-lg">
           {markdownContent}
         </ReactMarkdown>
         <style>
-          {` h1 { font-size: 2.5rem; font-weight: bold; }
+          {`        h1 { font-size: 2.5rem; font-weight: bold; }
                     h2 { font-size: 2rem; font-weight: bold; }
                     h3 { font-size: 1.75rem; font-weight: bold; }
                     p { font-size: 1rem; }
@@ -76,6 +88,7 @@ function Project({ project }) {
             project.comments.map((comment) => (
               <Comment key={comment._id} comment={comment} />
             ))}
+
         </div>
       </div>
     </div>

@@ -34,9 +34,8 @@ export default function ProjectPage()
     else if (data) 
     {
         let project = data.getProjectById;
-        //let comments = project.comments;
-        
-        
+    
+            
         
         return (
             <div>

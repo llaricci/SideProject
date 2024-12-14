@@ -1,7 +1,21 @@
+import Image from "next/image";
+import logo from './logo.png';
+
 export default function Landing() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+
+        <Image
+          src = {logo}
+          width={100}
+          height={100}
+          alt="Project Logo"
+        />
+
+      <br />
+
       <section className="text-center">
+
         <h1 className="text-4xl font-bold text-gray-800 mb-4">
           Welcome to SideProject
         </h1>
