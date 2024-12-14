@@ -93,7 +93,12 @@ const users = gql`
       password
       projects {
         _id
-        creatorId
+        creator {
+          _id
+          firstName
+          lastName
+          email
+        }
       }
       favoriteProjects {
         _id
