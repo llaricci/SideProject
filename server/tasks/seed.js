@@ -110,7 +110,9 @@ const main = async () => {
   const commentList = [];
   for (let i = 0; i < 30; i++) {
     const userIndex = i % 25; // Cycle through users for comments
-    const projectIndex = i % 50; // Cycle through projects for comments
+    //const projectIndex = i % 50; // Cycle through projects for comments
+    const projectIndex = 49 - (i % 50);
+    
     commentList.push({
       _id: new ObjectId(),
       userId: userIds[userIndex],
