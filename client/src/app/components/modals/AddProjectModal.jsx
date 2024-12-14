@@ -161,7 +161,7 @@ function AddProjectModal(props) {
         },
       });
 
-      alert("Project successfully edited");
+      //alert("Project successfully edited");
       setError("");
       props.handleClose();
     } catch (e) {
