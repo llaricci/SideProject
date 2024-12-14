@@ -1,6 +1,6 @@
-export default function Home() {
+export default function Landing() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
       <section className="text-center">
         <h1 className="text-4xl font-bold text-gray-800 mb-4">
           Welcome to SideProject
@@ -23,6 +23,6 @@ export default function Home() {
           </a>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -30,14 +30,24 @@ function Header() {
             </Typography>
 
             <Button color="inherit">
-              <p className="text-[16px] font-bold text-gray-800">View Favorites</p>
+              <p className="text-[16px] font-bold text-gray-800">
+                View Favorites
+              </p>
             </Button>
             <br />
             <Button color="inherit">
-              <Link href="/users/testuser"><p className="text-[16px] font-bold text-gray-800">View Test Profile</p></Link>
+              <Link href="/users">
+                <p className="text-[16px] font-bold text-gray-800">
+                  View Users
+                </p>
+              </Link>
             </Button>
             <Button color="inherit">
-              <Link href="/projects/testproject"><p className="text-[16px] font-bold text-gray-800">View Test Project</p></Link>
+              <Link href="/projects/testproject">
+                <p className="text-[16px] font-bold text-gray-800">
+                  View Test Project
+                </p>
+              </Link>
             </Button>
           </Toolbar>
         </AppBar>
