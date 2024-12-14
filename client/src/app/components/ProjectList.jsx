@@ -78,7 +78,7 @@ function ProjectList(props) {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button size="large">View Details</Button>
+              <Button size="large" href = {`/projects/${project._id}`}>View Details</Button>
             </CardActions>
             <CardActions>
               <Button

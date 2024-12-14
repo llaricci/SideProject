@@ -3,33 +3,6 @@ import ReactMarkdown from 'react-markdown';
 
 import Comment from '../components/Comment';
 
-const markdownContent = `
-# Roommate Roulette 
----
-## Technologies Used
-- HTML, CSS, Javascript
-
----
-
-## Description
-- Roommate Roulette is a web-application designed to help students find roommate groups with others living in the same area.
-
----
-
-## Number of Favorites
-- 2
-
----  
-
-## Favorited By
-- Reshiram Dragon (reshiram@example.com)
-- Zekrom Dragon (zekrom@example.com)
-
----
-## Comments
-
-`;
-
 let comment =
 {
     user:{
@@ -42,12 +15,52 @@ let comment =
 
 }
 
-function Project() {
+function Project({project}) 
+{
+    
+    
+    const markdownContent = `
+    # ${project.name}
+    ---
+    ## Technologies Used
+    - ${project.technologies
+        .map((technology) => `${technology}`)
+        .join(', ')}
+
+    ---
+
+    ## Description
+    - ${project.description}
+
+    ---
+
+    ## Number of Favorites
+    - ${project.numOfFavorites}
+
+    ---  
+
+    ## Favorited By
+    ${
+    project.favorites && project.favorites.length > 0
+        ? project.favorites
+            .map((user) => `- ${user.firstName} ${user.lastName} (${user.email})`)
+            .join('\n')
+        : "No users"
+    }
+    ---
+    ## Comments
+
+    `;
+
+
+
     return (
         <div className = "justify-items-center"
             style={{ padding: '20px', fontFamily: 'Arial, sans-serif', lineHeight: '1.6'}}>
             <div className="w-1/2">
-                <ReactMarkdown>{markdownContent}</ReactMarkdown>
+                <ReactMarkdown className="markdown-content prose lg:prose-lg">
+                    {markdownContent}
+                </ReactMarkdown>
                 <style>
                     {` h1 { font-size: 2.5rem; font-weight: bold; }
                     h2 { font-size: 2rem; font-weight: bold; }
