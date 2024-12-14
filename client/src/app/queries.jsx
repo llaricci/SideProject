@@ -9,12 +9,24 @@ const projects = gql`
       description
       creator {
         _id
+        firstName
+        lastName
       }
       comments {
         _id
+        user {
+          _id
+          firstName
+          lastName
+          email
+        }
+        comment
       }
       favoritedBy {
         _id
+        firstName
+        lastName
+        email
       }
       numOfFavorites
     }
@@ -35,12 +47,13 @@ const GetProjectById = gql`
       }
       comments {
         _id
-        user
-        {
+        user {
+          _id
           firstName
           lastName
           email
         }
+        comment
       }
       favoritedBy {
         _id
@@ -131,6 +144,15 @@ const getUserById = gql`
       projects {
         _id
         name
+        comments {
+          _id
+          user {
+            _id
+            firstName
+            lastName
+          }
+          comment
+        }
         technologies
         description
       }

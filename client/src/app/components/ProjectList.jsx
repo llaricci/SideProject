@@ -9,9 +9,13 @@ import Typography from "@mui/material/Typography";
 
 import EditProjectModal from "./modals/EditProjectModal";
 import DeleteProjectModal from "./modals/DeleteProjectModal";
+import { useQuery } from "@apollo/client";
+import queries from "../queries";
+import { comment } from "postcss";
 
 function ProjectList(props) {
   const projectList = props.projectList;
+
   const [editForm, showEditForm] = useState(false);
   const [editProject, setEditProject] = useState(null);
 
@@ -69,16 +73,25 @@ function ProjectList(props) {
                       .join(", ")
                   : "No one yet"}
               </Typography>
-
+              <p className="font-bold">Comments: </p>
               <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
-                Comments:{" "}
                 {project.comments && project.comments.length > 0
-                  ? project.comments.map((comment) => comment.user).join(", ")
+                  ? project.comments
+                      .map(
+                        (comment) =>
+                          comment.user.firstName +
+                          ": " +
+                          comment.comment.slice(0, 10) +
+                          "..."
+                      )
+                      .join(", ") + "\n"
                   : "No comments yet"}
               </Typography>
             </CardContent>
             <CardActions>
-              <Button size="large" href = {`/projects/${project._id}`}>View Details</Button>
+              <Button size="large" href={`/projects/${project._id}`}>
+                View Details
+              </Button>
             </CardActions>
             <CardActions>
               <Button

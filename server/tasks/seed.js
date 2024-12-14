@@ -11,119 +11,125 @@ const main = async () => {
   const projects = await Projects();
   const comments = await Comments();
 
-  const user1 = {
-    _id: new ObjectId(),
-    firstName: "Patrick",
-    lastName: "Hill",
-    email: "patrickhill@gmail.com",
-    bio: "User bio",
-    password: await bcrypt.hash("password", 10), // Hash the password
-    projects: [],
-    favoriteProjects: [], // Use favoriteProjects as per schema
-    profLanguages: ["JAVA", "NEXT_JS"],
-  };
+  // Predefined list of programming languages
+  const languages = [
+    "JAVASCRIPT",
+    "PYTHON",
+    "JAVA",
+    "CSHARP",
+    "CPLUSPLUS",
+    "RUBY",
+    "PHP",
+    "TYPESCRIPT",
+    "SWIFT",
+    "KOTLIN",
+    "GO",
+    "RUST",
+    "HTML",
+    "CSS",
+    "SQL",
+    "GRAPHQL",
+    "NODE_JS",
+    "REACT",
+    "ANGULAR",
+    "VUE",
+    "NEXT_JS",
+    "SVELTE",
+    "TAILWINDCSS",
+    "BOOTSTRAP",
+    "AWS",
+    "GOOGLE_CLOUD",
+    "ORACLE_CLOUD",
+    "DOCKER",
+    "KUBERNETES",
+    "MONGODB",
+    "POSTGRESQL",
+    "REDIS",
+    "FIREBASE",
+    "GIT",
+    "GITHUB",
+    "OTHER",
+  ];
 
-  const user2 = {
-    _id: new ObjectId(),
-    firstName: "Pink",
-    lastName: "Man",
-    email: "email@gmail.com",
-    bio: "User bio",
-    password: await bcrypt.hash("password", 10), // Hash the password
-    projects: [],
-    favoriteProjects: [], // Use favoriteProjects as per schema
-    profLanguages: ["CPLUSPLUS", "REACT"],
-  };
-
-  const insertedUsers = await users.insertMany([user1, user2]);
-  const user1Id = user1._id;
-  const user2Id = user2._id;
-
-  let insertedProjects = await projects.insertMany([
-    {
+  // Create 25 users
+  const userList = [];
+  for (let i = 0; i < 25; i++) {
+    const selectedLanguages = [
+      languages[i % languages.length],
+      languages[(i + 5) % languages.length],
+    ];
+    userList.push({
       _id: new ObjectId(),
-      name: "First Project",
-      technologies: ["JAVA", "NEXT_JS"],
-      description: "A cool project using modern technologies",
-      creatorId: user1Id,
+      firstName: `User${i + 1}`,
+      lastName: `LastName${i + 1}`,
+      email: `user${i + 1}@example.com`,
+      bio: `Bio for User${i + 1}`,
+      password: await bcrypt.hash("password", 10),
+      projects: [],
+      favoriteProjects: [],
+      profLanguages: selectedLanguages,
+    });
+  }
+
+  const insertedUsers = await users.insertMany(userList);
+  const userIds = Object.values(insertedUsers.insertedIds);
+
+  // Create 50 projects
+  const projectList = [];
+  for (let i = 0; i < 50; i++) {
+    const creatorIndex = i % 25; // Distribute projects across users
+    const projectTechnologies = [
+      languages[i % languages.length],
+      languages[(i + 3) % languages.length],
+    ];
+    projectList.push({
+      _id: new ObjectId(),
+      name: `Project ${i + 1}`,
+      technologies: projectTechnologies,
+      description: `Description for Project ${i + 1}`,
+      creatorId: userIds[creatorIndex],
       comments: [],
       favoritedBy: [],
-      numOfFavorites: 0, // Include numOfFavorites
-    },
-    {
-      _id: new ObjectId(),
-      name: "Second Project",
-      technologies: ["CPLUSPLUS", "REACT"],
-      description: "An innovative project for frontend and backend",
-      creatorId: user1Id,
-      comments: [],
-      favoritedBy: [],
-      numOfFavorites: 0, // Include numOfFavorites
-    },
-    {
-      _id: new ObjectId(),
-      name: "Third Project",
-      technologies: ["CPLUSPLUS", "REACT"],
-      description: "An innovative project for frontend and backend",
-      creatorId: user2Id,
-      comments: [],
-      favoritedBy: [],
-      numOfFavorites: 0, // Include numOfFavorites
-    },
-    {
-      _id: new ObjectId(),
-      name: "Fourth Project",
-      technologies: ["CPLUSPLUS", "REACT"],
-      description: "An innovative project for frontend and backend",
-      creatorId: user2Id,
-      comments: [],
-      favoritedBy: [],
-      numOfFavorites: 0, // Include numOfFavorites
-    },
-  ]);
+      numOfFavorites: 0,
+    });
+  }
 
-  const project1Id = insertedProjects.insertedIds[0];
-  const project2Id = insertedProjects.insertedIds[1];
-  const project3Id = insertedProjects.insertedIds[2];
-  const project4Id = insertedProjects.insertedIds[3];
+  const insertedProjects = await projects.insertMany(projectList);
+  const projectIds = Object.values(insertedProjects.insertedIds);
 
-  await users.updateMany(
-    { _id: user1Id },
-    { $push: { projects: { $each: [project1Id, project2Id] } } }
-  );
-  await users.updateMany(
-    { _id: user2Id },
-    { $push: { projects: { $each: [project3Id, project4Id] } } }
-  );
+  // Update users with their created projects
+  for (let i = 0; i < 50; i++) {
+    const creatorIndex = i % 25;
+    await users.updateOne(
+      { _id: userIds[creatorIndex] },
+      { $push: { projects: projectIds[i] } }
+    );
+  }
 
-  // Add comments
-  const insertedComments = await comments.insertMany([
-    {
+  // Create 30 comments
+  const commentList = [];
+  for (let i = 0; i < 30; i++) {
+    const userIndex = i % 25; // Cycle through users for comments
+    const projectIndex = i % 50; // Cycle through projects for comments
+    commentList.push({
       _id: new ObjectId(),
-      userId: user1Id,
-      comment: "Damn this project sucks!",
-      projectId: project1Id,
-    },
-    {
-      _id: new ObjectId(),
-      userId: user2Id,
-      comment: "This is a really cool project!",
-      projectId: project2Id,
-    },
-  ]);
+      userId: userIds[userIndex],
+      comment: `Comment ${i + 1} on Project ${projectIndex + 1}`,
+      projectId: projectIds[projectIndex],
+    });
+  }
 
-  const comment1Id = insertedComments.insertedIds[0];
-  const comment2Id = insertedComments.insertedIds[1];
+  const insertedComments = await comments.insertMany(commentList);
+  const commentIds = Object.values(insertedComments.insertedIds);
 
-  // Update projects with comment IDs
-  await projects.updateOne(
-    { _id: project1Id },
-    { $push: { comments: comment1Id } }
-  );
-  await projects.updateOne(
-    { _id: project2Id },
-    { $push: { comments: comment2Id } }
-  );
+  // Update projects with comments
+  for (let i = 0; i < 30; i++) {
+    const projectIndex = i % 50;
+    await projects.updateOne(
+      { _id: projectIds[projectIndex] },
+      { $push: { comments: commentIds[i] } }
+    );
+  }
 
   console.log("Done seeding database");
   await closeConnection();
