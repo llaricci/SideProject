@@ -1,12 +1,13 @@
 "use client";
 
-import SearchBar from "../components/SearchBar";
+import Search from "../components/Search";
 
 
 const SearchBarPage = () => {
     return (
-        <SearchBar />
+        <Search  />
     );
 };
+
 
 export default SearchBarPage;

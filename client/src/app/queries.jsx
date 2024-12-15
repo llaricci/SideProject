@@ -67,7 +67,7 @@ const GetProjectById = gql`
     }
   }
 `;
-const GetProjectsbyTechnology = gql`
+export const GetProjectsbyTechnology = gql`
   query GetProjectsbyTechnology($technology: Technology!) {
     getProjectsbyTechnology(technology: $technology) {
       _id
@@ -88,7 +88,7 @@ const GetProjectsbyTechnology = gql`
     }
   }
 `;
-const searchProjectByName = gql`
+export const searchProjectByName = gql`
   query SearchProjectByName($searchTerm: String!) {
     searchProjectByName(searchTerm: $searchTerm) {
       _id
@@ -169,7 +169,7 @@ const getUserById = gql`
   }
 `;
 
-const searchUserByName = gql`
+export const searchUserByName = gql`
   query SearchUserByName($searchTerm: String!) {
     searchUserByName(searchTerm: $searchTerm) {
       _id
