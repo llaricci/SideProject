@@ -91,6 +91,7 @@ const main = async () => {
       comments: [],
       favoritedBy: [],
       numOfFavorites: 0,
+      images: [], // Added empty images array
     });
   }
 
