@@ -59,6 +59,7 @@ export const typeDefs = `#graphql
         comments: [Comment!]!
         favoritedBy: [User!]!
         numOfFavorites: Int
+        images: [String]!
     }
 
     type User {
@@ -95,6 +96,7 @@ export const typeDefs = `#graphql
             technologies: [Technology!]!
             description: String!
             creatorId: String!
+            images: [String!]
         ): Project
         
         addComment(
@@ -128,7 +130,8 @@ export const typeDefs = `#graphql
             name: String 
             technologies: [Technology!]
             description: String
-            creatorId: String 
+            creatorId: String
+            images: [String] 
         ): Project
 
         deleteUser(

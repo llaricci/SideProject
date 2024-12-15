@@ -71,6 +71,15 @@ function Project({ project }) {
                     p { font-size: 1rem; }
                     hr { border: none; border-top: 2px solid #ccc;  margin: 1.5rem 0; } `}
         </style>
+        {project.images &&
+          project.images.map((image, index) => (
+            <img
+              key={index}
+              src={image}
+              alt={`Project Image ${index}`}
+              className="rounded-lg"
+            />
+          ))}
         <div className="grid grid-cols-2 gap-2 mx-auto">
           {project.comments &&
             project.comments.map((comment) => (
