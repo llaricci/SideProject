@@ -22,6 +22,8 @@ const customStyles = {
 function EditProjectModal(props) {
   const [error, setError] = useState(false);
   const [project, setProject] = useState(props.project.project);
+  const [images, setImages] = useState(project.images);
+  const [imagePreview, setImagePreview] = useState(project.images);
   const [editProject] = useMutation(queries.editProject, {
     refetchQueries: [
       {
@@ -33,7 +35,34 @@ function EditProjectModal(props) {
       setError(err.message);
     },
   });
-
+  const imageUpload = (e) => {
+    const files = Object.values(e.target.files);
+    console.log(files);
+    let uploaded = [];
+    let uploadedPreviews = [];
+    if (files.length + images.length > 5) {
+      setError("You can only upload 5 images!");
+      e.target.value = "";
+      return;
+    }
+    files.forEach((file) => {
+      if (file.size > 10000000) {
+        setError("Image size must be less than 10MB!");
+        return;
+      } else {
+        uploaded.push(file);
+        uploadedPreviews.push(URL.createObjectURL(file));
+      }
+    });
+    setImages((prev) => [...prev, ...uploaded]);
+    setImagePreview((prev) => [...prev, ...uploadedPreviews]);
+    e.target.value = "";
+    setError("");
+  };
+  const removeImage = (i) => {
+    setImages((prev) => prev.filter((_, index) => index !== i));
+    setImagePreview((prev) => prev.filter((_, index) => index !== i));
+  };
   const projectSubmit = async (e) => {
     e.preventDefault();
 
@@ -55,18 +84,14 @@ function EditProjectModal(props) {
 
         console.log(obj);*/
 
-    
-
-    if (projectName.trim().length < 2 || projectName.trim().length > 50) 
-    {
+    if (projectName.trim().length < 2 || projectName.trim().length > 50) {
       setError("Project Name must be between 2 and 50 characters!");
       return;
     }
 
     projectName = projectName.trim();
 
-    if (projectDescription.trim().length == 0) 
-        {
+    if (projectDescription.trim().length == 0) {
       setError("Project Description must not be empty!");
       return;
     }
@@ -77,7 +102,30 @@ function EditProjectModal(props) {
       setError("At least one technology must be checked!");
       return;
     }
+    const files = images;
+    const nonFileImage = [];
+    const readFileAsDataURL = async (file) => {
+      if (file instanceof File) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+      return file;
+    };
 
+    const getImagesData = async (files) => {
+      const imagePromises = files.map((file) => readFileAsDataURL(file));
+      return Promise.all(imagePromises);
+    };
+
+    let imagelist = [];
+    console.log(nonFileImage);
+    if (files) {
+      imagelist = await getImagesData(files);
+    }
     try {
       await editProject({
         variables: {
@@ -86,6 +134,7 @@ function EditProjectModal(props) {
           technologies: selectedTechnologies,
           description: projectDescription,
           creatorId: props.user._id,
+          images: imagelist,
         },
       });
 
@@ -165,7 +214,6 @@ function EditProjectModal(props) {
               defaultValue={project.name}
               className=" w-full rounded-md border-2 border-blue-500 rounded-full"
             />
-
             <br /> <br />
             <label className="text-xl font- mb-1"> Technologies Used: </label>
             <div className="grid grid-cols-6 gap-1">
@@ -183,7 +231,6 @@ function EditProjectModal(props) {
                 </div>
               ))}
             </div>
-
             <br />
             <label className="text-xl font- mb-1"> Project Description: </label>
             <textarea
@@ -191,6 +238,51 @@ function EditProjectModal(props) {
               defaultValue={project.description}
               className=" w-full rounded-md border-2 border-blue-500 rounded-full"
             />
+            <label className="text-xl font- mb-1"> Project Images: </label>
+            <input
+              type="file"
+              id="images"
+              name="images"
+              multiple
+              accept="image/*"
+              onChange={imageUpload}
+              hidden
+            />
+            <label
+              className="w-full border-5 border-blue-600 rounded-lg text-sm shadow-sm hover:shadow-lg focus:outline-none "
+              htmlFor="images"
+            >
+              Select file
+            </label>
+            <div className="flex grid-cols-* space-x-4">
+              {imagePreview.map((preview, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={preview}
+                    alt={`Preview ${index + 1}`}
+                    className="w-20 h-20 rounded-lg object-cover border border-gray-300"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="rounded-md absolute top-0 right-0 bg-red-500 text-white p-1"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="25"
+                      height="25"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#000000"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
             <div className="flex justify-between items-center">
               <button
                 type="submit"

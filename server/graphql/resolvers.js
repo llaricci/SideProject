@@ -406,9 +406,12 @@ export const resolvers = {
         return usersFavoriteProjects;
       } catch (e) {
         console.error(e);
-        throw new GraphQLError(`Error fetching favorite projects: ${e.message}`, {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
-        });
+        throw new GraphQLError(
+          `Error fetching favorite projects: ${e.message}`,
+          {
+            extensions: { code: "INTERNAL_SERVER_ERROR" },
+          }
+        );
       }
     },
   },
@@ -542,6 +545,15 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
+        if (args.images) {
+          args.images.forEach((image) => {
+            if (typeof image !== "string" || !image.startsWith("data:image/")) {
+              throw new GraphQLError(`Invalid image format`, {
+                extensions: { code: "BAD_USER_INPUT" },
+              });
+            }
+          });
+        }
         const newProject = {
           _id: new ObjectId(),
           name: args.name,
@@ -551,6 +563,7 @@ export const resolvers = {
           comments: [],
           favoritedBy: [],
           numOfFavorites: 0,
+          images: args.images || [],
         };
         let insertedProject = await projects.insertOne(newProject);
         if (!insertedProject.acknowledged || !insertedProject.insertedId) {
@@ -665,7 +678,9 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const project = await projects.findOne({ _id: new ObjectId(args.projectId) });
+        const project = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
         if (!project) {
           throw new GraphQLError(`Project not found`, {
             extensions: { code: "NOT_FOUND" },
@@ -677,7 +692,9 @@ export const resolvers = {
           });
         }
         const favoriteProjects = user.favoriteProjects || [];
-        if (favoriteProjects.some((proj) => proj.toString() === args.projectId)) {
+        if (
+          favoriteProjects.some((proj) => proj.toString() === args.projectId)
+        ) {
           throw new GraphQLError(`Project already favorited`, {
             extensions: { code: "BAD_USER_INPUT" },
           });
@@ -690,12 +707,19 @@ export const resolvers = {
 
         await projects.updateOne(
           { _id: new ObjectId(args.projectId) },
-          { $push: { favoritedBy: new ObjectId(args.userId) }, $inc: { numOfFavorites: 1 } }
+          {
+            $push: { favoritedBy: new ObjectId(args.userId) },
+            $inc: { numOfFavorites: 1 },
+          }
         );
 
         // Update Redis cache
-        const updatedUser = await users.findOne({ _id: new ObjectId(args.userId) });
-        const updatedProject = await projects.findOne({ _id: new ObjectId(args.projectId) });
+        const updatedUser = await users.findOne({
+          _id: new ObjectId(args.userId),
+        });
+        const updatedProject = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
 
         await client.del(`user_${args.userId}`, "$");
         await client.del(`project_${args.projectId}`, "$");
@@ -783,6 +807,17 @@ export const resolvers = {
           updateFields.description = args.description.trim();
         }
 
+        if (args.images) {
+          args.images.forEach((image) => {
+            if (typeof image !== "string" || !image.startsWith("data:image/")) {
+              throw new GraphQLError(`Invalid image format`, {
+                extensions: { code: "BAD_USER_INPUT" },
+              });
+            }
+          });
+          updateFields.images = args.images;
+        }
+
         const updatedProject = await projects.updateOne(
           { _id: new ObjectId(args._id) },
           { $set: updateFields }
@@ -794,7 +829,9 @@ export const resolvers = {
         }
 
         // Fetch the updated project
-        const projectAfterUpdate = await projects.findOne({ _id: new ObjectId(args._id) });
+        const projectAfterUpdate = await projects.findOne({
+          _id: new ObjectId(args._id),
+        });
 
         // Update Redis cache
         await client.del(`project_${args._id}`, "$");
@@ -850,7 +887,9 @@ export const resolvers = {
               extensions: { code: "BAD_USER_INPUT" },
             });
           }
-          const emailExists = await userCollection.findOne({ email: args.email });
+          const emailExists = await userCollection.findOne({
+            email: args.email,
+          });
           if (emailExists && emailExists._id.toString() !== args._id) {
             throw new GraphQLError(`Email already in use`, {
               extensions: { code: "BAD_USER_INPUT" },
@@ -925,13 +964,17 @@ export const resolvers = {
         const comments = await Comments();
         const client = contextValue.redisClient;
 
-        const userToDelete = await users.findOne({ _id: new ObjectId(args._id) });
+        const userToDelete = await users.findOne({
+          _id: new ObjectId(args._id),
+        });
         if (!userToDelete) {
           throw new GraphQLError(`User not found`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const deletedUser = await users.deleteOne({ _id: new ObjectId(args._id) });
+        const deletedUser = await users.deleteOne({
+          _id: new ObjectId(args._id),
+        });
         if (!deletedUser.deletedCount) {
           throw new GraphQLError(`Could not delete user`, {
             extensions: { code: "NOT_FOUND" },
@@ -941,11 +984,16 @@ export const resolvers = {
         // Remove user from favoritedBy in projects
         await projects.updateMany(
           { favoritedBy: new ObjectId(args._id) },
-          { $pull: { favoritedBy: new ObjectId(args._id) }, $inc: { numOfFavorites: -1 } }
+          {
+            $pull: { favoritedBy: new ObjectId(args._id) },
+            $inc: { numOfFavorites: -1 },
+          }
         );
 
         // Delete user's projects
-        const userProjects = await projects.find({ creatorId: new ObjectId(args._id) }).toArray();
+        const userProjects = await projects
+          .find({ creatorId: new ObjectId(args._id) })
+          .toArray();
         for (const project of userProjects) {
           await projects.deleteOne({ _id: project._id });
           // Delete comments related to the project
@@ -980,14 +1028,18 @@ export const resolvers = {
         const comments = await Comments();
         const client = contextValue.redisClient;
 
-        const projectToDelete = await projects.findOne({ _id: new ObjectId(args._id) });
+        const projectToDelete = await projects.findOne({
+          _id: new ObjectId(args._id),
+        });
         if (!projectToDelete) {
           throw new GraphQLError(`Project not found`, {
             extensions: { code: "NOT_FOUND" },
           });
         }
         // Delete the project
-        const deletedProject = await projects.deleteOne({ _id: new ObjectId(args._id) });
+        const deletedProject = await projects.deleteOne({
+          _id: new ObjectId(args._id),
+        });
         if (!deletedProject.deletedCount) {
           throw new GraphQLError(`Could not delete project`, {
             extensions: { code: "NOT_FOUND" },
@@ -1004,7 +1056,9 @@ export const resolvers = {
           { $pull: { favoriteProjects: new ObjectId(projectToDelete._id) } }
         );
         // Delete all comments associated with the project
-        await comments.deleteMany({ projectId: new ObjectId(projectToDelete._id) });
+        await comments.deleteMany({
+          projectId: new ObjectId(projectToDelete._id),
+        });
 
         // Clear Redis cache
         await client.del(`project_${args._id}`, "$");
@@ -1078,7 +1132,9 @@ export const resolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        const project = await projects.findOne({ _id: new ObjectId(args.projectId) });
+        const project = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
         if (!project) {
           throw new GraphQLError(`Project not found`, {
             extensions: { code: "NOT_FOUND" },
@@ -1090,7 +1146,9 @@ export const resolvers = {
           });
         }
         const favoriteProjects = user.favoriteProjects || [];
-        if (!favoriteProjects.some((proj) => proj.toString() === args.projectId)) {
+        if (
+          !favoriteProjects.some((proj) => proj.toString() === args.projectId)
+        ) {
           throw new GraphQLError(`Project not favorited`, {
             extensions: { code: "BAD_USER_INPUT" },
           });
@@ -1104,12 +1162,19 @@ export const resolvers = {
         // Remove user from project's favoritedBy
         await projects.updateOne(
           { _id: new ObjectId(args.projectId) },
-          { $pull: { favoritedBy: new ObjectId(args.userId) }, $inc: { numOfFavorites: -1 } }
+          {
+            $pull: { favoritedBy: new ObjectId(args.userId) },
+            $inc: { numOfFavorites: -1 },
+          }
         );
 
         // Update Redis cache
-        const updatedUser = await users.findOne({ _id: new ObjectId(args.userId) });
-        const updatedProject = await projects.findOne({ _id: new ObjectId(args.projectId) });
+        const updatedUser = await users.findOne({
+          _id: new ObjectId(args.userId),
+        });
+        const updatedProject = await projects.findOne({
+          _id: new ObjectId(args.projectId),
+        });
         await client.del(`user_${args.userId}`, "$");
         await client.del(`project_${args.projectId}`, "$");
         await client.json.set(`user_${args.userId}`, "$", updatedUser);
@@ -1120,9 +1185,12 @@ export const resolvers = {
         if (e instanceof GraphQLError) {
           throw e;
         }
-        throw new GraphQLError(`Error removing favorited project: ${e.message}`, {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
-        });
+        throw new GraphQLError(
+          `Error removing favorited project: ${e.message}`,
+          {
+            extensions: { code: "INTERNAL_SERVER_ERROR" },
+          }
+        );
       }
     },
   },

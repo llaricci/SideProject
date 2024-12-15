@@ -7,6 +7,7 @@ const projects = gql`
       name
       technologies
       description
+      images
       creator {
         _id
         firstName
@@ -40,6 +41,7 @@ const GetProjectById = gql`
       name
       technologies
       description
+      images
       creator {
         _id
         firstName
@@ -72,6 +74,7 @@ const GetProjectsbyTechnology = gql`
       name
       technologies
       description
+      images
       creator {
         _id
       }
@@ -117,6 +120,7 @@ const users = gql`
       password
       projects {
         _id
+        images
         creator {
           _id
           firstName
@@ -144,6 +148,7 @@ const getUserById = gql`
       projects {
         _id
         name
+        images
         comments {
           _id
           user {
@@ -262,17 +267,20 @@ const addProject = gql`
     $technologies: [Technology!]!
     $description: String!
     $creatorId: String!
+    $images: [String!]
   ) {
     addProject(
       name: $name
       technologies: $technologies
       description: $description
       creatorId: $creatorId
+      images: $images
     ) {
       _id
       name
       technologies
       description
+      images
       creator {
         _id
       }
@@ -384,6 +392,7 @@ const editProject = gql`
     $technologies: [Technology!]!
     $description: String!
     $creatorId: String!
+    $images: [String!]
   ) {
     editProject(
       _id: $id
@@ -391,11 +400,13 @@ const editProject = gql`
       technologies: $technologies
       description: $description
       creatorId: $creatorId
+      images: $images
     ) {
       _id
       name
       technologies
       description
+      images
       creator {
         _id
       }
