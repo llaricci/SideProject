@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/Header";
 
 import { ApolloWrapper } from "./ApolloWrapper";
+import { AuthProvider } from "@/app/NextAuth";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,7 +30,9 @@ export default function RootLayout({ children }) {
       >
         <div id="__next">
           <Header />
-          <ApolloWrapper>{children}</ApolloWrapper>
+          <AuthProvider>
+            <ApolloWrapper>{children}</ApolloWrapper>
+          </AuthProvider>
         </div>
       </body>
     </html>

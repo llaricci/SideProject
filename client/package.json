@@ -22,6 +22,7 @@
     "@nextui-org/system": "^2.4.4",
     "@nextui-org/theme": "^2.4.1",
     "@nextui-org/user": "^2.2.4",
+    "firebase": "^11.1.0",
     "framer-motion": "^11.13.1",
     "graphql": "^16.9.0",
     "mui-markdown": "^1.2.3",
