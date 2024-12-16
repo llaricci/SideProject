@@ -138,7 +138,20 @@ const main = async () => {
   await users.updateOne(
     { _id: userIds[0] },
     { $push: { favoriteProjects: { $each: [projectIds[2], projectIds[4], projectIds[6]] } } }
-);
+  );
+
+  //Project Update(s)
+  await projects.updateMany(
+    { _id: { $in: [projectIds[2], projectIds[4], projectIds[6]] } },
+    {
+      $push: { favoritedBy: userIds[0] },
+      $inc: { numOfFavorites: 1 }
+    }
+  );
+  
+
+
+
 
   console.log("Done seeding database");
   await closeConnection();
