@@ -120,6 +120,7 @@ const users = gql`
       password
       projects {
         _id
+        name
         images
         creator {
           _id
@@ -163,6 +164,17 @@ const getUserById = gql`
       }
       favoriteProjects {
         _id
+        name
+        technologies
+        description
+        images
+        creator
+        {
+          _id
+          firstName
+          lastName
+        }
+
       }
       profLanguages
     }
