@@ -899,7 +899,7 @@ export const resolvers = {
         }
 
         if (args.password) {
-          const newPassword = validation.checkString(args.password);
+          const newPassword = validation.checkPassword(args.password);
           if (bcrypt.compareSync(args.password, userToUpdate.password)) {
             throw new GraphQLError(
               `Password cannot be the same as the current password`,
