@@ -134,6 +134,12 @@ const main = async () => {
     );
   }
 
+  // Favorites Testing
+  await users.updateOne(
+    { _id: userIds[0] },
+    { $push: { favoriteProjects: { $each: [projectIds[2], projectIds[4], projectIds[6]] } } }
+);
+
   console.log("Done seeding database");
   await closeConnection();
 };
