@@ -30,6 +30,10 @@ function Header() {
             </Typography>
 
             <Button color="inherit">
+              <Link href= "/users[user._id]/favorites"> 
+              <p className="text-[16px] font-bold text-gray-800">
+                View Favorites
+              </p></Link>
               <p className="text-[16px] font-bold text-gray-800">
                 View Favorites
               </p>

@@ -9,6 +9,9 @@ import {
   searchUserByName,
   GetProjectsbyTechnology,
 } from "../queries";
+import AllUsersList from "./AllUsersList";
+import ProjectList from "./ProjectList";
+
 const technologies = [
   "JAVASCRIPT",
   "PYTHON",
@@ -47,19 +50,18 @@ const technologies = [
   "GITHUB",
   "OTHER",
 ];
+
 const Search = () => {
   const router = useRouter();
   const [searchType, setSearchType] = useState("");
   const [queryInput, setQueryInput] = useState("");
   const [error, setError] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [projectsByTechnology, { data: projectsByTechData }] = useLazyQuery(
-    GetProjectsbyTechnology
-  );
-  const [projectByName, { data: projectsData }] =
-    useLazyQuery(searchProjectByName);
+  const [projectsByTechnology, { data: projectsByTechData }] = useLazyQuery(GetProjectsbyTechnology);
+  const [projectByName, { data: projectsData }] = useLazyQuery(searchProjectByName);
   const [userByName, { data: usersData }] = useLazyQuery(searchUserByName);
   const [results, setResults] = useState(<></>);
+
   useEffect(() => {
     if (searchResults.length === 0) {
       setResults(<Typography>{"No results found"}</Typography>);
@@ -125,7 +127,7 @@ const Search = () => {
               key={project._id}
               onClick={() => router.push(`/projects/${project._id}`)}
             >
-              {project.name}
+              <ProjectList projectList={searchResults}/>
             </li>
           ))}
         </ul>
@@ -140,7 +142,7 @@ const Search = () => {
               key={user._id}
               onClick={() => router.push(`/users/${user._id}`)}
             >
-              {user.firstName}-{user.lastName.substring(0, 1)}
+              <AllUsersList userList={searchResults}></AllUsersList>
             </li>
           ))}
         </ul>
