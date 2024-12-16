@@ -1,21 +1,14 @@
 import Image from "next/image";
-import logo from './logo.png';
+import logo from "./logo.png";
 
 export default function Landing() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-
-        <Image
-          src = {logo}
-          width={100}
-          height={100}
-          alt="Project Logo"
-        />
+      <Image src={logo} width={100} height={100} alt="Project Logo" />
 
       <br />
 
       <section className="text-center">
-
         <h1 className="text-4xl font-bold text-gray-800 mb-4">
           Welcome to SideProject
         </h1>
@@ -24,7 +17,7 @@ export default function Landing() {
         </p>
         <div className="flex-auto space-x-4">
           <a
-            href="/register"
+            href="/signup"
             className="px-6 py-3 text-white bg-blue-500 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
           >
             Register

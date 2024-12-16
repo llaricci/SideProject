@@ -471,7 +471,7 @@ export const resolvers = {
           args.bio = validation.checkString(args.bio);
         }
 
-        args.password = validation.checkString(args.password);
+        args.password = validation.checkPassword(args.password);
 
         // Validate profLanguages
         args.profLanguages.forEach((element) => {
@@ -510,7 +510,7 @@ export const resolvers = {
         if (e instanceof GraphQLError) {
           throw e;
         }
-        throw new GraphQLError(`Error adding user: ${e.message}`, {
+        throw new GraphQLError(`Error adding user: ${e}`, {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         });
       }
