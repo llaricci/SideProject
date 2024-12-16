@@ -3,6 +3,7 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import { createClient } from "redis";
 import { typeDefs } from "./graphql/typeDefs.js";
 import { resolvers } from "./graphql/resolvers.js";
+import { app as firebase } from "./config/firebaseAuth.js";
 
 const redisClient = createClient();
 await redisClient.connect(); 
@@ -16,7 +17,7 @@ const server = new ApolloServer({
 const { url } = await startStandaloneServer(server, {
   listen: { port: 4000 },
   context: async() => {
-    return {redisClient}
+    return {redisClient, firebase};
   }
 });
 
