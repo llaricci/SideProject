@@ -67,9 +67,9 @@ const GetProjectById = gql`
     }
   }
 `;
-const GetProjectsbyTechnology = gql`
-  query GetProjectsbyTechnology($technology: Technology!) {
-    getProjectsbyTechnology(technology: $technology) {
+export const GetProjectsbyTechnology = gql`
+  query GetProjectsByTechnology($technology: Technology!) {
+    getProjectsByTechnology(technology: $technology) {
       _id
       name
       technologies
@@ -88,7 +88,7 @@ const GetProjectsbyTechnology = gql`
     }
   }
 `;
-const searchProjectByName = gql`
+export const searchProjectByName = gql`
   query SearchProjectByName($searchTerm: String!) {
     searchProjectByName(searchTerm: $searchTerm) {
       _id
@@ -169,7 +169,7 @@ const getUserById = gql`
   }
 `;
 
-const searchUserByName = gql`
+export const searchUserByName = gql`
   query SearchUserByName($searchTerm: String!) {
     searchUserByName(searchTerm: $searchTerm) {
       _id
@@ -204,9 +204,9 @@ const comments = gql`
   }
 `;
 
-const getCommentsById = gql`
-  query GetCommentsById($id: String!) {
-    getCommentsById(_id: $id) {
+const getCommentById = gql`
+  query GetCommentById($id: String!) {
+    getCommentById(_id: $id) {
       _id
       user {
         _id
@@ -487,7 +487,7 @@ let exported = {
   getUserById,
   searchUserByName,
   comments,
-  getCommentsById,
+  getCommentById,
   addComment,
   addFavoritedProject,
   addProject,

@@ -49,6 +49,13 @@ function Header() {
                 </p>
               </Link>
             </Button>
+            <Button color="inherit">
+              <Link href="/search">
+                <p className="text-[16px] font-bold text-gray-800">
+                  Search
+                </p>
+              </Link>
+            </Button>
           </Toolbar>
         </AppBar>
       </Box>
