@@ -10,7 +10,7 @@ import {
   GetProjectsbyTechnology,
 } from "../queries";
 import AllUsersList from "./AllUsersList";
-import ProjectList from "./ProjectList";
+import AllProjectsList from "./AllProjectsList";
 
 const technologies = [
   "JAVASCRIPT",
@@ -127,7 +127,7 @@ const Search = () => {
               key={project._id}
               onClick={() => router.push(`/projects/${project._id}`)}
             >
-              <ProjectList projectList={searchResults}/>
+              <AllProjectsList projectList={searchResults}/>
             </li>
           ))}
         </ul>

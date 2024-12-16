@@ -13,7 +13,6 @@ import Image from "next/image";
 import logo from "./images/logo.png";
 
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 
 import DeleteFavoriteModal from "./modals/DeleteFavoriteModal";
 

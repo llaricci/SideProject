@@ -97,6 +97,8 @@ export const searchProjectByName = gql`
       description
       creator {
         _id
+        firstName
+        lastName
       }
       comments {
         _id

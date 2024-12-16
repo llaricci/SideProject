@@ -5,6 +5,9 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from '@mui/icons-material/Search';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import PersonIcon from '@mui/icons-material/Person';
 
 import Link from "next/link";
 
@@ -29,30 +32,33 @@ function Header() {
               </Link>
             </Typography>
 
+            <Button color="inherit" href = "/search">
+                <p className="text-[16px] font-bold text-gray-800">
+                <SearchIcon />
+                  Search
+                </p>
+            </Button>
+
             <Button color="inherit">
               <p className="text-[16px] font-bold text-gray-800">
-                View Favorites
+                <FavoriteIcon color = "error" />
+                Favorites
               </p>
             </Button>
+            
             <br />
             <Button color="inherit">
               <Link href="/users">
                 <p className="text-[16px] font-bold text-gray-800">
-                  View Users
+                  <PersonIcon />
+                  All Users
                 </p>
               </Link>
             </Button>
             <Button color="inherit">
-              <Link href="/projects/testproject">
+              <Link href="/users/testuser">
                 <p className="text-[16px] font-bold text-gray-800">
-                  View Test Project
-                </p>
-              </Link>
-            </Button>
-            <Button color="inherit">
-              <Link href="/search">
-                <p className="text-[16px] font-bold text-gray-800">
-                  Search
+                  View Profile
                 </p>
               </Link>
             </Button>
