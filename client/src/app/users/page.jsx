@@ -15,7 +15,7 @@ export default function AllUsers() {
   } else if (data) {
     let users = data.users;
     return (
-      <div className="flex justify-center min-h-screen bg-gray-50 ">
+      <div className="bg-white ">
         <section className="text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">All Users</h1>
           <AllUsersList userList={users} />

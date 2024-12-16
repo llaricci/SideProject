@@ -11,10 +11,8 @@ import Link from "next/link";
 function AllUsersList(props) {
   const userList = props.userList;
   return (
-    <div>
-      <div
-        style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}
-      >
+    <div className = "grid grid-cols-3 place-items-center gap-2">
+      
         {userList.map((user) => (
           <Card key={user._id} sx={{ width: "75%", marginBottom: "20px" }}>
             <CardContent>
@@ -49,7 +47,7 @@ function AllUsersList(props) {
           </Card>
         ))}
       </div>
-    </div>
+
   );
 }
 
