@@ -16,8 +16,8 @@ function Project({ project })
             : "No technologies listed.";
 
     let projectFavorites = 
-        project.favorites && project.favorites.length > 0
-        ? project.favorites
+        project.favoritedBy && project.favoritedBy.length > 0
+        ? project.favoritedBy
             .map(
             (user) => `- ${user.firstName} ${user.lastName} (${user.email})`
             )

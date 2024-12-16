@@ -37,7 +37,7 @@ export default function FavoritesList()
         console.log(projects);
         
         return (
-            <div>
+            <div className="flex justify-center min-h-screen bg-white">
             <Favorites favorites = {projects} user = {user} />
             </div>
         )

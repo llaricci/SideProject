@@ -12,6 +12,9 @@ import Divider from "@mui/material/Divider";
 import Image from "next/image";
 import logo from "./images/logo.png";
 
+import HeartBrokenIcon from '@mui/icons-material/HeartBroken';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+
 import DeleteFavoriteModal from "./modals/DeleteFavoriteModal";
 
 
@@ -48,7 +51,8 @@ function Favorites (props)
       <div className="grid grid-cols-3 place-items-center gap-3">
 
       {favoritesList && favoritesList.map((favorite) => (
-        <Card key={favorite._id}> 
+        <Card 
+            key={favorite._id}> 
             <CardContent>
             <div className="flex justify-center">
             {logo && (
@@ -78,15 +82,18 @@ function Favorites (props)
                 <br />
                 <Divider />
                 <br />
-                <Button href = {`/projects/${favorite._id}`}>
+                <Button size = "large" href = {`/projects/${favorite._id}`}>
                     View Details
                 </Button>
+                <br />
                 <Button
                 size="large"
+                
                 onClick={() => {
                   handleOpenDeleteModal(favorite);
                 }}
                 >
+                    <HeartBrokenIcon color="error" />
                     Remove Favorite
                 </Button>
             </CardContent>

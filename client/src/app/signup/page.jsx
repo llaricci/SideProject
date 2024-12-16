@@ -64,7 +64,7 @@ function SignupPage() {
     });
   };
   return (
-    <div className="justify-center items-center flex">
+    <div className="justify-center items-center flex bg-white text-black">
       <form
         className="p-10 flex flex-col gap-4 min-h-screen"
         onSubmit={(e) => {
