@@ -8,6 +8,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from '@mui/icons-material/Search';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import PersonIcon from '@mui/icons-material/Person';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
 
 import Link from "next/link";
 
@@ -45,7 +47,7 @@ function Header() {
                 Favorites
               </p>
             </Button>
-            
+
             <br />
             <Button color="inherit">
               <Link href="/users">
@@ -56,8 +58,17 @@ function Header() {
               </Link>
             </Button>
             <Button color="inherit">
+              <Link href="/projects">
+                <p className="text-[16px] font-bold text-gray-800">
+                  <IntegrationInstructionsIcon/>
+                  All Projects
+                </p>
+              </Link>
+            </Button>
+            <Button color="inherit">
               <Link href="/users/testuser">
                 <p className="text-[16px] font-bold text-gray-800">
+                <AccountCircleIcon />
                   View Profile
                 </p>
               </Link>

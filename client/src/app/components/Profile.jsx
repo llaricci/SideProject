@@ -14,7 +14,7 @@ import Divider from "@mui/material/Divider";
 //modal stuff
 import AddProjectModal from "../components/modals/AddProjectModal";
 import EditUserModal from "./modals/EditUserModal";
-import DeleteUserModal from "./modals/DeleteUser";
+import DeleteUserModal from "./modals/DeleteUserModal";
 
 import { useState } from "react";
 

@@ -57,6 +57,74 @@ const main = async () => {
     "Eighteen", "Nineteen", "Twenty", "TwentyOne", "TwentyTwo", "TwentyThree", 
     "TwentyFour", "TwentyFive"
   ];
+
+  const projectNames = [
+    "CodeCanvas", "PixelCraft", "BugTrackerPro", "TaskForge", "AutoLinter", "DevDashboard", 
+    "CodeSnipShare", "BugHunt", "LogicBuilder", "AlgoVisualize", "TestifyJS", "GitHelperBot",
+    "AuthGenie", "SyntaxWizard", "DeployNinja", "GraphQLStudio", "MongoMaster", "SchemaSculptor",
+    "StreamSync", "DataMapperX", "TaskMind", "ProjectPulse", "ReactPlanner", "TypeItFast",
+    "IDEPlus", "APIExplorer", "NodeFleet", "CodeTimeLog", "JsonOrganizer", "MarkdownXpress",
+    "CodeRefactorer", "DesignBoard", "PortfolioCraft", "HackSimulator", "CompilerPro",
+    "CodeCompare", "PerfMonit", "DebuggerX", "BugFixRace", "ApiMocker", "FrontendForge",
+    "BacklogTracker", "AI-CodeMate", "ScriptRunner", "TechBlogGen", "CodeVocab", "SQLSketcher",
+    "UIFlowDesigner", "CloudDeployMate", "ErrorFixHub", "AIRefactorBot"
+  ];
+
+  const projectDescriptions = [
+    "An interactive platform to collaborate on coding projects with real-time drawing tools.",
+    "A tool to create pixel art projects, with advanced color palette management.",
+    "Track and resolve software bugs efficiently with real-time team collaboration.",
+    "An advanced task management tool for developers with project timelines and reporting.",
+    "Automated code linting tool supporting multiple languages for clean and standardized code.",
+    "A customizable dashboard to monitor project status, code metrics, and team productivity.",
+    "Share code snippets securely with version history and syntax highlighting.",
+    "Gamified bug tracking system for developers to find and fix issues quickly.",
+    "Drag-and-drop platform to build complex logical workflows visually for programming projects.",
+    "Visualize complex algorithms with interactive animations for learning and debugging.",
+    "A unit testing automation framework with detailed logging and performance analysis.",
+    "A bot that simplifies Git operations by automating branching, merging, and pull requests.",
+    "Generate secure authentication flows with tokens, JWTs, and social login integrations.",
+    "A code syntax highlighter that integrates into editors and custom websites seamlessly.",
+    "Simplify cloud-based app deployments with streamlined setup and CI/CD pipelines.",
+    "A visual studio for designing, testing, and debugging GraphQL queries and schemas.",
+    "Master MongoDB operations with intuitive querying tools and performance optimization.",
+    "Build and validate database schemas with visual design and export tools.",
+    "Sync live streams of data and events in real time across multiple client applications.",
+    "A mapping tool to efficiently transform and synchronize structured and unstructured data.",
+    "Organize and prioritize your tasks with a developer-centric productivity planner.",
+    "Monitor project health, progress, and resource utilization with analytics dashboards.",
+    "A task planner that integrates React components for developers and UI designers.",
+    "Gamified typing tool for programmers with real-world coding snippets and timers.",
+    "A lightweight integrated development environment with advanced debugging tools.",
+    "Explore, test, and debug APIs interactively using a clean, developer-friendly UI.",
+    "Node.js-based task manager for running and scheduling background scripts efficiently.",
+    "Log development time spent on coding projects with task categorization and reports.",
+    "Organize and beautify JSON data with validation, formatting, and export options.",
+    "Markdown editor with live previews, versioning, and easy export formats like PDF.",
+    "Automate and optimize repetitive code refactoring tasks across large projects.",
+    "A collaborative whiteboard to design and review software architecture visually.",
+    "Build and deploy custom developer portfolios with dynamic project showcases.",
+    "Simulate real-world hacking challenges with practice tools for ethical hackers.",
+    "Lightweight compiler with real-time error checking and code performance metrics.",
+    "Compare code side-by-side with syntax highlighting and version history diffing.",
+    "Monitor code performance and identify bottlenecks in large-scale applications.",
+    "Advanced debugging tool with logs, breakpoints, and performance snapshots.",
+    "Compete in time-limited challenges to fix bugs and earn developer rankings.",
+    "Mock REST APIs quickly for frontend testing and faster local development cycles.",
+    "A tool to scaffold frontend codebases with templates and UI component previews.",
+    "Track and organize your project backlog with task boards and sprint planning tools.",
+    "AI-powered coding assistant that suggests, autocompletes, and optimizes your code.",
+    "Run, schedule, and monitor JavaScript scripts with logging and error handling.",
+    "Generate a fully-functional tech blog with Markdown support and themes.",
+    "Learn programming terminology and concepts with an interactive coding vocabulary app.",
+    "Visualize SQL queries and table relationships for designing and debugging databases.",
+    "Drag-and-drop UI tool for designing smooth application flows and wireframes.",
+    "Automate cloud deployment processes with seamless integration and rollback features.",
+    "A centralized hub to manage and fix recurring programming errors in any language.",
+    "AI-driven refactoring tool that analyzes code and suggests best practice improvements."
+  ];
+  
+  
   
 
   // Create 25 users
@@ -92,9 +160,9 @@ const main = async () => {
     ];
     projectList.push({
       _id: new ObjectId(),
-      name: `Project ${i + 1}`,
+      name: projectNames[i],
       technologies: projectTechnologies,
-      description: `Description for Project ${i + 1}`,
+      description: projectDescriptions[i],
       creatorId: userIds[creatorIndex],
       comments: [],
       favoritedBy: [],
