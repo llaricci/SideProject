@@ -77,6 +77,8 @@ export const GetProjectsbyTechnology = gql`
       images
       creator {
         _id
+        firstName
+        lastName
       }
       comments {
         _id

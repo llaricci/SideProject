@@ -13,43 +13,44 @@ import AllUsersList from "./AllUsersList";
 import AllProjectsList from "./AllProjectsList";
 
 const technologies = [
-  "JAVASCRIPT",
-  "PYTHON",
-  "JAVA",
-  "CSHARP",
-  "CPLUSPLUS",
-  "RUBY",
+  "JavaScript",
+  "Python",
+  "Java",
+  "CSharp",
+  "CPlusPlus",
+  "Ruby",
   "PHP",
-  "TYPESCRIPT",
-  "SWIFT",
-  "KOTLIN",
-  "GO",
-  "RUST",
+  "TypeScript",
+  "Swift",
+  "Kotlin",
+  "Go",
+  "Rust",
   "HTML",
   "CSS",
   "SQL",
-  "GRAPHQL",
-  "NODE_JS",
-  "REACT",
-  "ANGULAR",
-  "VUE",
-  "NEXT_JS",
-  "SVELTE",
-  "TAILWINDCSS",
-  "BOOTSTRAP",
+  "GraphQL",
+  "NodeJS",
+  "React",
+  "Angular",
+  "Vue",
+  "NextJS",
+  "Svelte",
+  "TailwindCSS",
+  "Bootstrap",
   "AWS",
-  "GOOGLE_CLOUD",
-  "ORACLE_CLOUD",
-  "DOCKER",
-  "KUBERNETES",
-  "MONGODB",
-  "POSTGRESQL",
-  "REDIS",
-  "FIREBASE",
-  "GIT",
-  "GITHUB",
-  "OTHER",
+  "GoogleCloud",
+  "OracleCloud",
+  "Docker",
+  "Kubernetes",
+  "MongoDB",
+  "PostgreSQL",
+  "Redis",
+  "Firebase",
+  "Git",
+  "GitHub",
+  "Other"
 ];
+
 
 const Search = () => {
   const router = useRouter();
@@ -69,18 +70,21 @@ const Search = () => {
       setError("Please enter a search query");
       return;
     }
+
     if (searchType === "projectsByTechnology") {
       await projectsByTechnology({
-        variables: { technology: queryInput.toUpperCase() },
+        variables: { technology: queryInput }
       }).then((res) => {
         setSearchResults(res.data.getProjectsByTechnology);
       });
+
     } else if (searchType === "projectByName") {
       await projectByName({ variables: { searchTerm: queryInput } }).then(
         (res) => {
           setSearchResults(res.data.searchProjectByName);
         }
       );
+
     } else if (searchType === "userByName") {
       await userByName({ variables: { searchTerm: queryInput } }).then(
         (res) => {
