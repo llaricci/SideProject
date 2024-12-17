@@ -6,21 +6,35 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import HeartBrokenIcon from '@mui/icons-material/HeartBroken';
 
 import EditProjectModal from "./modals/EditProjectModal";
 import DeleteProjectModal from "./modals/DeleteProjectModal";
+
+import AddFavoriteModal from "./modals/AddFavoriteModal";
+import DeleteFavoriteModal from "./modals/DeleteFavoriteModal";
+
+
 import { useQuery } from "@apollo/client";
 import queries from "../queries";
 import { comment } from "postcss";
 
-function ProjectList(props) {
-  const projectList = props.projectList;
-
+function ProjectList({projectList, user, isOwner, currentUser, favorites}) {
+ 
   const [editForm, showEditForm] = useState(false);
-  const [editProject, setEditProject] = useState(null);
+  const [editProject, setEditProject] = useState(false);
 
   const [deleteForm, showDeleteForm] = useState(false);
   const [deleteProject, setdeleteProject] = useState(false);
+
+  const [addFavoritesForm, showAddFavoritesForm] = useState(false);
+  const [addFavorite, setAddFavorite] = useState(false);
+
+
+
+  const [deleteFavoritesForm, showDeleteFavoritesForm] = useState(false);
+  const [deleteFavorite, setDeleteFavorite] = useState(false);
 
   const handleOpenEditModal = (project) => {
     showEditForm(true);
@@ -32,9 +46,21 @@ function ProjectList(props) {
     setdeleteProject(project);
   };
 
+  const handleOpenDeleteFavoriteModal = (project) => {
+    showDeleteFavoritesForm(true);
+    setDeleteFavorite(project);
+  };
+
+  const handleOpenAddModal = (project) => {
+    showAddFavoritesForm(true);
+    setAddFavorite(project);
+  };
+
   const handleCloseModals = () => {
     showEditForm(false);
     showDeleteForm(false);
+    showAddFavoritesForm(false);
+    showDeleteFavoritesForm(false);
   };
 
   return (
@@ -93,6 +119,8 @@ function ProjectList(props) {
                 View Details
               </Button>
             </CardActions>
+
+          {isOwner && 
             <CardActions>
               <Button
                 size="large"
@@ -111,25 +139,77 @@ function ProjectList(props) {
                 Delete Project
               </Button>
             </CardActions>
+          }
+
+          {!isOwner && !favorites.some((fav) => fav._id === project._id) && (
+            <CardActions>
+              <Button
+                size="large"
+                onClick={() => {
+                  handleOpenAddModal(project );
+                }}
+              >
+                <FavoriteIcon color="error" />
+                Add Favorite
+              </Button>
+            </CardActions>
+          )}
+
+          {!isOwner && favorites.some((fav) => fav._id === project._id) && (
+            <CardActions>
+              <Button
+                size="large"
+                onClick={() => {
+                  handleOpenDeleteFavoriteModal(project );
+                }}
+              >
+                <HeartBrokenIcon color="error" />
+                Remove Favorite
+              </Button>
+            </CardActions>
+          )}
+
           </Card>
         ))}
+
+        
 
         {editForm && editProject && (
           <EditProjectModal
             isOpen={editForm}
-            user={props.user}
+            user={user}
             project={editProject}
             handleClose={handleCloseModals}
           />
         )}
+
         {deleteForm && deleteProject && (
           <DeleteProjectModal
             isOpen={deleteForm}
             project={deleteProject}
-            user={props.user}
+            user={user}
             handleClose={handleCloseModals}
           />
         )}
+
+        {addFavoritesForm && addFavorite && (
+          <AddFavoriteModal
+            isOpen={addFavoritesForm}
+            project={addFavorite}
+            user={currentUser}
+            handleClose={handleCloseModals}
+          />
+        )}
+
+        {deleteFavoritesForm && deleteFavorite && (
+          <DeleteFavoriteModal
+            isOpen={deleteFavoritesForm}
+            project={deleteFavorite}
+            user={currentUser}
+            handleClose={handleCloseModals}
+          />
+        )}
+
       </div>
     </div>
   );
