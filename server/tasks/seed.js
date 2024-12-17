@@ -107,51 +107,60 @@ const main = async () => {
     );
   }
 
-  // Create 30 comments
+  // Create comments and favorites for users
   const commentList = [];
-  for (let i = 0; i < 30; i++) {
-    const userIndex = i % 25; // Cycle through users for comments
-    //const projectIndex = i % 50; // Cycle through projects for comments
-    const projectIndex = 49 - (i % 50);
+  for (let i = 0; i < 25; i++) {
+    const userIndex = i; // Current user
+    const firstProjectIndex = 50 - i; // User i comments on project 50-i
+    const secondProjectIndex = 25 - i; // User i comments on project 25-i
     
+    // Comment and favorite project 50-i
     commentList.push({
       _id: new ObjectId(),
       userId: userIds[userIndex],
-      comment: `Comment ${i + 1} on Project ${projectIndex + 1}`,
-      projectId: projectIds[projectIndex],
+      comment: `Comment by User${i + 1} on Project ${firstProjectIndex}`,
+      projectId: projectIds[firstProjectIndex - 1], // Project indices are 0-based
     });
+    await users.updateOne(
+      { _id: userIds[userIndex] },
+      { $addToSet: { favoriteProjects: projectIds[firstProjectIndex - 1] } }
+    );
+    await projects.updateOne(
+      { _id: projectIds[firstProjectIndex - 1] },
+      { $inc: { numOfFavorites: 1 } }
+    );
+  
+    // Comment and favorite project 25-i
+    commentList.push({
+      _id: new ObjectId(),
+      userId: userIds[userIndex],
+      comment: `Comment by User${i + 1} on Project ${secondProjectIndex}`,
+      projectId: projectIds[secondProjectIndex - 1], // Project indices are 0-based
+    });
+    await users.updateOne(
+      { _id: userIds[userIndex] },
+      { $addToSet: { favoriteProjects: projectIds[secondProjectIndex - 1] } }
+    );
+    await projects.updateOne(
+      { _id: projectIds[secondProjectIndex - 1] }, // Corrected to use secondProjectIndex
+      { 
+        $inc: { numOfFavorites: 1 },
+        $push: { favoritedBy: userIds[userIndex] } // Add user to favoritedBy array
+      }
+    );
   }
+  
 
   const insertedComments = await comments.insertMany(commentList);
   const commentIds = Object.values(insertedComments.insertedIds);
 
   // Update projects with comments
-  for (let i = 0; i < 30; i++) {
-    const projectIndex = i % 50;
+  for (let i = 0; i < 50; i++) {
     await projects.updateOne(
-      { _id: projectIds[projectIndex] },
+      { _id: projectIds[i] },
       { $push: { comments: commentIds[i] } }
     );
   }
-
-  // Favorites Testing
-  await users.updateOne(
-    { _id: userIds[0] },
-    { $push: { favoriteProjects: { $each: [projectIds[2], projectIds[4], projectIds[6]] } } }
-  );
-
-  //Project Update(s)
-  await projects.updateMany(
-    { _id: { $in: [projectIds[2], projectIds[4], projectIds[6]] } },
-    {
-      $push: { favoritedBy: userIds[0] },
-      $inc: { numOfFavorites: 1 }
-    }
-  );
-  
-
-
-
 
   console.log("Done seeding database");
   await closeConnection();
