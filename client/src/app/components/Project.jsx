@@ -2,13 +2,25 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 
 import Comment from "../components/Comment";
+import AddCommentModal from "./modals/AddCommentModal";
 
 import queries from "../queries";
 import { useQuery } from "@apollo/client";
-
+import { useState } from "react";
 
 function Project({ project }) 
 {
+
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [comments, setComments] = useState(project.comments || []);
+
+  const handleAddComment = (newComment) => {
+    setComments((prev) => [...prev, newComment]);
+  };
+
+  const currentUser = {
+    _id: "000000000000000000000000", // Replace this with actual authenticated user ID
+  };
   
     let projectTechnologies = 
         project.technologies
@@ -23,14 +35,6 @@ function Project({ project })
             )
             .join("\n")
         : "No users"
-
-
-
-    let comments = " ";
-
-    if (project.comments && project.comments.length === 0) 
-            comments = "No comments yet.";
-  
   
     const markdownContent = `
 
@@ -55,11 +59,12 @@ by: ${project.creator.firstName} ${project.creator.lastName}
     ---  
 
     ## Favorited By
+
     - ${projectFavorites}
 
     ---
     ## Comments
-    - ${comments}
+    -  
 
     `;
 
@@ -97,9 +102,24 @@ by: ${project.creator.firstName} ${project.creator.lastName}
             project.comments.map((comment) => (
               <Comment key={comment._id} comment={comment} />
             ))}
-
         </div>
+
+        <button
+          onClick={() => setModalOpen(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+        >
+          Add Comment
+        </button>
       </div>
+
+      <AddCommentModal
+          isOpen={isModalOpen}
+          onClose={() => setModalOpen(false)}
+          projectId={project._id}
+          userId={currentUser._id} 
+          onCommentAdded={handleAddComment}
+        />
+
     </div>
   );
 }

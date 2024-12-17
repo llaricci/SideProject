@@ -65,37 +65,39 @@ const Search = () => {
 
   const handleSearch = async () => {
     setError("");
+    setSearchResults([]); // Clear previous results
+  
     if (!queryInput) {
       setResults(<></>);
       setError("Please enter a search query");
       return;
     }
-
-    if (searchType === "projectsByTechnology") {
-      await projectsByTechnology({
-        variables: { technology: queryInput }
-      }).then((res) => {
-        setSearchResults(res.data.getProjectsByTechnology);
-      });
-
-    } else if (searchType === "projectByName") {
-      await projectByName({ variables: { searchTerm: queryInput } }).then(
-        (res) => {
-          setSearchResults(res.data.searchProjectByName);
-        }
-      );
-
-    } else if (searchType === "userByName") {
-      await userByName({ variables: { searchTerm: queryInput } }).then(
-        (res) => {
-          setSearchResults(res.data.searchUserByName);
-        }
-      );
-    } else {
-      setResults(<></>);
-      setError("Plesae select a search type");
+    try {
+      if (searchType === "projectsByTechnology") {
+        const { data } = await projectsByTechnology({
+          variables: { technology: queryInput },
+        });
+        setSearchResults(data?.getProjectsByTechnology || []);
+      } else if (searchType === "projectByName") {
+        const { data } = await projectByName({
+          variables: { searchTerm: queryInput },
+        });
+        setSearchResults(data?.searchProjectByName || []);
+      } else if (searchType === "userByName") {
+        const { data } = await userByName({
+          variables: { searchTerm: queryInput },
+        });
+        setSearchResults(data?.searchUserByName || []);
+      } else {
+        setResults(<></>);
+        setError("Please select a search type");
+      }
+    } catch (err) {
+      console.error("Error fetching search results:", err);
+      setError("An error occurred while fetching results.");
     }
   };
+  
 
   const renderResults = () => {
     if (
