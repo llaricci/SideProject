@@ -933,11 +933,12 @@ export const resolvers = {
           { _id: new ObjectId(args._id) },
           { $set: updateFields }
         );
-        if (!updatedUser.modifiedCount) {
+        
+        /*if (!updatedUser.modifiedCount) {
           throw new GraphQLError(`Could not update User`, {
             extensions: { code: "NOT_FOUND" },
           });
-        }
+        }*/
 
         // Update Redis cache
         await client.del(cacheKey, "$");
