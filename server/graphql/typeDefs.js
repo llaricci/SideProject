@@ -12,43 +12,44 @@ export const typeDefs = `#graphql
     }
 
     enum Technology {
-        JAVASCRIPT
-        PYTHON
-        JAVA
-        CSHARP
-        CPLUSPLUS
-        RUBY
-        PHP
-        TYPESCRIPT
-        SWIFT
-        KOTLIN
-        GO
-        RUST
-        HTML
-        CSS
-        SQL
-        GRAPHQL
-        NODE_JS
-        REACT
-        ANGULAR
-        VUE
-        NEXT_JS
-        SVELTE
-        TAILWINDCSS
-        BOOTSTRAP
-        AWS
-        GOOGLE_CLOUD
-        ORACLE_CLOUD
-        DOCKER
-        KUBERNETES
-        MONGODB
-        POSTGRESQL
-        REDIS
-        FIREBASE
-        GIT
-        GITHUB
-        OTHER
-    }
+    JavaScript
+    Python
+    Java
+    CSharp
+    CPlusPlus
+    Ruby
+    PHP
+    TypeScript
+    Swift
+    Kotlin
+    Go
+    Rust
+    HTML
+    CSS
+    SQL
+    GraphQL
+    NodeJS
+    React
+    Angular
+    Vue
+    NextJS
+    Svelte
+    TailwindCSS
+    Bootstrap
+    AWS
+    GoogleCloud
+    OracleCloud
+    Docker
+    Kubernetes
+    MongoDB
+    PostgreSQL
+    Redis
+    Firebase
+    Git
+    GitHub
+    Other
+}
+
 
     type Project {
         _id: String!

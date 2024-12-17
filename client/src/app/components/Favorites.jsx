@@ -47,7 +47,7 @@ function Favorites (props)
         Favorites Page
       </Typography>
     
-      <div className="grid grid-cols-3 place-items-center gap-3">
+      <div className="grid grid-cols-3 gap-3 place-items-center ">
 
       {favoritesList && favoritesList.map((favorite) => (
         <Card 
