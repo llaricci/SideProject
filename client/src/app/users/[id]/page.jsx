@@ -25,6 +25,8 @@ export default function ProfilePage() {
     let user = data.getUserById;
     let projects = user.projects;
 
+    console.log(projects);
+
     console.log(user);
     return (
       <div className="min-h-screen flex">

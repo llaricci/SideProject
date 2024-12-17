@@ -150,6 +150,12 @@ const getUserById = gql`
       password
       projects {
         _id
+        favoritedBy
+        {
+          _id
+          firstName
+          lastName
+        }
         name
         images
         comments {
@@ -163,6 +169,7 @@ const getUserById = gql`
         }
         technologies
         description
+        
       }
       favoriteProjects {
         _id
@@ -176,6 +183,7 @@ const getUserById = gql`
           firstName
           lastName
         }
+
 
       }
       profLanguages

@@ -30,6 +30,8 @@ export default function FavoritesList()
     
     else if (data) 
     {
+        
+        
         let user = data.getUserById;
 
         console.log(user);
