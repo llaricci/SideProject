@@ -13,20 +13,40 @@ import Divider from "@mui/material/Divider";
 
 //modal stuff
 import AddProjectModal from "../components/modals/AddProjectModal";
+import EditUserModal from "./modals/EditUserModal";
+import DeleteUserModal from "./modals/DeleteUser";
+
 import { useState } from "react";
 
 function Profile({ user }) {
   //modal stuff
   const [showAddModal, setShowAddModal] = useState(false);
 
+  const [editForm, showEditModal] = useState(false);
+  const [editProfile, setEditProfile] = useState(null);
+  
+  const [deleteForm, showDeleteModal] = useState(false);
+  const [deleteProfile, setDeleteProfile] = useState(false);
+
   const handleOpenAddModal = () => {
     setShowAddModal(true);
   };
 
+  const handleOpenEditModal = (user) => {
+    showEditModal(true);
+    setEditProfile(user);
+  };
+
+  const handleOpenDeleteModal = (user) => {
+    showDeleteModal(true);
+    setDeleteProfile(user);
+  };
+
+  
   const handleCloseModals = () => {
     setShowAddModal(false);
-    // setShowEditModal(false);
-    //setShowDeleteModal(false);
+    showEditModal(false);
+    showDeleteModal(false);
   };
   //
   return (
@@ -72,8 +92,21 @@ function Profile({ user }) {
           </Accordion>
         </CardContent>
         <CardActions sx={{ marginTop: "auto" }}>
-          <Button size="large">Edit Profile</Button>
-          <Button size="large">Delete Profile</Button>
+          <Button size="large"
+         onClick={() => 
+          {
+          handleOpenEditModal(user);
+        }}
+          
+          >Edit Profile</Button>
+
+          <Button size="large"
+          onClick={() => 
+            {
+            handleOpenDeleteModal(user);
+          }}
+          
+          >Delete Profile</Button>
         </CardActions>
         <Button size="large" onClick={() => handleOpenAddModal()}>
           Add Project
@@ -83,6 +116,22 @@ function Profile({ user }) {
           <AddProjectModal
             user={user}
             isOpen={showAddModal}
+            handleClose={handleCloseModals}
+          />
+        )}
+
+        {editForm && editProfile && (
+          <EditUserModal
+            isOpen={editForm}
+            user={user}
+            handleClose={handleCloseModals}
+          />
+        )}
+
+         {deleteForm && deleteProfile && (
+          <DeleteUserModal
+            isOpen={deleteForm}
+            user={user}
             handleClose={handleCloseModals}
           />
         )}
