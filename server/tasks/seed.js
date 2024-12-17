@@ -140,7 +140,7 @@ const main = async () => {
       lastName: `LastName${numberToWord[i]}`,
       email: `user${i + 1}@example.com`,
       bio: `Bio for User${i + 1}`,
-      password: await bcrypt.hash("password", 10),
+      password: await bcrypt.hash("Test123$", 10),
       projects: [],
       favoriteProjects: [],
       profLanguages: selectedLanguages,
@@ -237,6 +237,31 @@ const main = async () => {
       { $push: { comments: commentIds[i] } }
     );
   }
+
+  let testUser = 
+  {  
+    _id: new ObjectId("000000000000000000000000"),
+    firstName: "Fuecoco",
+    lastName: "FireCroc",
+    email: "fuecoco@example.com",
+    password: await bcrypt.hash("Test123$", 10),
+    bio: "A fire croc looking for a job! Have 5+ years of experience with React and 2 years with NextJS!",
+    profLanguages: [
+      "CPlusPlus",
+      "JavaScript",
+      "Python",
+      "NextJS",
+      "TailwindCSS",
+      "Svelte"
+    ],
+    projects: [],
+    favoriteProjects: []
+  }
+
+  await users.insertOne(testUser);
+
+
+
 
   console.log("Done seeding database");
   await closeConnection();
