@@ -18,7 +18,7 @@ import DeleteUserModal from "./modals/DeleteUserModal";
 
 import { useState } from "react";
 
-function Profile({ user }) {
+function Profile({ user, isOwner }) {
   //modal stuff
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -91,26 +91,23 @@ function Profile({ user }) {
             </AccordionDetails>
           </Accordion>
         </CardContent>
-        <CardActions sx={{ marginTop: "auto" }}>
-          <Button size="large"
-         onClick={() => 
-          {
-          handleOpenEditModal(user);
-        }}
-          
-          >Edit Profile</Button>
+     
 
-          <Button size="large"
-          onClick={() => 
-            {
-            handleOpenDeleteModal(user);
-          }}
-          
-          >Delete Profile</Button>
-        </CardActions>
-        <Button size="large" onClick={() => handleOpenAddModal()}>
-          Add Project
-        </Button>
+        {isOwner && (
+          <>
+            <CardActions sx={{ marginTop: "auto" }}>
+              <Button size="large" onClick={() => handleOpenEditModal(user)}>
+                Edit Profile
+              </Button>
+              <Button size="large" onClick={() => handleOpenDeleteModal(user)}>
+                Delete Profile
+              </Button>
+            </CardActions>
+            <Button size="large" onClick={handleOpenAddModal}>
+              Add Project
+            </Button>
+          </>
+        )}
 
         {showAddModal && (
           <AddProjectModal
@@ -128,7 +125,7 @@ function Profile({ user }) {
           />
         )}
 
-         {deleteForm && deleteProfile && (
+        {deleteForm && deleteProfile && (
           <DeleteUserModal
             isOpen={deleteForm}
             user={user}
