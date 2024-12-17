@@ -62,14 +62,6 @@ const Search = () => {
   const [userByName, { data: usersData }] = useLazyQuery(searchUserByName);
   const [results, setResults] = useState(<></>);
 
-  useEffect(() => {
-    if (searchResults.length === 0) {
-      setResults(<Typography>{"No results found"}</Typography>);
-    } else {
-      setResults(renderResults());
-    }
-    setError("");
-  }, [searchResults]);
   const handleSearch = async () => {
     setError("");
     if (!queryInput) {
@@ -100,52 +92,26 @@ const Search = () => {
       setError("Plesae select a search type");
     }
   };
+
   const renderResults = () => {
     if (
       searchType === "projectsByTechnology" &&
       projectsByTechData?.getProjectsByTechnology
     ) {
       return (
-        <ul>
-          {searchResults.map((project) => (
-            <li
-              key={project._id}
-              onClick={() => router.push(`/projects/${project._id}`)}
-            >
-              {project.name} - {project.technologies.join(",  ")}
-            </li>
-          ))}
-        </ul>
+        <AllProjectsList projectList={searchResults}/>
       );
     }
 
     if (searchType === "projectByName" && projectsData?.searchProjectByName) {
       return (
-        <ul>
-          {searchResults.map((project) => (
-            <li
-              key={project._id}
-              onClick={() => router.push(`/projects/${project._id}`)}
-            >
-              <AllProjectsList projectList={searchResults}/>
-            </li>
-          ))}
-        </ul>
+        <AllProjectsList projectList={searchResults}/>
       );
     }
 
     if (searchType === "userByName" && usersData?.searchUserByName) {
       return (
-        <ul>
-          {searchResults.map((user) => (
-            <li
-              key={user._id}
-              onClick={() => router.push(`/users/${user._id}`)}
-            >
-              <AllUsersList userList={searchResults}></AllUsersList>
-            </li>
-          ))}
-        </ul>
+        <AllUsersList userList={searchResults}></AllUsersList>
       );
     }
   };
@@ -155,7 +121,7 @@ const Search = () => {
       <Typography variant="h4" gutterBottom>
         Search
       </Typography>
-
+      
       <Box sx={{ marginBottom: 2, backgroundColor: "#ffffff" }}>
         <TextField
           select
@@ -218,8 +184,14 @@ const Search = () => {
       <Box sx={{ marginTop: 4 }}>
         <Typography variant="h6">Results:</Typography>
         {error && <Typography color="error">{error}</Typography>}
-        {results}
+
+        {searchResults.length === 0 ? (
+          <Typography>No results found</Typography>
+        ) : (
+          renderResults()
+        )}
       </Box>
+
     </Box>
   );
 };
