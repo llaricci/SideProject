@@ -23,39 +23,28 @@ function EditUserModal(props) {
   const [error, setError] = useState(false);
   const [user, setUser] = useState(props.user);
 
-  const [editUser] = useMutation(queries.editUser, {
-    onCompleted: (data) => {
-      console.log(data);
-      props.handleClose();
-    },
-  });
+  const [editUser] = useMutation(queries.editUser);
 
-  function checkEmail(email) {
-    if (!email) {
-      setError(`Error you must provide an email`);
-      return;
-    }
-
-    if (typeof email !== "string") {
-      setError(`Error: Email must be of type string`);
-      return;
-    }
-
+  function checkEmail(email) 
+  {
+    if (!email) throw new Error("Error: You must provide an email");
+  
+    if (typeof email !== "string")
+      throw new Error("Error: Email must be of type string");
+  
     email = email.trim();
-
-    if (email.length === 0) {
-      setError(`Email cannot be empty spaces`);
-      return;
-    }
-
+  
+    if (email.length === 0)
+      throw new Error("Error: Email cannot be empty spaces");
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(email)) {
-      setError(`Error: Invalid email format`);
-      return;
-    }
+  
+    if (!emailRegex.test(email))
+      throw new Error("Error: Invalid email format");
+  
     return email;
   }
+  
 
   const userSubmit = async (e) => {
     e.preventDefault();
@@ -79,7 +68,20 @@ function EditUserModal(props) {
 
     lastName = lastName.trim();
 
-    email = checkEmail(email);
+    try 
+    {
+      email = checkEmail(email);
+    } 
+    
+    catch (e) 
+    {
+      setError(e.message);
+      return;
+    }
+    
+    
+
+    email = email.trim();
 
     if (biography.trim().length < 2) {
       setError("Biography must be at least 2 characters");
@@ -116,7 +118,7 @@ function EditUserModal(props) {
           lastName: lastName,
           email: email,
           bio: biography,
-          profLanguages: selectedTechnologies,
+          profLanguages: selectedTechnologies
         },
       });
 
