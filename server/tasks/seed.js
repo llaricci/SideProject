@@ -50,6 +50,13 @@ const main = async () => {
   "GitHub",
   "Other"
   ];
+
+  const numberToWord = [
+    "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+    "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
+    "Eighteen", "Nineteen", "Twenty", "TwentyOne", "TwentyTwo", "TwentyThree", 
+    "TwentyFour", "TwentyFive"
+  ];
   
 
   // Create 25 users
@@ -61,8 +68,8 @@ const main = async () => {
     ];
     userList.push({
       _id: new ObjectId(),
-      firstName: `User${i + 1}`,
-      lastName: `LastName${i + 1}`,
+      firstName: `FirstName${numberToWord[i]}`,
+      lastName: `LastName${numberToWord[i]}`,
       email: `user${i + 1}@example.com`,
       bio: `Bio for User${i + 1}`,
       password: await bcrypt.hash("password", 10),
