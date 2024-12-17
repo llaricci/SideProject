@@ -42,10 +42,12 @@ function Header() {
             </Button>
 
             <Button color="inherit">
+            <Link href="/users/000000000000000000000000/favorites">
               <p className="text-[16px] font-bold text-gray-800">
                 <FavoriteIcon color = "error" />
                 Favorites
               </p>
+            </Link>
             </Button>
 
             <br />
@@ -66,7 +68,7 @@ function Header() {
               </Link>
             </Button>
             <Button color="inherit">
-              <Link href="/users/testuser">
+              <Link href="/users/000000000000000000000000">
                 <p className="text-[16px] font-bold text-gray-800">
                 <AccountCircleIcon />
                   View Profile
