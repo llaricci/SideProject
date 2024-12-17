@@ -11,9 +11,13 @@ import PersonIcon from '@mui/icons-material/Person';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
 
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 import Link from "next/link";
 
 function Header() {
+
+
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
@@ -67,14 +71,44 @@ function Header() {
                 </p>
               </Link>
             </Button>
+
             <Button color="inherit">
+              <Link href="/login">
+                <p className="text-[16px] font-bold text-gray-800">
+                <AccountCircleIcon />
+                  Login
+                </p>
+              </Link>
+            </Button>
+
+            <Button color="inherit">
+              <Link href="/signup">
+                <p className="text-[16px] font-bold text-gray-800">
+                <AccountCircleIcon />
+                  Sign Up
+                </p>
+              </Link>
+            </Button>
+
+      {/*Hardcoding user for testing  */}
+            {/* <Button color="inherit">
               <Link href="/users/000000000000000000000000">
                 <p className="text-[16px] font-bold text-gray-800">
                 <AccountCircleIcon />
                   View Profile
                 </p>
               </Link>
-            </Button>
+            </Button> */}
+{/* 
+            <Button color="inherit">
+              <Link href="/login">
+                <p className="text-[16px] font-bold text-gray-800">
+                <AccountCircleIcon />
+                  Logout
+                </p>
+              </Link>
+            </Button> */}
+
           </Toolbar>
         </AppBar>
       </Box>

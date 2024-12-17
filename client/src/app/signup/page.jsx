@@ -88,6 +88,7 @@ function SignupPage() {
               console.log(user);
               addUser({
                 variables: {
+                  firebaseUID : auth.currentUser.uid,
                   email: formData.email,
                   password: formData.password,
                   firstName: formData.firstName,

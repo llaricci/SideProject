@@ -13,7 +13,7 @@ const AddCommentModal = ({ isOpen, onClose, projectId, userId, onCommentAdded })
     try {
       const { data } = await addComment({
         variables: { 
-        userId : "000000000000000000000000",
+        userId : "000000000000000000000000", //Change later
         comment: fieldValues.comment,
         projectId 
         },

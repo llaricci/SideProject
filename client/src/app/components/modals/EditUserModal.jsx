@@ -111,6 +111,7 @@ function EditUserModal(props) {
       await editUser({
         variables: {
           id: user._id,
+          firebaseUID: user.firebaseUID,
           firstName: firstName,
           lastName: lastName,
           email: email,
