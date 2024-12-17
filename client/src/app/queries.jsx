@@ -305,6 +305,8 @@ const addProject = gql`
       images
       creator {
         _id
+        firstName
+        lastName
       }
       comments {
         _id
@@ -431,6 +433,8 @@ const editProject = gql`
       images
       creator {
         _id
+        firstName
+        lastName
       }
       comments {
         _id

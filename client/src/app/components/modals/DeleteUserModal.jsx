@@ -4,8 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import ReactModal from "react-modal";
 import queries from "../../queries";
 
-import { useRouter } from 'next/navigation';
-
+import { useRouter } from "next/navigation";
 
 ReactModal.setAppElement("#__next");
 
@@ -28,9 +27,15 @@ function DeleteUserModal(props) {
   const [showDeleteModal, setShowDeleteModal] = useState(props.isOpen);
   const [user, setUser] = useState(props.user);
   const [error, setError] = useState("");
-  const [deleteUser] = useMutation(queries.deleteUser);
+  const [deleteUser] = useMutation(queries.deleteUser, {
+    refetchQueries: [
+      {
+        query: queries.users,
+      },
+    ],
+  });
 
-  const router = useRouter()
+  const router = useRouter();
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
@@ -51,7 +56,7 @@ function DeleteUserModal(props) {
 
       setError("");
       props.handleClose();
-      router.push('/users');
+      router.push("/users");
     } catch (e) {
       setError(e.message);
       return;
@@ -74,7 +79,8 @@ function DeleteUserModal(props) {
           {error}
         </h3>
         <label className="block text-2xl font-medium mb-1">
-          Are you sure you want to delete user: {user.firstName} {user.lastName}?
+          Are you sure you want to delete user: {user.firstName} {user.lastName}
+          ?
         </label>
         <br />
         <div className="flex justify-between items-center">

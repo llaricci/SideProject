@@ -25,14 +25,12 @@ function EditProjectModal(props) {
   const [images, setImages] = useState(project.images);
   const [imagePreview, setImagePreview] = useState(project.images);
   const [editProject] = useMutation(queries.editProject, {
-    refetchQueries: [
-      {
-        query: queries.GetProjectById,
-        variables: { id: project._id },
-      },
-    ],
     onError(err) {
       setError(err.message);
+    },
+    onCompleted: (data) => {
+      console.log(data);
+      props.handleClose();
     },
   });
   const imageUpload = (e) => {
@@ -153,42 +151,42 @@ function EditProjectModal(props) {
   };
 
   const technologies = [
-   "JavaScript",
-  "Python",
-  "Java",
-  "CSharp",
-  "CPlusPlus",
-  "Ruby",
-  "PHP",
-  "TypeScript",
-  "Swift",
-  "Kotlin",
-  "Go",
-  "Rust",
-  "HTML",
-  "CSS",
-  "SQL",
-  "GraphQL",
-  "NodeJS",
-  "React",
-  "Angular",
-  "Vue",
-  "NextJS",
-  "Svelte",
-  "TailwindCSS",
-  "Bootstrap",
-  "AWS",
-  "GoogleCloud",
-  "OracleCloud",
-  "Docker",
-  "Kubernetes",
-  "MongoDB",
-  "PostgreSQL",
-  "Redis",
-  "Firebase",
-  "Git",
-  "GitHub",
-  "Other"
+    "JavaScript",
+    "Python",
+    "Java",
+    "CSharp",
+    "CPlusPlus",
+    "Ruby",
+    "PHP",
+    "TypeScript",
+    "Swift",
+    "Kotlin",
+    "Go",
+    "Rust",
+    "HTML",
+    "CSS",
+    "SQL",
+    "GraphQL",
+    "NodeJS",
+    "React",
+    "Angular",
+    "Vue",
+    "NextJS",
+    "Svelte",
+    "TailwindCSS",
+    "Bootstrap",
+    "AWS",
+    "GoogleCloud",
+    "OracleCloud",
+    "Docker",
+    "Kubernetes",
+    "MongoDB",
+    "PostgreSQL",
+    "Redis",
+    "Firebase",
+    "Git",
+    "GitHub",
+    "Other",
   ];
 
   return (

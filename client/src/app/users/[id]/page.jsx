@@ -10,6 +10,9 @@ import queries from "../../queries";
 
 export default function ProfilePage() {
   let { id } = useParams();
+  const projects = useQuery(queries.projects, {
+    fetchPolicy: "cache-and-network",
+  });
   const { loading, error, data } = useQuery(queries.getUserById, {
     fetchPolicy: "cache-and-network",
     variables: { id: id },

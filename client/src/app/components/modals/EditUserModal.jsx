@@ -19,53 +19,44 @@ const customStyles = {
   },
 };
 
-
-
 function EditUserModal(props) {
   const [error, setError] = useState(false);
   const [user, setUser] = useState(props.user);
 
   const [editUser] = useMutation(queries.editUser, {
-    refetchQueries: [
-      {
-        query: queries.getUserById,
-        variables: { id: user._id },
-      },
-    ],
+    onCompleted: (data) => {
+      console.log(data);
+      props.handleClose();
+    },
   });
 
-  function checkEmail (email) 
-  {
-    if (!email)
-    {
-        setError(`Error you must provide an email`);
-        return;
+  function checkEmail(email) {
+    if (!email) {
+      setError(`Error you must provide an email`);
+      return;
     }
 
-    if (typeof email !== 'string')
-    {
-        setError(`Error: Email must be of type string`);
-        return;
+    if (typeof email !== "string") {
+      setError(`Error: Email must be of type string`);
+      return;
     }
 
     email = email.trim();
 
-    if (email.length === 0)
-    {
-        setError(`Email cannot be empty spaces`);
-        return;
+    if (email.length === 0) {
+      setError(`Email cannot be empty spaces`);
+      return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email)) 
-    {
-        setError(`Error: Invalid email format`);
-        return;
+    if (!emailRegex.test(email)) {
+      setError(`Error: Invalid email format`);
+      return;
     }
     return email;
   }
-  
+
   const userSubmit = async (e) => {
     e.preventDefault();
 
@@ -74,17 +65,14 @@ function EditUserModal(props) {
     let email = document.getElementById("email").value;
     let biography = document.getElementById("biography").value;
 
-   
-    if (firstName.trim().length < 2 || firstName.trim().length > 50) 
-    {
+    if (firstName.trim().length < 2 || firstName.trim().length > 50) {
       setError("First Name must be between 2 and 50 characters!");
       return;
     }
 
     firstName = firstName.trim();
 
-    if (lastName.trim().length < 2 || lastName.trim().length > 50) 
-    {
+    if (lastName.trim().length < 2 || lastName.trim().length > 50) {
       setError("Last Name must be between 2 and 50 characters!");
       return;
     }
@@ -93,8 +81,7 @@ function EditUserModal(props) {
 
     email = checkEmail(email);
 
-    if (biography.trim().length < 2)
-    {
+    if (biography.trim().length < 2) {
       setError("Biography must be at least 2 characters");
       return;
     }
@@ -104,29 +91,23 @@ function EditUserModal(props) {
     const formData = new FormData(e.target);
     const selectedTechnologies = formData.getAll("technologies");
 
-    if (selectedTechnologies.length <= 0) 
-      {
+    if (selectedTechnologies.length <= 0) {
       setError("At least one technology must be checked!");
       return;
     }
 
-
-
-    let obj =
-    {
+    let obj = {
       id: user._id,
       firstName: firstName,
       lastName: lastName,
       email: email,
       bio: biography,
-      profLanguages: selectedTechnologies
-    }
+      profLanguages: selectedTechnologies,
+    };
 
     console.log(obj);
 
-   
-    try 
-    {
+    try {
       await editUser({
         variables: {
           id: user._id,
@@ -134,16 +115,13 @@ function EditUserModal(props) {
           lastName: lastName,
           email: email,
           bio: biography,
-          profLanguages: selectedTechnologies
+          profLanguages: selectedTechnologies,
         },
       });
 
       setError("");
       props.handleClose();
-    } 
-    
-    catch (e) 
-    {
+    } catch (e) {
       setError(e.message);
       return;
     }
@@ -156,44 +134,42 @@ function EditUserModal(props) {
 
   const technologies = [
     "JavaScript",
-   "Python",
-   "Java",
-   "CSharp",
-   "CPlusPlus",
-   "Ruby",
-   "PHP",
-   "TypeScript",
-   "Swift",
-   "Kotlin",
-   "Go",
-   "Rust",
-   "HTML",
-   "CSS",
-   "SQL",
-   "GraphQL",
-   "NodeJS",
-   "React",
-   "Angular",
-   "Vue",
-   "NextJS",
-   "Svelte",
-   "TailwindCSS",
-   "Bootstrap",
-   "AWS",
-   "GoogleCloud",
-   "OracleCloud",
-   "Docker",
-   "Kubernetes",
-   "MongoDB",
-   "PostgreSQL",
-   "Redis",
-   "Firebase",
-   "Git",
-   "GitHub",
-   "Other"
-   ];
-
-  
+    "Python",
+    "Java",
+    "CSharp",
+    "CPlusPlus",
+    "Ruby",
+    "PHP",
+    "TypeScript",
+    "Swift",
+    "Kotlin",
+    "Go",
+    "Rust",
+    "HTML",
+    "CSS",
+    "SQL",
+    "GraphQL",
+    "NodeJS",
+    "React",
+    "Angular",
+    "Vue",
+    "NextJS",
+    "Svelte",
+    "TailwindCSS",
+    "Bootstrap",
+    "AWS",
+    "GoogleCloud",
+    "OracleCloud",
+    "Docker",
+    "Kubernetes",
+    "MongoDB",
+    "PostgreSQL",
+    "Redis",
+    "Firebase",
+    "Git",
+    "GitHub",
+    "Other",
+  ];
 
   return (
     <div>
@@ -218,7 +194,7 @@ function EditUserModal(props) {
               defaultValue={user.firstName}
               className=" w-full rounded-md border-2 border-blue-500 rounded-full"
             />
-            <br /> 
+            <br />
             <label className="text-xl font- mb-1"> Last Name: </label>
             <textarea
               id="lastName"
@@ -232,7 +208,7 @@ function EditUserModal(props) {
               defaultValue={user.email}
               className=" w-full rounded-md border-2 border-blue-500 rounded-full"
             />
-            <br /> 
+            <br />
             <label className="text-xl font- mb-1"> Biography: </label>
             <textarea
               id="biography"
@@ -240,7 +216,10 @@ function EditUserModal(props) {
               className=" w-full rounded-md border-2 border-blue-500 rounded-full"
             />
 
-            <label className="text-xl font- mb-1"> Proficient Technologies </label>
+            <label className="text-xl font- mb-1">
+              {" "}
+              Proficient Technologies{" "}
+            </label>
             <div className="grid grid-cols-8 gap-1">
               {technologies.map((tech) => (
                 <div key={tech} className="mb-2">
@@ -256,7 +235,7 @@ function EditUserModal(props) {
                 </div>
               ))}
             </div>
-           
+
             <div className="flex justify-between items-center">
               <button
                 type="submit"

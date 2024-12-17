@@ -9,41 +9,41 @@ const saltRounds = 10;
 
 const Technologies = [
   "JavaScript",
-   "Python",
-   "Java",
-   "CSharp",
-   "CPlusPlus",
-   "Ruby",
-   "PHP",
-   "TypeScript",
-   "Swift",
-   "Kotlin",
-   "Go",
-   "Rust",
-   "HTML",
-   "CSS",
-   "SQL",
-   "GraphQL",
-   "NodeJS",
-   "React",
-   "Angular",
-   "Vue",
-   "NextJS",
-   "Svelte",
-   "TailwindCSS",
-   "Bootstrap",
-   "AWS",
-   "GoogleCloud",
-   "OracleCloud",
-   "Docker",
-   "Kubernetes",
-   "MongoDB",
-   "PostgreSQL",
-   "Redis",
-   "Firebase",
-   "Git",
-   "GitHub",
-   "Other"
+  "Python",
+  "Java",
+  "CSharp",
+  "CPlusPlus",
+  "Ruby",
+  "PHP",
+  "TypeScript",
+  "Swift",
+  "Kotlin",
+  "Go",
+  "Rust",
+  "HTML",
+  "CSS",
+  "SQL",
+  "GraphQL",
+  "NodeJS",
+  "React",
+  "Angular",
+  "Vue",
+  "NextJS",
+  "Svelte",
+  "TailwindCSS",
+  "Bootstrap",
+  "AWS",
+  "GoogleCloud",
+  "OracleCloud",
+  "Docker",
+  "Kubernetes",
+  "MongoDB",
+  "PostgreSQL",
+  "Redis",
+  "Firebase",
+  "Git",
+  "GitHub",
+  "Other",
 ];
 
 export const resolvers = {
@@ -835,6 +835,7 @@ export const resolvers = {
 
         // Update Redis cache
         await client.del(`project_${args._id}`, "$");
+        await client.flushAll();
         await client.json.set(`project_${args._id}`, "$", projectAfterUpdate);
 
         return projectAfterUpdate;
@@ -933,7 +934,7 @@ export const resolvers = {
           { _id: new ObjectId(args._id) },
           { $set: updateFields }
         );
-        
+
         /*if (!updatedUser.modifiedCount) {
           throw new GraphQLError(`Could not update User`, {
             extensions: { code: "NOT_FOUND" },
@@ -942,6 +943,7 @@ export const resolvers = {
 
         // Update Redis cache
         await client.del(cacheKey, "$");
+        await client.flushAll();
         await client.json.set(cacheKey, "$", newUser);
         await client.expire(cacheKey, 3600);
 
@@ -1006,6 +1008,7 @@ export const resolvers = {
 
         // Clear Redis cache
         await client.del(`user_${args._id}`, "$");
+        await client.del("users", "$");
         await client.del(`projects`, "$");
         await client.del(`comments`, "$");
 
@@ -1064,7 +1067,7 @@ export const resolvers = {
         // Clear Redis cache
         await client.del(`project_${args._id}`, "$");
         await client.json.del(`user_${projectToDelete.creatorId}`, "$");
-
+        await client.flushAll();
         return projectToDelete;
       } catch (e) {
         throw new GraphQLError(`Error deleting project: ${e.message}`, {

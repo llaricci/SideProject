@@ -29,7 +29,6 @@ function AddProjectModal(props) {
   const [showAddModal, setShowAddModal] = useState(props.isOpen);
 
   const [error, setError] = useState(false);
-
   const [addProject] = useMutation(queries.addProject, {
     refetchQueries: [
       {
@@ -37,27 +36,14 @@ function AddProjectModal(props) {
         variables: { id: props.user._id },
       },
     ],
-
     update(cache, { data: { addProject } }) {
-      const existingData = cache.readQuery({
-        query: queries.getUserById,
-        variables: { id: props.user._id },
+      const { projects } = cache.readQuery({
+        query: queries.projects,
       });
-
-      if (existingData?.getUserById?.projects) {
-        const { getUserById } = existingData;
-
-        cache.writeQuery({
-          query: queries.getUserById,
-          variables: { id: props.user._id },
-          data: {
-            getUserById: {
-              ...getUserById,
-              projects: [...getUserById.projects, addProject],
-            },
-          },
-        });
-      }
+      cache.writeQuery({
+        query: queries.projects,
+        data: { projects: [...projects, addProject] },
+      });
     },
   });
 
@@ -68,41 +54,41 @@ function AddProjectModal(props) {
 
   const [technologies, setTechnologies] = useState([
     "JavaScript",
-  "Python",
-  "Java",
-  "C#",
-  "C++",
-  "Ruby",
-  "PHP",
-  "TypeScript",
-  "Swift",
-  "Kotlin",
-  "Go",
-  "Rust",
-  "HTML",
-  "CSS",
-  "SQL",
-  "GraphQL",
-  "Node.js",
-  "React",
-  "Angular",
-  "Vue",
-  "Next.js",
-  "Svelte",
-  "Tailwind CSS",
-  "Bootstrap",
-  "AWS",
-  "Google Cloud",
-  "Oracle Cloud",
-  "Docker",
-  "Kubernetes",
-  "MongoDB",
-  "PostgreSQL",
-  "Redis",
-  "Firebase",
-  "Git",
-  "GitHub",
-  "Other"
+    "Python",
+    "Java",
+    "C#",
+    "C++",
+    "Ruby",
+    "PHP",
+    "TypeScript",
+    "Swift",
+    "Kotlin",
+    "Go",
+    "Rust",
+    "HTML",
+    "CSS",
+    "SQL",
+    "GraphQL",
+    "Node.js",
+    "React",
+    "Angular",
+    "Vue",
+    "Next.js",
+    "Svelte",
+    "Tailwind CSS",
+    "Bootstrap",
+    "AWS",
+    "Google Cloud",
+    "Oracle Cloud",
+    "Docker",
+    "Kubernetes",
+    "MongoDB",
+    "PostgreSQL",
+    "Redis",
+    "Firebase",
+    "Git",
+    "GitHub",
+    "Other",
   ]);
   const handleChangeTechnologies = (i, technology) => {
     const newTechnology = [...technologies];

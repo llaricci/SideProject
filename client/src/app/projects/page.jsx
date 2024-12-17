@@ -17,7 +17,9 @@ export default function AllProjects() {
     return (
       <div className="bg-white ">
         <section className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">All Projects</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            All Projects
+          </h1>
           <AllProjectsList projectList={projects} />
           <div className="flex-auto space-x-4"></div>
         </section>
