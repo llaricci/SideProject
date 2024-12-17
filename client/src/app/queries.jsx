@@ -168,8 +168,11 @@ const getUserById = gql`
           comment
         }
         technologies
-        description
-        
+        description   
+        creator
+        {
+          _id
+        }
       }
       favoriteProjects {
         _id
