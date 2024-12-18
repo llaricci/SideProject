@@ -73,6 +73,41 @@ export const resolvers = {
         });
       }
     },
+    getUserByFirebaseUID: async (_, args, contextValue) => {
+      try {
+        const client = contextValue.redisClient;
+        const cacheKey = `user_${args.firebaseUID}`;
+
+        // Validate ObjectId
+        validation.checkFirebaseUID(args.firebaseUID);
+
+        // Check if the user is cached
+        const cachedUser = await client.json.get(cacheKey, "$");
+        if (cachedUser) {
+          return cachedUser;
+        }
+        // If not cached, fetch from the database
+        const users = await Users();
+        const user = await users.findOne({ firebaseUID: args.firebaseUID });
+        if (!user) {
+          throw new GraphQLError("User not found", {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        // Cache the user in Redis
+        await client.json.set(cacheKey, "$", user);
+        await client.expire(cacheKey, 3600);
+
+        return user;
+      } catch (e) {
+        if (e instanceof GraphQLError) {
+          throw e;
+        }
+        throw new GraphQLError(`Error fetching user: ${e}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
+    },
     getUserById: async (_, args, contextValue) => {
       try {
         const client = contextValue.redisClient;

@@ -4,6 +4,7 @@ export const typeDefs = `#graphql
         getProjectById(_id: String!): Project
         users: [User]
         getUserById(_id: String!): User
+        getUserByFirebaseUID(firebaseUID: String!): User
         comments: [Comment]
         getCommentById(_id: String!): Comment
         getProjectsByTechnology(technology: Technology!): [Project]
@@ -50,7 +51,7 @@ export const typeDefs = `#graphql
     Other
     }
 
-
+    
     type Project {
         _id: String!
         name: String! 

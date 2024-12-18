@@ -141,7 +141,55 @@ const users = gql`
     }
   }
 `;
-
+const GetUserByFirebaseUID = gql`
+  query GetUserByFirebaseUID($firebaseUid: String!) {
+    getUserByFirebaseUID(firebaseUID: $firebaseUid) {
+      _id
+      firstName
+      lastName
+      email
+      bio
+      password
+      projects {
+        _id
+        favoritedBy {
+          _id
+          firstName
+          lastName
+        }
+        name
+        images
+        comments {
+          _id
+          user {
+            _id
+            firstName
+            lastName
+          }
+          comment
+        }
+        technologies
+        description
+        creator {
+          _id
+        }
+      }
+      favoriteProjects {
+        _id
+        name
+        technologies
+        description
+        images
+        creator {
+          _id
+          firstName
+          lastName
+        }
+      }
+      profLanguages
+    }
+  }
+`;
 const getUserById = gql`
   query GetUserById($id: String!) {
     getUserById(_id: $id) {
