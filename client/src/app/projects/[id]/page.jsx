@@ -18,18 +18,29 @@ export default function ProjectPage() {
     variables: { id: id },
   });
 
-  if (loading) {
+  const { loading: loading2, error: error2, data: data2 } = useQuery(queries.getUserById, {
+    fetchPolicy: "cache-and-network",
+    variables: { id: "000000000000000000000000" },
+  });
+
+  if (loading || loading2) 
+  {
     return <div>Loading...</div>;
   }
 
-  if (error) {
+  if (error || error2) 
+  {
     redirect("/error");
-  } else if (data) {
+  } 
+  
+  else if (data && data2) 
+  {
     let project = data.getProjectById;
+    let user = data2.getUserById;
 
     return (
       <div>
-        <Project project={project} />
+        <Project project={project} currentUser = {user} />
       </div>
     );
   }

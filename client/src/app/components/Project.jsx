@@ -8,8 +8,39 @@ import queries from "../queries";
 import { useQuery } from "@apollo/client";
 import { useState } from "react";
 
-function Project({ project }) 
+import { Button } from "@mui/material";
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import HeartBrokenIcon from '@mui/icons-material/HeartBroken';
+
+import AddFavoriteModal from "./modals/AddFavoriteModal";
+import DeleteFavoriteModal from "./modals/DeleteFavoriteModal";
+
+//Current user mock auth handled in /projects/[id]/page.jsx file
+//Set to Fuecoco Firecroc for testing purposes
+function Project({ project, currentUser }) 
 {
+  const [addFavoritesForm, showAddFavoritesForm] = useState(false);
+  const [addFavorite, setAddFavorite] = useState(false);
+    
+  const [deleteFavoritesForm, showDeleteFavoritesForm] = useState(false);
+  const [deleteFavorite, setDeleteFavorite] = useState(false);
+  
+  const handleOpenDeleteModal = (project) => {
+      showDeleteFavoritesForm(true);
+      setDeleteFavorite(project);
+    };
+  
+  const handleOpenAddModal = (project) => {
+      showAddFavoritesForm(true);
+      setAddFavorite(project);
+    };
+  
+  const handleCloseModals = () => {
+      showAddFavoritesForm(false);
+      showDeleteFavoritesForm(false);
+    };
+
+
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [comments, setComments] = useState(project.comments || []);
@@ -20,9 +51,6 @@ function Project({ project })
     setComments((prev) => [...prev, newComment]);
   };
 
-  const currentUser = {
-    _id: "000000000000000000000000", // Replace this with actual authenticated user ID
-  };
 
   const hasUserCommented = comments.some(
     (comment) => comment.user._id === currentUser._id
@@ -113,7 +141,6 @@ ${projectFavorites}
 
 `;
 
-
   return (
     <div
       className="justify-items-center bg-white text-white"
@@ -196,6 +223,21 @@ ${projectFavorites}
       )}
 
       <br />
+      <br />
+
+      {currentUser.favoriteProjects.some(projectObj => projectObj._id === project._id) ? (
+              <Button size="large" color="info" variant="contained" onClick={() => {
+                handleOpenDeleteModal(project);
+              }}>
+                <HeartBrokenIcon color="error" /> Remove Favorite
+              </Button>
+            ) : (
+              <Button size="large" color="info" variant="contained" onClick={() => {
+                handleOpenAddModal(project);
+              }}>
+                <FavoriteIcon color="error" /> Add Favorite
+              </Button>
+            )}
 
 
       </div>
@@ -207,6 +249,24 @@ ${projectFavorites}
           userId={currentUser._id} 
           onCommentAdded={handleAddComment}
         />
+
+      {addFavoritesForm && addFavorite && (
+          <AddFavoriteModal
+            isOpen={addFavoritesForm}
+            project={addFavorite}
+            user={currentUser}
+            handleClose={handleCloseModals}
+          />
+        )}
+
+        {deleteFavoritesForm && deleteFavorite && (
+          <DeleteFavoriteModal
+            isOpen={deleteFavoritesForm}
+            project={deleteFavorite}
+            user={currentUser}
+            handleClose={handleCloseModals}
+          />
+        )}
 
     </div>
   );
