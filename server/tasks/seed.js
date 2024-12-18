@@ -101,6 +101,24 @@ const main = async () => {
     "A platform for managing and tracking dependencies across projects with detailed insights.",
     "A code refactoring tool that automates the process of improving and optimizing code quality."
   ];
+
+  const firstNames = [
+    "Olivia", "Liam", "Emma", "Noah", "Ava", "Elijah", "Isabella", "Lucas", "Mia", "James",
+    "Amelia", "Benjamin", "Harper", "Mason", "Evelyn", "Jackson", "Abigail", "Ethan", "Emily", "Alexander", "Sofia",
+    "Henry", "Charlotte", "Sebastian", "Ella", "Matthew", "Scarlett", "Aiden", "Grace", "Jack", "Zoey",
+    "Michael", "Aria", "Daniel", "Chloe", "Logan", "Penelope", "Jackson", "Layla", "David", "Nora",
+    "Owen", "Lily", "Samuel", "Victoria", "Carter", "Riley", "Isaac", "Eleanor", "Wyatt", "Mila"
+  ];
+
+  const lastNames = [
+    "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor",
+    "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Roberts",
+    "Gonzalez", "Clark", "Rodriguez", "Lewis", "Lee", "Walker", "Young", "Hall", "Allen", "King",
+    "Wright", "Scott", "Green", "Adams", "Baker", "Nelson", "Carter", "Mitchell", "Perez", "Robinson",
+    "Hernandez", "Gomez", "Sanchez", "Morris", "Murphy", "Cameron", "Collins", "Reed", "Stewart", "Mason"
+  ];
+  
+  
   
   
 
@@ -115,8 +133,8 @@ const main = async () => {
     userList.push({
       _id: new ObjectId(),
       firebaseUID: generateFirebaseUID(), // Random Firebase UID
-      firstName: `User`,
-      lastName: numberToWord[i],
+      firstName: firstNames[i],
+      lastName: lastNames[i],
       email: `user${i + 1}@example.com`,
       bio: `Bio for User${i + 1}`,
       password: await bcrypt.hash("Test123$", 10),
@@ -172,7 +190,7 @@ const main = async () => {
     commentList.push({
       _id: new ObjectId(),
       userId: userIds[userIndex],
-      comment: `Comment by User${i + 1} on Project ${projectIndex1 + 1}`,
+      comment: `${firstNames[i]} commented on Project ${projectIndex1 + 1}`,
       projectId: projectIds[projectIndex1],
     });
     await projects.updateOne(
