@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -10,13 +13,27 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import PersonIcon from '@mui/icons-material/Person';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
-
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 import Link from "next/link";
+import { auth } from "@/lib/config/firebaseAuth";
 
 function Header() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe(); // Clean up the subscription on unmount
+  }, []);
+
+  if (loading) {
+    return null; // Optionally show a spinner or placeholder while loading
+  }
 
   return (
     <div>
@@ -38,77 +55,81 @@ function Header() {
               </Link>
             </Typography>
 
-            <Button color="inherit" href = "/search">
-                <p className="text-[16px] font-bold text-gray-800">
-                <SearchIcon />
-                  Search
-                </p>
-            </Button>
-
-            <Button color="inherit">
-            <Link href="/users/000000000000000000000000/favorites">
+            <Button color="inherit" href="/search">
               <p className="text-[16px] font-bold text-gray-800">
-                <FavoriteIcon color = "error" />
-                Favorites
+                <SearchIcon />
+                Search
               </p>
-            </Link>
             </Button>
 
-            <br />
-            <Button color="inherit">
-              <Link href="/users">
-                <p className="text-[16px] font-bold text-gray-800">
-                  <PersonIcon />
-                  All Users
-                </p>
-              </Link>
-            </Button>
-            <Button color="inherit">
-              <Link href="/projects">
-                <p className="text-[16px] font-bold text-gray-800">
-                  <IntegrationInstructionsIcon/>
-                  All Projects
-                </p>
-              </Link>
-            </Button>
-
-            <Button color="inherit">
-              <Link href="/login">
-                <p className="text-[16px] font-bold text-gray-800">
-                <AccountCircleIcon />
-                  Login
-                </p>
-              </Link>
-            </Button>
-
-            <Button color="inherit">
-              <Link href="/signup">
-                <p className="text-[16px] font-bold text-gray-800">
-                <AccountCircleIcon />
-                  Sign Up
-                </p>
-              </Link>
-            </Button>
-
-      {/*Hardcoding user for testing  */}
-            {/* <Button color="inherit">
-              <Link href="/users/000000000000000000000000">
-                <p className="text-[16px] font-bold text-gray-800">
-                <AccountCircleIcon />
-                  View Profile
-                </p>
-              </Link>
-            </Button> */}
-{/* 
-            <Button color="inherit">
-              <Link href="/login">
-                <p className="text-[16px] font-bold text-gray-800">
-                <AccountCircleIcon />
-                  Logout
-                </p>
-              </Link>
-            </Button> */}
-
+            {user ? (
+              <>
+                {/* Menu items for logged-in users */}
+                <Button color="inherit">
+                  <Link href={`/users/${user.uid}/favorites`}>
+                    <p className="text-[16px] font-bold text-gray-800">
+                      <FavoriteIcon color="error" />
+                      Favorites
+                    </p>
+                  </Link>
+                </Button>
+                <Button color="inherit">
+                  <Link href="/users">
+                    <p className="text-[16px] font-bold text-gray-800">
+                      <PersonIcon />
+                      All Users
+                    </p>
+                  </Link>
+                </Button>
+                <Button color="inherit">
+                  <Link href="/projects">
+                    <p className="text-[16px] font-bold text-gray-800">
+                      <IntegrationInstructionsIcon />
+                      All Projects
+                    </p>
+                  </Link>
+                </Button>
+                <Button color="inherit">
+                  <Link href={`/users/${user.uid}`}>
+                    <p className="text-[16px] font-bold text-gray-800">
+                      <AccountCircleIcon />
+                      Profile
+                    </p>
+                  </Link>
+                </Button>
+                <Button
+                  color="inherit"
+                  onClick={() => {
+                    signOut(auth);
+                  }}
+                >
+                  <p className="text-[16px] font-bold text-gray-800">
+                    <AccountCircleIcon />
+                    Logout
+                  </p>
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* Menu items for guests */}
+                <Button color="inherit">
+                  <Link href="/login">
+                    <p className="text-[16px] font-bold text-gray-800">
+                      <AccountCircleIcon />
+                      Login
+                    </p>
+                  </Link>
+                </Button>
+                <Button color="inherit">
+                  <Link href="/signup">
+                    <p className="text-[16px] font-bold text-gray-800">
+                      <AccountCircleIcon />
+                      Sign Up
+                    </p>
+                  </Link>
+                </Button>
+              </>
+            )}
           </Toolbar>
         </AppBar>
       </Box>
