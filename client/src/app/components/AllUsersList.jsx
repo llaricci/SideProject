@@ -8,6 +8,9 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 
+import { Divider } from "@mui/material";
+
+
 function AllUsersList(props) {
   const userList = props.userList;
   return (
@@ -20,9 +23,13 @@ function AllUsersList(props) {
                 {user.firstName} {user.lastName}
               </Typography>
               <br />
+              <Divider sx={{ borderBottomWidth: 5 }} />
+              <br />
               <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
                 Technologies: {user.profLanguages.join(", ")}
               </Typography>
+              <br />
+              <Divider sx={{ borderBottomWidth: 5 }} />
               <br />
               <Typography variant="body2">
                 {user.email}
@@ -35,12 +42,8 @@ function AllUsersList(props) {
               </Typography>
             </CardContent>
             <CardActions className="flex justify-center">
-              <Button size="large">
-                <Link href={`/users/${user._id}`}>
-                  <p className="text-base font-bold text-blue-800 mb-4">
+              <Button size="large" color = "info" variant = "contained" href={`/users/${user._id}`}>
                     View Details
-                  </p>
-                </Link>
               </Button>
             </CardActions>
             <CardActions></CardActions>

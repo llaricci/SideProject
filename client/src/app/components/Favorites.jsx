@@ -81,12 +81,15 @@ function Favorites (props)
                 <br />
                 <Divider />
                 <br />
-                <Button size = "large" href = {`/projects/${favorite._id}`}>
+                <Button size = "large" variant = "contained" color = "info" href = {`/projects/${favorite._id}`}>
                     View Details
                 </Button>
                 <br />
+                <br />
                 <Button
                 size="large"
+                variant = "contained" 
+                color = "info"
                 
                 onClick={() => {
                   handleOpenDeleteModal(favorite);

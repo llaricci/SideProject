@@ -115,7 +115,7 @@ function ProjectList({projectList, user, isOwner, currentUser, favorites}) {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button size="large" href={`/projects/${project._id}`}>
+              <Button size="large" color = "info" variant = "contained" href={`/projects/${project._id}`}>
                 View Details
               </Button>
             </CardActions>
@@ -145,6 +145,8 @@ function ProjectList({projectList, user, isOwner, currentUser, favorites}) {
             <CardActions>
               <Button
                 size="large"
+                variant = "contained"
+                color = "info"
                 onClick={() => {
                   handleOpenAddModal(project );
                 }}
@@ -159,6 +161,8 @@ function ProjectList({projectList, user, isOwner, currentUser, favorites}) {
             <CardActions>
               <Button
                 size="large"
+                variant = "contained"
+                color = "info"
                 onClick={() => {
                   handleOpenDeleteFavoriteModal(project );
                 }}
