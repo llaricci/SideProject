@@ -187,7 +187,8 @@ function AddProjectModal(props) {
       //alert("Project successfully edited");
       setError("");
       props.handleClose();
-    } catch (e) {
+    } 
+    catch (e) {
       setError(e.message);
       return;
     }

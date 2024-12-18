@@ -225,19 +225,19 @@ ${projectFavorites}
       <br />
       <br />
 
-      {currentUser.favoriteProjects.some(projectObj => projectObj._id === project._id) ? (
-              <Button size="large" color="info" variant="contained" onClick={() => {
-                handleOpenDeleteModal(project);
-              }}>
-                <HeartBrokenIcon color="error" /> Remove Favorite
-              </Button>
-            ) : (
-              <Button size="large" color="info" variant="contained" onClick={() => {
-                handleOpenAddModal(project);
-              }}>
-                <FavoriteIcon color="error" /> Add Favorite
-              </Button>
-            )}
+      {currentUser._id !== project.creator._id && 
+        (
+        currentUser.favoriteProjects.some(projectObj => projectObj._id === project._id) ? (
+          <Button size="large" color="info" variant="contained" onClick={() => handleOpenDeleteModal(project)}>
+            <HeartBrokenIcon color="error" /> Remove Favorite
+          </Button>
+        ) : 
+        (
+          <Button size="large" color="info" variant="contained" onClick={() => handleOpenAddModal(project)}>
+            <FavoriteIcon color="error" /> Add Favorite
+          </Button>
+        )
+      )}
 
 
       </div>
