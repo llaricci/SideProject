@@ -9,8 +9,43 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { Divider } from "@mui/material";
 
-function AllProjectsList(props) {
+import AddFavoriteModal from "./modals/AddFavoriteModal";
+import DeleteFavoriteModal from "./modals/DeleteFavoriteModal";
+
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import HeartBrokenIcon from '@mui/icons-material/HeartBroken';
+
+function AllProjectsList(props) 
+{
+  
+  const [addFavoritesForm, showAddFavoritesForm] = useState(false);
+  const [addFavorite, setAddFavorite] = useState(false);
+  
+  const [deleteFavoritesForm, showDeleteFavoritesForm] = useState(false);
+  const [deleteFavorite, setDeleteFavorite] = useState(false);
+
+  const handleOpenDeleteModal = (project) => {
+    showDeleteFavoritesForm(true);
+    setDeleteFavorite(project);
+  };
+
+  const handleOpenAddModal = (project) => {
+    showAddFavoritesForm(true);
+    setAddFavorite(project);
+  };
+
+  const handleCloseModals = () => {
+    showAddFavoritesForm(false);
+    showDeleteFavoritesForm(false);
+  };
+  
+
   const projectList = props.projectList;
+
+  let currentUser = props.currentUser;
+
+  console.log(currentUser);
+
   return (
     <div className = "grid grid-cols-3 place-items-center gap-2">
       
@@ -34,17 +69,47 @@ function AllProjectsList(props) {
               </Typography>
             </CardContent>
             <CardActions className="flex justify-center">
-              <Button size="large">
-                <Link href={`/projects/${project._id}`}>
-                  <p className="text-base font-bold text-blue-800 mb-4">
+            <Button size="large" color = "info" variant = "contained" href={`/projects/${project._id}`}>
                     View Details
-                  </p>
-                </Link>
-              </Button>
+              </Button>         
             </CardActions>
-            <CardActions></CardActions>
+
+            <CardActions className="flex justify-center">
+            {currentUser.favoriteProjects.some(projectObj => projectObj._id === project._id) ? (
+              <Button size="large" color="info" variant="contained" onClick={() => {
+                handleOpenDeleteModal(project);
+              }}>
+                <HeartBrokenIcon color="error" /> Remove Favorite
+              </Button>
+            ) : (
+              <Button size="large" color="info" variant="contained" onClick={() => {
+                handleOpenAddModal(project);
+              }}>
+                <FavoriteIcon color="error" /> Add Favorite
+              </Button>
+            )}
+            </CardActions>
+           
           </Card>
         ))}
+
+        {addFavoritesForm && addFavorite && (
+          <AddFavoriteModal
+            isOpen={addFavoritesForm}
+            project={addFavorite}
+            user={currentUser}
+            handleClose={handleCloseModals}
+          />
+        )}
+
+        {deleteFavoritesForm && deleteFavorite && (
+          <DeleteFavoriteModal
+            isOpen={deleteFavoritesForm}
+            project={deleteFavorite}
+            user={currentUser}
+            handleClose={handleCloseModals}
+          />
+        )}
       </div>
 
   );
