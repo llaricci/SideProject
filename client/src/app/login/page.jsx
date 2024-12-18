@@ -62,7 +62,7 @@ function LoginPage() {
         </label>
         <label className="grid grid-cols-3 items-center text-black">
           <span className="text-right pr-4"></span>
-          <button type="submit" className="p-2 border border-gray-300 rounded">
+          <button type="submit" className="p-2 border border-gray-300 bg-blue rounded">
             Log In
           </button>
         </label>
