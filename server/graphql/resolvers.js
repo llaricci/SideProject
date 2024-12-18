@@ -487,6 +487,7 @@ export const resolvers = {
 
         const newUser = {
           _id: new ObjectId(),
+          firebaseUID: args.firebaseUID,
           firstName: args.firstName,
           lastName: args.lastName,
           email: args.email,

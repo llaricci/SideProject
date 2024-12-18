@@ -48,7 +48,7 @@ export const typeDefs = `#graphql
     Git
     GitHub
     Other
-}
+    }
 
 
     type Project {
@@ -84,6 +84,7 @@ export const typeDefs = `#graphql
 
     type Mutation {
         addUser(
+            firebaseUID: String!
             firstName: String!
             lastName: String!
             email: String!
