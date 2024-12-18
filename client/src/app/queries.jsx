@@ -143,9 +143,10 @@ const users = gql`
   }
 `;
 const GetUserByFirebaseUID = gql`
-  query GetUserByFirebaseUID($firebaseUid: String!) {
-    getUserByFirebaseUID(firebaseUID: $firebaseUid) {
+  query GetUserByFirebaseUID($firebaseUID: String!) {
+    getUserByFirebaseUID(firebaseUID: $firebaseUID) {
       _id
+      firebaseUID
       firstName
       lastName
       email

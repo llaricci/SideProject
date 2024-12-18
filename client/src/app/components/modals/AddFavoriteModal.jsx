@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import ReactModal from "react-modal";
 import queries from "../../queries";
 
-// ReactModal.setAppElement("#__next");
+//ReactModal.setAppElement("#__next");
 
 const customStyles = {
   content: {
@@ -27,13 +27,13 @@ function AddFavoriteModal(props) {
   const [user, setUser] = useState(props.user);
   const [error, setError] = useState("");
 
-  const [addFavoritedProject] = useMutation(queries.addFavoritedProject, 
-  {
+  const [addFavoritedProject] = useMutation(queries.addFavoritedProject, {
     refetchQueries: [
       {
         query: queries.getUserById,
         variables: { id: user._id },
-      }]
+      },
+    ],
   });
 
   useEffect(() => {
@@ -46,7 +46,6 @@ function AddFavoriteModal(props) {
   };
 
   const projectSubmit = async (e) => {
-    
     e.preventDefault();
 
     console.log(props);
@@ -54,13 +53,11 @@ function AddFavoriteModal(props) {
     console.log(project);
     console.log(props.user.user);
 
-
-
     try {
       await addFavoritedProject({
         variables: {
           projectId: project._id,
-          userId: props.user._id
+          userId: props.user._id,
         },
       });
 
@@ -77,9 +74,6 @@ function AddFavoriteModal(props) {
   console.log(project);
 
   return (
-    
-
-
     <div>
       <ReactModal
         name="addFavoriteModal"
@@ -88,9 +82,7 @@ function AddFavoriteModal(props) {
         style={customStyles}
       >
         <br />
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Favorite Form
-        </h1>
+        <h1 className="text-2xl font-bold mb-4 text-center">Favorite Form</h1>
         <h3 className="text-red-500 text-xl mb-4 text-center font-bold underline ">
           {error}
         </h3>

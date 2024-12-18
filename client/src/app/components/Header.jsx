@@ -12,6 +12,7 @@ export default function AllProjects() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log("onAuthStateChanged fired, currentUser:", currentUser);
       if (currentUser) {
         setUser({ uid: currentUser.uid }); // Use Firebase UID
       } else {
@@ -27,20 +28,21 @@ export default function AllProjects() {
     fetchPolicy: "cache-and-network",
   });
 
-  const { loading: loading2, error: error2, data: data2 } = useQuery(
-    queries.GetUserByFirebaseUID,
-    {
-      fetchPolicy: "cache-and-network",
-      variables: { firebaseUID: user?.uid },
-      skip: !user, // Skip query until user is set
-    }
-  );
+  const {
+    loading: loading2,
+    error: error2,
+    data: data2,
+  } = useQuery(queries.GetUserByFirebaseUID, {
+    fetchPolicy: "cache-and-network",
+    variables: user?.uid ? { firebaseUID: user.uid } : undefined,
+    skip: !user?.uid, // Skip if user.uid is not available
+  });
 
   if (authLoading || loading || loading2) {
     return <div>Loading...</div>;
   }
 
-  if (!user) {
+  if (!user?.uid) {
     return <div>Please log in to view projects.</div>;
   }
 

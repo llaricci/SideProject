@@ -1,7 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
 
-import Header from "./components/Header";
+import AllProjects from "./components/Header";
 
 import { ApolloWrapper } from "./ApolloWrapper";
 import { AuthProvider } from "@/app/NextAuth";
@@ -29,10 +29,12 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div id="__next">
-          <Header />
-          <AuthProvider>
-            <ApolloWrapper>{children}</ApolloWrapper>
-          </AuthProvider>
+          <ApolloWrapper>
+            <AuthProvider>
+              <AllProjects />
+              {children}/
+            </AuthProvider>
+          </ApolloWrapper>
         </div>
       </body>
     </html>
