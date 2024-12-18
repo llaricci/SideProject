@@ -104,12 +104,15 @@ by: ${project.creator.firstName} ${project.creator.lastName}
             ))}
         </div>
 
+      {currentUser._id != project.creator._id &&
+      (
         <button
           onClick={() => setModalOpen(true)}
           className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
         >
           Add Comment
         </button>
+      )}
       </div>
 
       <AddCommentModal
