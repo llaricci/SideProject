@@ -29,7 +29,7 @@ const ReusableModal = ({
           boxShadow: 2,
         }}
       >
-        <h3>{title}</h3>
+        <h3 className = 'text-black'>{title}</h3>
         {fields.map((field) => (
           <TextField
             key={field.name}

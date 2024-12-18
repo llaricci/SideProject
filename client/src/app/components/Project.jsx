@@ -14,6 +14,8 @@ function Project({ project })
   const [isModalOpen, setModalOpen] = useState(false);
   const [comments, setComments] = useState(project.comments || []);
 
+  console.log(comments);
+
   const handleAddComment = (newComment) => {
     setComments((prev) => [...prev, newComment]);
   };
@@ -21,6 +23,10 @@ function Project({ project })
   const currentUser = {
     _id: "000000000000000000000000", // Replace this with actual authenticated user ID
   };
+
+  const hasUserCommented = comments.some(
+    (comment) => comment.user._id === currentUser._id
+  );
   
     let projectTechnologies = 
         project.technologies
@@ -104,7 +110,7 @@ by: ${project.creator.firstName} ${project.creator.lastName}
             ))}
         </div>
 
-      {currentUser._id != project.creator._id &&
+      {!hasUserCommented && currentUser._id != project.creator._id &&
       (
         <button
           onClick={() => setModalOpen(true)}

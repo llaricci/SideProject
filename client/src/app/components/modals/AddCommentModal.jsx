@@ -5,7 +5,14 @@ import queries from "../../queries";
 
 const AddCommentModal = ({ isOpen, onClose, projectId, userId, onCommentAdded }) => {
   const [fieldValues, setFieldValues] = useState({comment: ""});
-  const [addComment] = useMutation(queries.addComment);
+  const [addComment] = useMutation(queries.addComment,{
+    refetchQueries: [
+      {
+        query: queries.GetProjectById,
+        variables: { id: projectId },
+      },
+    ],
+});
 
   const handleSubmit = async () => {
     if (!fieldValues.comment.trim()) return;
