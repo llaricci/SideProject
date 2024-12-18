@@ -16,7 +16,7 @@ function LoginPage() {
     });
   };
   return (
-    <div className="justify-center items-center flex">
+    <div className="justify-center items-center flex bg-white text-black">
       <form
         className="p-10 flex flex-col gap-4 min-h-screen"
         onSubmit={(e) => {
@@ -38,7 +38,8 @@ function LoginPage() {
           redirect("/users");
         }}
       >
-        <label className="grid grid-cols-3 items-center">
+        <h1 className="text-2xl font-bold text-center">Login Form</h1>
+        <label className="grid grid-cols-3 items-center text-black">
           <span className="text-right pr-4">Email:</span>
           <input
             type="email"
@@ -49,7 +50,7 @@ function LoginPage() {
             onChange={onChange}
           />
         </label>
-        <label className="grid grid-cols-3 items-center">
+        <label className="grid grid-cols-3 items-center text-black">
           <span className="text-right pr-4">Password:</span>
           <input
             type="password"
@@ -59,7 +60,7 @@ function LoginPage() {
             onChange={onChange}
           />
         </label>
-        <label className="grid grid-cols-3 items-center">
+        <label className="grid grid-cols-3 items-center text-black">
           <span className="text-right pr-4"></span>
           <button type="submit" className="p-2 border border-gray-300 rounded">
             Log In
