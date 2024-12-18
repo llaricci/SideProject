@@ -20,13 +20,9 @@ services:
       - mongo
   redis:
     image: redis/redis-stack:latest
-    ports:
-      - "6379:6379"
 
   mongo:
     image: mongo:latest
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
 
