@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import ReactModal from "react-modal";
 import queries from "../../queries";
 
-ReactModal.setAppElement("#__next");
+// ReactModal.setAppElement("#__next");
 
 const customStyles = {
   content: {
@@ -35,6 +35,10 @@ function AddFavoriteModal(props) {
         variables: { id: user._id },
       }]
   });
+
+  useEffect(() => {
+    ReactModal.setAppElement("#__next");
+  }, []); // Run only once after the component mounts
 
   const handleCloseAddModal = () => {
     setShowAddModal(false);

@@ -531,6 +531,7 @@ export const resolvers = {
           projects: [],
           favoriteProjects: [],
           profLanguages: args.profLanguages,
+          token: args.token
         };
         let insertedUser = await users.insertOne(newUser);
         if (!insertedUser.acknowledged || !insertedUser.insertedId) {

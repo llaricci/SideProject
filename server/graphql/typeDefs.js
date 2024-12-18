@@ -75,6 +75,7 @@ export const typeDefs = `#graphql
         projects: [Project!]!
         favoriteProjects: [Project!]
         profLanguages: [Technology!]!
+        token: String!
     }
         
     type Comment {
@@ -93,6 +94,7 @@ export const typeDefs = `#graphql
             bio: String!
             password: String!
             profLanguages: [Technology!]!
+            token: String!
         ): User
 
         addProject(
