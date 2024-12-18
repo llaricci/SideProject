@@ -120,6 +120,7 @@ function SignupPage() {
             });
         }}
       >
+        <h1 className="text-2xl font-bold text-center">Signup Form</h1>
         {error && <div className="text-red-500">{error}</div>}
         <label className="grid grid-cols-3 items-center">
           <span className="text-right pr-4">Email:</span>
