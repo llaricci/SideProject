@@ -117,6 +117,7 @@ const users = gql`
   query Users {
     users {
       _id
+      firebaseUID
       firstName
       lastName
       email
@@ -152,8 +153,7 @@ const getUserById = gql`
       password
       projects {
         _id
-        favoritedBy
-        {
+        favoritedBy {
           _id
           firstName
           lastName
@@ -170,9 +170,8 @@ const getUserById = gql`
           comment
         }
         technologies
-        description   
-        creator
-        {
+        description
+        creator {
           _id
         }
       }
@@ -182,14 +181,11 @@ const getUserById = gql`
         technologies
         description
         images
-        creator
-        {
+        creator {
           _id
           firstName
           lastName
         }
-
-
       }
       profLanguages
     }
@@ -327,6 +323,7 @@ const addProject = gql`
 const addUser = gql`
   mutation AddUser(
     $firstName: String!
+    $firebaseUID: String!
     $lastName: String!
     $email: String!
     $bio: String!
@@ -336,12 +333,14 @@ const addUser = gql`
     addUser(
       firstName: $firstName
       lastName: $lastName
+      firebaseUID: $firebaseUID
       email: $email
       bio: $bio
       password: $password
       profLanguages: $profLanguages
     ) {
       _id
+      firebaseUID
       firstName
       lastName
       email

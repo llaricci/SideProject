@@ -28,7 +28,7 @@ function LoginPage() {
               console.log(user);
 
               // use their firebase ID to access the graphql user, (that needs to be a new field)
-
+              
               // if user matches, redirect to their profile page
               // if no user matches, create one.
             })

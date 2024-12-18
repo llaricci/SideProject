@@ -65,6 +65,7 @@ export const typeDefs = `#graphql
 
     type User {
         _id: String!
+        firebaseUID: String!
         firstName: String!
         lastName: String!
         email: String!

@@ -11,41 +11,41 @@ function SignupPage() {
   const [error, setError] = useState("");
   const [technologies, setTechnologies] = useState([
     "JavaScript",
-  "Python",
-  "Java",
-  "CSharp",
-  "CPlusPlus",
-  "Ruby",
-  "PHP",
-  "TypeScript",
-  "Swift",
-  "Kotlin",
-  "Go",
-  "Rust",
-  "HTML",
-  "CSS",
-  "SQL",
-  "GraphQL",
-  "NodeJS",
-  "React",
-  "Angular",
-  "Vue",
-  "NextJS",
-  "Svelte",
-  "TailwindCSS",
-  "Bootstrap",
-  "AWS",
-  "GoogleCloud",
-  "OracleCloud",
-  "Docker",
-  "Kubernetes",
-  "MongoDB",
-  "PostgreSQL",
-  "Redis",
-  "Firebase",
-  "Git",
-  "GitHub",
-  "Other"
+    "Python",
+    "Java",
+    "CSharp",
+    "CPlusPlus",
+    "Ruby",
+    "PHP",
+    "TypeScript",
+    "Swift",
+    "Kotlin",
+    "Go",
+    "Rust",
+    "HTML",
+    "CSS",
+    "SQL",
+    "GraphQL",
+    "NodeJS",
+    "React",
+    "Angular",
+    "Vue",
+    "NextJS",
+    "Svelte",
+    "TailwindCSS",
+    "Bootstrap",
+    "AWS",
+    "GoogleCloud",
+    "OracleCloud",
+    "Docker",
+    "Kubernetes",
+    "MongoDB",
+    "PostgreSQL",
+    "Redis",
+    "Firebase",
+    "Git",
+    "GitHub",
+    "Other",
   ]);
   const [addUser] = useMutation(queries.addUser);
   let [formData, setFormData] = useState({
@@ -84,11 +84,12 @@ function SignupPage() {
             formData.email,
             formData.password
           )
-            .then((user) => {
+            .then((userCredential) => {
+              const user = userCredential.user;
               console.log(user);
               addUser({
                 variables: {
-                  firebaseUID : auth.currentUser.uid,
+                  firebaseUID: user.uid,
                   email: formData.email,
                   password: formData.password,
                   firstName: formData.firstName,
@@ -110,7 +111,6 @@ function SignupPage() {
                   formData.email,
                   formData.password
                 ).then((user) => {
-                  console.log(user);
                   // fix this to go to user profile
                   redirect("/users");
                 });
