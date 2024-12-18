@@ -1,0 +1,11 @@
+# So docker doesn't include your build stuff by accident
+node_modules
+npm-debug.log
+yarn-error.log
+.env
+.git
+.DS_Store
+
+Dockerfile
+.dockerignore
+README.md

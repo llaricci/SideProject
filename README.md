@@ -15,6 +15,17 @@ SideProject is a portfolio app for programmers to list and show off their projec
 
 ## Installation
 
+- run `docker-compose up --build` in the root directory
+- run `docker-compose exec server npm run seed ` in the root directory
+- visit `localhost:3000`
+
+### Alternative without Docker
+
+- start mongodb and redis-stack-server
+- run `npm run seed` in `./server`
+- run `npm start` in `./server`
+- run `npm start` in `./client`
+- visit `localhost:3000`
 
 ## How To Get Started
 

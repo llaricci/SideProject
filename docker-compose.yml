@@ -1,0 +1,34 @@
+version: "3.7"
+
+services:
+  client:
+    build: ./client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+
+  server:
+    build: ./server
+    ports:
+      - "4000:4000"
+    environment:
+      - REDIS_URL=redis://redis
+      - MONGO_URL=mongodb://mongo
+    depends_on:
+      - redis
+      - mongo
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

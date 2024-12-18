@@ -5,7 +5,9 @@ import { typeDefs } from "./graphql/typeDefs.js";
 import { resolvers } from "./graphql/resolvers.js";
 import { app as firebase } from "./config/firebaseAuth.js";
 
-const redisClient = createClient();
+const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379/";
+
+const redisClient = createClient({ url: REDIS_URL });
 await redisClient.connect(); 
 await redisClient.flushDb();
 
