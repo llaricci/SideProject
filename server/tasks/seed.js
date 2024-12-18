@@ -33,8 +33,76 @@ const main = async () => {
     "TwentyFour", "TwentyFive"
   ];
 
-  const projectNames = ["CodeCanvas", "PixelCraft", "BugTrackerPro", "TaskForge", "AutoLinter"];
-  const projectDescriptions = ["An interactive platform", "A bug tracking system", "Task management for developers"];
+  const projectNames = [
+    "DevTracker", "AlgoMaster", "CloudForge", "CodeBeacons", "TechRadar",
+    "TaskFlowPro", "ScriptLab", "BugFixer", "DevConnect", "ErrorHunter",
+    "QuickDeploy", "ByteCraft", "CodeQuest", "StackLab", "RepoGuard",
+    "TestPilot", "StackStream", "CodeForgeX", "BugSquasher", "DataDrive",
+    "CodePulsePro", "StreamCoder", "BuildBot", "TestBoost", "ErrorFixer",
+    "CodeWhiz", "SyncMaster", "DevZen", "SnapBuild", "DataFlowX",
+    "ByteVerse", "TechFlow", "CloudRover", "ProjectSync", "CodePilot",
+    "PatchCraft", "TestForge", "RefactorBot", "MetaFlow", "AutoCode",
+    "CodeFusion", "DataBlast", "DeployHub", "ErrorTrak", "CloudMatrix",
+    "DevCraft", "CodeHubX", "DeployFlow", "ByteLink", "TechNinja",
+    "DataSnap", "RefactorForge", "BuildGrid", "CodeRocket", "BugTrackerX"
+  ];
+  
+  const projectDescriptions = [
+    "A real-time developer activity tracker that provides insights on coding productivity.",
+    "An AI-powered algorithm testing platform for performance benchmarking.",
+    "A cloud infrastructure tool for seamless DevOps management and deployment.",
+    "A platform for organizing and navigating code repositories with visual mapping.",
+    "A tool for tracking and analyzing technology trends and developments.",
+    "A task management system built for agile development teams with enhanced features.",
+    "A testing suite for executing and analyzing scripts in various languages.",
+    "A bug resolution system that integrates with multiple bug-tracking tools.",
+    "A collaborative platform for developers to connect, share, and solve coding challenges.",
+    "An error detection tool that scans code for potential bugs and performance bottlenecks.",
+    "A deployment automation tool that simplifies the process of launching new versions.",
+    "A platform for building and sharing custom software solutions and frameworks.",
+    "An interactive coding adventure game for learning algorithms and data structures.",
+    "A comprehensive tool for managing and testing development stacks and environments.",
+    "A repository management tool with enhanced security and compliance features.",
+    "A test-driven development framework designed to streamline unit testing and validation.",
+    "A live-streaming coding environment that lets you share development progress with peers.",
+    "A fully featured cloud-based IDE for quick and easy coding without any setup.",
+    "An advanced bug detection system for analyzing and fixing issues in real-time.",
+    "An integrated development environment tailored for full-stack developers.",
+    "A data-driven project tracker that integrates with GitHub to monitor progress.",
+    "A platform for streamlining build pipelines and continuous integration processes.",
+    "A tool for automating the deployment and management of development pipelines.",
+    "An AI-powered code quality checker that provides instant feedback and suggestions.",
+    "A repository and collaboration platform for open-source projects with improved governance.",
+    "A bug-reporting and tracking tool with AI-driven automated issue resolution.",
+    "A tool designed to optimize and improve cloud-based application deployments.",
+    "A system for syncing, refactoring, and optimizing code across multiple repositories.",
+    "A platform for quickly running tests across multiple environments and platforms.",
+    "A developer-centric collaboration tool for remote and hybrid teams.",
+    "An IDE plugin that enhances code navigation and debugging with AI-driven features.",
+    "A cloud-native application design and development platform for microservices.",
+    "A machine learning-powered test automation framework for faster quality assurance.",
+    "A security-focused platform for scanning code for vulnerabilities and breaches.",
+    "A set of tools for organizing, optimizing, and automating development workflows.",
+    "A platform for building decentralized applications with blockchain integration.",
+    "A fully customizable coding assistant for improving productivity in development.",
+    "A system for analyzing and visualizing code quality and refactoring opportunities.",
+    "A code delivery pipeline that automates deployment to various environments.",
+    "A virtualized development environment that runs code in isolated containers.",
+    "A project management tool that integrates with GitHub for detailed project insights.",
+    "A platform for monitoring, debugging, and analyzing application logs in real-time.",
+    "A tool that integrates with cloud infrastructure to optimize app performance.",
+    "A real-time collaborative debugging tool that helps multiple developers solve issues together.",
+    "A platform for creating and testing AI-driven software solutions for developers.",
+    "An automated code deployment tool designed for faster delivery with zero downtime.",
+    "A continuous testing framework designed for integrating test suites into the CI/CD pipeline.",
+    "A cloud-based platform for managing and scaling software projects across multiple teams.",
+    "A machine learning tool that automates the code review process for accuracy and efficiency.",
+    "A fully integrated development environment that supports live coding, testing, and debugging.",
+    "A platform for managing and tracking dependencies across projects with detailed insights.",
+    "A code refactoring tool that automates the process of improving and optimizing code quality."
+  ];
+  
+  
 
   // Create Users
   const userList = [];
@@ -47,8 +115,8 @@ const main = async () => {
     userList.push({
       _id: new ObjectId(),
       firebaseUID: generateFirebaseUID(), // Random Firebase UID
-      firstName: `FirstName${numberToWord[i]}`,
-      lastName: `LastName${numberToWord[i]}`,
+      firstName: `User`,
+      lastName: numberToWord[i],
       email: `user${i + 1}@example.com`,
       bio: `Bio for User${i + 1}`,
       password: await bcrypt.hash("Test123$", 10),
@@ -71,9 +139,9 @@ const main = async () => {
 
     projectList.push({
       _id: new ObjectId(),
-      name: projectNames[i % projectNames.length],
+      name: projectNames[i],
       technologies: projectTechnologies,
-      description: projectDescriptions[i % projectDescriptions.length],
+      description: projectDescriptions[i],
       creatorId: userIds[creatorIndex],
       comments: [],
       favoritedBy: [],
