@@ -27,6 +27,7 @@ function Header() {
       setUser(currentUser);
       setLoading(false);
     });
+    
 
     return () => unsubscribe(); // Clean up the subscription on unmount
   }, []);

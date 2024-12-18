@@ -123,6 +123,7 @@ const users = gql`
       email
       bio
       password
+      token
       projects {
         _id
         name
@@ -142,9 +143,10 @@ const users = gql`
   }
 `;
 const GetUserByFirebaseUID = gql`
-  query GetUserByFirebaseUID($firebaseUid: String!) {
-    getUserByFirebaseUID(firebaseUID: $firebaseUid) {
+  query GetUserByFirebaseUID($firebaseUID: String!) {
+    getUserByFirebaseUID(firebaseUID: $firebaseUID) {
       _id
+      firebaseUID
       firstName
       lastName
       email
@@ -377,6 +379,7 @@ const addUser = gql`
     $bio: String!
     $password: String!
     $profLanguages: [Technology!]!
+    $token: String!
   ) {
     addUser(
       firstName: $firstName
@@ -386,6 +389,7 @@ const addUser = gql`
       bio: $bio
       password: $password
       profLanguages: $profLanguages
+      token: $token
     ) {
       _id
       firebaseUID
@@ -394,6 +398,7 @@ const addUser = gql`
       email
       bio
       password
+      token
       projects {
         _id
       }
@@ -560,6 +565,7 @@ let exported = {
   projects,
   GetProjectById,
   GetProjectsbyTechnology,
+  GetUserByFirebaseUID,
   searchProjectByName,
   users,
   getUserById,

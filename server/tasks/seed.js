@@ -3,6 +3,23 @@ import { Users, Projects, Comments } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcrypt"; // Import bcrypt for password hashing
 import { randomBytes } from "crypto"; // Import randomBytes for UID generation
+import { adminAuth } from "../config/firebaseAdmin.js"; // Firebase Admin SDK
+
+
+const deleteAllFirebaseUsers = async () => {
+  let nextPageToken;
+  do {
+    const listUsersResult = await adminAuth.listUsers(1000, nextPageToken);
+    const uids = listUsersResult.users.map((user) => user.uid);
+
+    if (uids.length > 0) {
+      console.log(`Deleting ${uids.length} users...`);
+      await adminAuth.deleteUsers(uids);
+    }
+
+    nextPageToken = listUsersResult.pageToken;
+  } while (nextPageToken);
+};
 
 // Helper function to generate random Firebase UIDs
 const generateFirebaseUID = () => {
@@ -16,6 +33,10 @@ const main = async () => {
   const users = await Users();
   const projects = await Projects();
   const comments = await Comments();
+
+  console.log("Deleting existing Firebase users...");
+  await deleteAllFirebaseUsers(); // Clear all Firebase users before seeding
+  console.log("Firebase users cleared.");
 
   // Predefined list of programming languages
   const languages = [
@@ -122,7 +143,7 @@ const main = async () => {
   
   
 
-  // Create Users
+// Create Users in Firebase Authentication & MongoDB
   const userList = [];
   for (let i = 0; i < 25; i++) {
     const selectedLanguages = [
@@ -130,21 +151,37 @@ const main = async () => {
       languages[(i + 5) % languages.length],
     ];
 
-    userList.push({
-      _id: new ObjectId(),
-      firebaseUID: generateFirebaseUID(), // Random Firebase UID
-      firstName: firstNames[i],
-      lastName: lastNames[i],
-      email: `user${i + 1}@example.com`,
-      bio: `Bio for User${i + 1}`,
-      password: await bcrypt.hash("Test123$", 10),
-      projects: [],
-      favoriteProjects: [],
-      profLanguages: selectedLanguages,
-    });
-  }
-  const insertedUsers = await users.insertMany(userList);
-  const userIds = Object.values(insertedUsers.insertedIds);
+  const email = `user${i + 1}@example.com`;
+  const password = "Test123$";
+
+  // Create user in Firebase Authentication
+  const firebaseUser = await adminAuth.createUser({
+    email,
+    password,
+    displayName: `${firstNames[i]} ${lastNames[i]}`,
+  });
+
+  const token = await adminAuth.createCustomToken(firebaseUser.uid);
+
+  // Push user to MongoDB
+  userList.push({
+    _id: new ObjectId(),
+    firebaseUID: firebaseUser.uid, // Firebase UID
+    firstName: firstNames[i],
+    lastName: lastNames[i],
+    email: firebaseUser.email,
+    bio: `Bio for User${i + 1}`,
+    password: await bcrypt.hash(password, 10), // Hashed password (for MongoDB if needed)
+    projects: [],
+    favoriteProjects: [],
+    profLanguages: selectedLanguages,
+    token
+  });
+}
+
+const insertedUsers = await users.insertMany(userList);
+const userIds = Object.values(insertedUsers.insertedIds);
+
 
   // Create Projects
   const projectList = [];
@@ -213,21 +250,25 @@ const main = async () => {
 
   await comments.insertMany(commentList);
 
-  // Add a Test User
-  const testUser = {
-    _id: new ObjectId("000000000000000000000000"),
-    firebaseUID: generateFirebaseUID(),
-    firstName: "Fuecoco",
-    lastName: "FireCroc",
-    email: "fuecoco@example.com",
-    password: await bcrypt.hash("Test123$", 10),
-    bio: "A fire croc looking for a job! Have 5+ years of experience with React and 2 years with NextJS!",
-    profLanguages: ["CPlusPlus", "JavaScript", "Python", "NextJS", "TailwindCSS", "Svelte"],
-    projects: [],
-    favoriteProjects: [],
-  };
+  // const testUserToken = await adminAuth.createCustomToken(testUserFirebase.uid);
 
-  await users.insertOne(testUser);
+
+  // // Add a Test User
+  // const testUser = {
+  //   _id: new ObjectId("000000000000000000000000"),
+  //   firebaseUID: generateFirebaseUID(),
+  //   firstName: "Fuecoco",
+  //   lastName: "FireCroc",
+  //   email: "fuecoco@example.com",
+  //   password: await bcrypt.hash("Test123$", 10),
+  //   bio: "A fire croc looking for a job! Have 5+ years of experience with React and 2 years with NextJS!",
+  //   profLanguages: ["CPlusPlus", "JavaScript", "Python", "NextJS", "TailwindCSS", "Svelte"],
+  //   projects: [],
+  //   favoriteProjects: [],
+  //   token: testUserToken
+  // };
+
+  // await users.insertOne(testUser);
 
   console.log("Done seeding database");
   await closeConnection();

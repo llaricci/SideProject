@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import ReactModal from "react-modal";
 import queries from "../../queries";
 
-ReactModal.setAppElement("#__next");
+// ReactModal.setAppElement("#__next");
 
 const customStyles = {
   content: {
@@ -44,6 +44,11 @@ function DeleteProjectModal(props) {
       });
     },
   });
+
+  useEffect(() => {
+    ReactModal.setAppElement("#__next");
+  }, []); // Run only once after the component mounts
+
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     props.handleClose();
