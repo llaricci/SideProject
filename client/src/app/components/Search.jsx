@@ -52,7 +52,7 @@ const technologies = [
 ];
 
 
-const Search = () => {
+const Search = ({currentUser}) => {
   const router = useRouter();
   const [searchType, setSearchType] = useState("");
   const [queryInput, setQueryInput] = useState("");
@@ -105,13 +105,18 @@ const Search = () => {
       projectsByTechData?.getProjectsByTechnology
     ) {
       return (
-        <AllProjectsList projectList={searchResults}/>
+        <AllProjectsList projectList={searchResults} currentUser = {currentUser}/>
       );
     }
 
     if (searchType === "projectByName" && projectsData?.searchProjectByName) {
+
+      //console.log(projectsData);
+      //console.log(user);
+
+
       return (
-        <AllProjectsList projectList={searchResults}/>
+        <AllProjectsList projectList={searchResults} currentUser = {currentUser}/>
       );
     }
 
