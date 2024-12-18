@@ -41,38 +41,78 @@ function Project({ project })
             )
             .join("\n")
         : "No users"
-  
-    const markdownContent = `
 
+
+      let projectComments = 
+        project.comments && project.comments.length > 0
+        ? " "
+        : "No comments yet"
+
+
+        let projectImages =
+  project.images && project.images.length > 0
+    ? project.images.map((image, index) => (
+      <img
+        key={index}
+        src={image}
+        alt={`Project Image ${index}`}
+        className="rounded-lg"
+      />
+    )
+  ) : (
+    "No Images"
+  );
+
+  // Image Gallery Stuff
+  // Taken from Online
+  const [currentPage, setCurrentPage] = useState(1);
+  const imagesPerPage = 1;
+
+  const indexOfLastImage = currentPage * imagesPerPage;
+  const indexOfFirstImage = indexOfLastImage - imagesPerPage;
+  const currentImages = project.images
+    ? project.images.slice(indexOfFirstImage, indexOfLastImage)
+    : [];
+
+  const totalPages = Math.ceil(project.images.length / imagesPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+
+const markdownContent = `
 # ${project.name}
 by: ${project.creator.firstName} ${project.creator.lastName}
 
 ---
 
-## Technologies Used
+## Technologies Used:
 - ${projectTechnologies}
 
-    ---
+---
 
-    ## Description
-    - ${project.description}
+## Description:
+${project.description}
 
-    ---
+---
 
-    ## Number of Favorites
-    - ${project.numOfFavorites}
+## Number of Favorites:
+${project.numOfFavorites}
 
-    ---  
+---
 
-    ## Favorited By
+## Favorited By:
+${projectFavorites}
 
-    - ${projectFavorites}
+---
 
-    ---
-    ## Comments
-    -  
+## Comments:
 
-    `;
+`;
+
 
   return (
     <div
@@ -94,21 +134,56 @@ by: ${project.creator.firstName} ${project.creator.lastName}
                     p { font-size: 1rem; }
                     hr { border: none; border-top: 2px solid #ccc;  margin: 1.5rem 0; } `}
         </style>
-        {project.images &&
-          project.images.map((image, index) => (
+
+      <div className="grid grid-cols-2 gap-2 mx-auto">
+          {project.comments && project.comments.length > 0 ? (
+            project.comments.map((comment) => (
+              <Comment key={comment._id} comment={comment} />
+            ))
+          ) : (
+            <p>No comments yet</p>
+          )}
+        </div>
+        <br />
+
+      {/*Taken from Online as well */}
+      <h2>Image Gallery:</h2>
+      {currentImages.length > 0 ? (
+          currentImages.map((image, index) => (
             <img
               key={index}
               src={image}
+              width={400} 
+              height={200} 
+  
               alt={`Project Image ${index}`}
               className="rounded-lg"
             />
-          ))}
-        <div className="grid grid-cols-2 gap-2 mx-auto">
-          {project.comments &&
-            project.comments.map((comment) => (
-              <Comment key={comment._id} comment={comment} />
-            ))}
-        </div>
+          ))
+        ) : (
+          <p>No Images Available</p>
+        )}
+
+        {project.images && project.images.length > imagesPerPage && (
+          <div className="pagination">
+            <br />
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+            >
+              Previous
+            </button>
+            <span>{currentPage}</span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="bg-blue-500 text-white px-4 py-2 rounded ml-2"
+            >
+              Next
+            </button>
+          </div>
+        )}
 
       {!hasUserCommented && currentUser._id != project.creator._id &&
       (
@@ -119,6 +194,10 @@ by: ${project.creator.firstName} ${project.creator.lastName}
           Add Comment
         </button>
       )}
+
+      <br />
+
+
       </div>
 
       <AddCommentModal
