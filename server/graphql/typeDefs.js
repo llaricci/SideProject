@@ -125,7 +125,6 @@ export const typeDefs = `#graphql
             _id: String!
             firstName: String
             lastName: String
-            email: String
             bio: String
             password: String
             profLanguages: [Technology!]

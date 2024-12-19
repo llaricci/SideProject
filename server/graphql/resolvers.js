@@ -922,24 +922,7 @@ export const resolvers = {
           updateFields.bio = validation.checkString(args.bio);
         }
 
-        if (args.email) {
-          if (validator.isEmail(args.email)) {
-            args.email = validator.normalizeEmail(args.email);
-          } else {
-            throw new GraphQLError(`Invalid email`, {
-              extensions: { code: "BAD_USER_INPUT" },
-            });
-          }
-          const emailExists = await userCollection.findOne({
-            email: args.email,
-          });
-          if (emailExists && emailExists._id.toString() !== args._id) {
-            throw new GraphQLError(`Email already in use`, {
-              extensions: { code: "BAD_USER_INPUT" },
-            });
-          }
-          updateFields.email = args.email;
-        }
+        
 
         if (args.password) {
           const newPassword = validation.checkPassword(args.password);

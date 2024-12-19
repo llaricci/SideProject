@@ -529,7 +529,6 @@ const editUser = gql`
     $id: String!
     $firstName: String
     $lastName: String
-    $email: String
     $bio: String
     $password: String
     $profLanguages: [Technology!]
@@ -538,7 +537,7 @@ const editUser = gql`
       _id: $id
       firstName: $firstName
       lastName: $lastName
-      email: $email
+
       bio: $bio
       password: $password
       profLanguages: $profLanguages

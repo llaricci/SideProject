@@ -28,21 +28,10 @@ function DeleteFavoriteModal(props) {
   const [removeFavoritedProject] = useMutation(queries.removeFavoritedProject, {
     refetchQueries: [
       {
-        query: queries.getUserById,
-        variables: { id: props.user._id },
+        query: queries.GetUserByFirebaseUID,
+        variables: { firebaseUID: props.user.firebaseUID },
       },
     ],
-    update(cache) {
-      cache.modify({
-        fields: {
-          projects(existingProjects, { readField }) {
-            return existingProjects.filter(
-              (projectRef) => project._id !== readField("_id", projectRef)
-            );
-          },
-        },
-      });
-    },
   });
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
@@ -56,7 +45,7 @@ function DeleteFavoriteModal(props) {
       await removeFavoritedProject({
         variables: {
           projectId: project._id,
-          userId: props.user._id
+          userId: props.user._id,
         },
       });
 
@@ -73,9 +62,6 @@ function DeleteFavoriteModal(props) {
   console.log(project);
 
   return (
-    
-
-
     <div>
       <ReactModal
         name="deleteProjectModal"
@@ -84,9 +70,7 @@ function DeleteFavoriteModal(props) {
         style={customStyles}
       >
         <br />
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Unfavorite Form
-        </h1>
+        <h1 className="text-2xl font-bold mb-4 text-center">Unfavorite Form</h1>
         <h3 className="text-red-500 text-xl mb-4 text-center font-bold underline ">
           {error}
         </h3>
@@ -100,7 +84,7 @@ function DeleteFavoriteModal(props) {
             className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onClick={projectSubmit}
           >
-            Delete Project
+            Remove Favorite
           </button>
           <button
             type="button"

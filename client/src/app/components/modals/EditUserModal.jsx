@@ -25,33 +25,13 @@ function EditUserModal(props) {
 
   const [editUser] = useMutation(queries.editUser);
 
-  function checkEmail(email) 
-  {
-    if (!email) throw new Error("Error: You must provide an email");
   
-    if (typeof email !== "string")
-      throw new Error("Error: Email must be of type string");
-  
-    email = email.trim();
-  
-    if (email.length === 0)
-      throw new Error("Error: Email cannot be empty spaces");
-  
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  
-    if (!emailRegex.test(email))
-      throw new Error("Error: Invalid email format");
-  
-    return email;
-  }
-  
-
   const userSubmit = async (e) => {
     e.preventDefault();
 
     let firstName = document.getElementById("firstName").value;
     let lastName = document.getElementById("lastName").value;
-    let email = document.getElementById("email").value;
+    
     let biography = document.getElementById("biography").value;
 
     if (firstName.trim().length < 2 || firstName.trim().length > 50) {
@@ -68,20 +48,7 @@ function EditUserModal(props) {
 
     lastName = lastName.trim();
 
-    try 
-    {
-      email = checkEmail(email);
-    } 
     
-    catch (e) 
-    {
-      setError(e.message);
-      return;
-    }
-    
-    
-
-    email = email.trim();
 
     if (biography.trim().length < 2) {
       setError("Biography must be at least 2 characters");
@@ -102,7 +69,7 @@ function EditUserModal(props) {
       id: user._id,
       firstName: firstName,
       lastName: lastName,
-      email: email,
+      
       bio: biography,
       profLanguages: selectedTechnologies,
     };
@@ -116,7 +83,7 @@ function EditUserModal(props) {
           firebaseUID: user.firebaseUID,
           firstName: firstName,
           lastName: lastName,
-          email: email,
+          
           bio: biography,
           profLanguages: selectedTechnologies
         },
@@ -205,12 +172,7 @@ function EditUserModal(props) {
               className=" w-full rounded-md border-2 border-blue-500 rounded-full"
             />
             <br />
-            <label className="text-xl font- mb-1"> Email: </label>
-            <textarea
-              id="email"
-              defaultValue={user.email}
-              className=" w-full rounded-md border-2 border-blue-500 rounded-full"
-            />
+            
             <br />
             <label className="text-xl font- mb-1"> Biography: </label>
             <textarea
