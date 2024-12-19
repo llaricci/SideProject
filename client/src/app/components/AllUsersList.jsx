@@ -17,7 +17,7 @@ function AllUsersList(props) {
     <div className = "grid grid-cols-3 place-items-center gap-2">
       
         {userList.map((user) => (
-          <Card key={user._id} sx={{ width: "75%", marginBottom: "20px" }}>
+          <Card key={user.firebaseUID} sx={{ width: "75%", marginBottom: "20px" }}>
             <CardContent>
               <Typography variant="h3" component="div">
                 {user.firstName} {user.lastName}
@@ -42,7 +42,7 @@ function AllUsersList(props) {
               </Typography>
             </CardContent>
             <CardActions className="flex justify-center">
-              <Button size="large" color = "info" variant = "contained" href={`/users/${user._id}`}>
+              <Button size="large" color = "info" variant = "contained" href={`/users/${user.firebaseUID}`}>
                     View Details
               </Button>
             </CardActions>

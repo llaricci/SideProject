@@ -11,10 +11,10 @@ export default function FavoritesList()
 {
 
     let { id } = useParams();
-    const { loading, error, data } = useQuery(queries.getUserById, 
+    const { loading, error, data } = useQuery(queries.GetUserByFirebaseUID, 
     {
         fetchPolicy: "cache-and-network",
-        variables: { id: id },
+        variables: { firebaseUID: id },
     });
 
 
@@ -32,7 +32,7 @@ export default function FavoritesList()
     {
         
         
-        let user = data.getUserById;
+        let user = data.getUserByFirebaseUID;
 
         console.log(user);
         let projects = user.favoriteProjects;
