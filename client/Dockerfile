@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-ARG GRAPHQL_URL=http://localhost:4000/graphql
+ARG GRAPHQL_URL=http://server:4000/graphql
 
 ENV GRAPHQL_URL=$GRAPHQL_URL
 
