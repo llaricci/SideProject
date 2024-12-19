@@ -5,6 +5,7 @@ import bcrypt from "bcrypt"; // Import bcrypt for password hashing
 import { randomBytes } from "crypto"; // Import randomBytes for UID generation
 import { adminAuth } from "../config/firebaseAdmin.js"; // Firebase Admin SDK
 
+
 const deleteAllFirebaseUsers = async () => {
   let nextPageToken;
   do {
@@ -22,10 +23,7 @@ const deleteAllFirebaseUsers = async () => {
 
 // Helper function to generate random Firebase UIDs
 const generateFirebaseUID = () => {
-  return randomBytes(21)
-    .toString("base64")
-    .replace(/[^a-zA-Z0-9]/g, "")
-    .slice(0, 28);
+  return randomBytes(21).toString("base64").replace(/[^a-zA-Z0-9]/g, "").slice(0, 28);
 };
 
 const main = async () => {
@@ -37,135 +35,39 @@ const main = async () => {
   const comments = await Comments();
 
   console.log("Deleting existing Firebase users...");
-  await deleteAllFirebaseUsers();
+  await deleteAllFirebaseUsers(); 
   console.log("Firebase users cleared.");
 
   // Predefined list of programming languages
   const languages = [
-    "JavaScript",
-    "Python",
-    "Java",
-    "CSharp",
-    "CPlusPlus",
-    "Ruby",
-    "PHP",
-    "TypeScript",
-    "Swift",
-    "Kotlin",
-    "Go",
-    "Rust",
-    "HTML",
-    "CSS",
-    "SQL",
-    "GraphQL",
-    "NodeJS",
-    "React",
-    "Angular",
-    "Vue",
-    "NextJS",
-    "Svelte",
-    "TailwindCSS",
-    "Bootstrap",
-    "AWS",
-    "GoogleCloud",
-    "OracleCloud",
-    "Docker",
-    "Kubernetes",
-    "MongoDB",
-    "PostgreSQL",
-    "Redis",
-    "Firebase",
-    "Git",
-    "GitHub",
-    "Other",
+    "JavaScript", "Python", "Java", "CSharp", "CPlusPlus", "Ruby", "PHP", "TypeScript",
+    "Swift", "Kotlin", "Go", "Rust", "HTML", "CSS", "SQL", "GraphQL", "NodeJS", "React",
+    "Angular", "Vue", "NextJS", "Svelte", "TailwindCSS", "Bootstrap", "AWS", "GoogleCloud",
+    "OracleCloud", "Docker", "Kubernetes", "MongoDB", "PostgreSQL", "Redis", "Firebase",
+    "Git", "GitHub", "Other"
   ];
 
   const numberToWord = [
-    "One",
-    "Two",
-    "Three",
-    "Four",
-    "Five",
-    "Six",
-    "Seven",
-    "Eight",
-    "Nine",
-    "Ten",
-    "Eleven",
-    "Twelve",
-    "Thirteen",
-    "Fourteen",
-    "Fifteen",
-    "Sixteen",
-    "Seventeen",
-    "Eighteen",
-    "Nineteen",
-    "Twenty",
-    "TwentyOne",
-    "TwentyTwo",
-    "TwentyThree",
-    "TwentyFour",
-    "TwentyFive",
+    "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+    "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
+    "Eighteen", "Nineteen", "Twenty", "TwentyOne", "TwentyTwo", "TwentyThree",
+    "TwentyFour", "TwentyFive"
   ];
 
   const projectNames = [
-    "DevTracker",
-    "AlgoMaster",
-    "CloudForge",
-    "CodeBeacons",
-    "TechRadar",
-    "TaskFlowPro",
-    "ScriptLab",
-    "BugFixer",
-    "DevConnect",
-    "ErrorHunter",
-    "QuickDeploy",
-    "ByteCraft",
-    "CodeQuest",
-    "StackLab",
-    "RepoGuard",
-    "TestPilot",
-    "StackStream",
-    "CodeForgeX",
-    "BugSquasher",
-    "DataDrive",
-    "CodePulsePro",
-    "StreamCoder",
-    "BuildBot",
-    "TestBoost",
-    "ErrorFixer",
-    "CodeWhiz",
-    "SyncMaster",
-    "DevZen",
-    "SnapBuild",
-    "DataFlowX",
-    "ByteVerse",
-    "TechFlow",
-    "CloudRover",
-    "ProjectSync",
-    "CodePilot",
-    "PatchCraft",
-    "TestForge",
-    "RefactorBot",
-    "MetaFlow",
-    "AutoCode",
-    "CodeFusion",
-    "DataBlast",
-    "DeployHub",
-    "ErrorTrak",
-    "CloudMatrix",
-    "DevCraft",
-    "CodeHubX",
-    "DeployFlow",
-    "ByteLink",
-    "TechNinja",
-    "DataSnap",
-    "RefactorForge",
-    "BuildGrid",
-    "CodeRocket",
-    "BugTrackerX",
+    "DevTracker", "AlgoMaster", "CloudForge", "CodeBeacons", "TechRadar",
+    "TaskFlowPro", "ScriptLab", "BugFixer", "DevConnect", "ErrorHunter",
+    "QuickDeploy", "ByteCraft", "CodeQuest", "StackLab", "RepoGuard",
+    "TestPilot", "StackStream", "CodeForgeX", "BugSquasher", "DataDrive",
+    "CodePulsePro", "StreamCoder", "BuildBot", "TestBoost", "ErrorFixer",
+    "CodeWhiz", "SyncMaster", "DevZen", "SnapBuild", "DataFlowX",
+    "ByteVerse", "TechFlow", "CloudRover", "ProjectSync", "CodePilot",
+    "PatchCraft", "TestForge", "RefactorBot", "MetaFlow", "AutoCode",
+    "CodeFusion", "DataBlast", "DeployHub", "ErrorTrak", "CloudMatrix",
+    "DevCraft", "CodeHubX", "DeployFlow", "ByteLink", "TechNinja",
+    "DataSnap", "RefactorForge", "BuildGrid", "CodeRocket", "BugTrackerX"
   ];
-
+  
   const projectDescriptions = [
     "A real-time developer activity tracker that provides insights on coding productivity.",
     "An AI-powered algorithm testing platform for performance benchmarking.",
@@ -218,117 +120,30 @@ const main = async () => {
     "A machine learning tool that automates the code review process for accuracy and efficiency.",
     "A fully integrated development environment that supports live coding, testing, and debugging.",
     "A platform for managing and tracking dependencies across projects with detailed insights.",
-    "A code refactoring tool that automates the process of improving and optimizing code quality.",
+    "A code refactoring tool that automates the process of improving and optimizing code quality."
   ];
 
   const firstNames = [
-    "Olivia",
-    "Liam",
-    "Emma",
-    "Noah",
-    "Ava",
-    "Elijah",
-    "Isabella",
-    "Lucas",
-    "Mia",
-    "James",
-    "Amelia",
-    "Benjamin",
-    "Harper",
-    "Mason",
-    "Evelyn",
-    "Jackson",
-    "Abigail",
-    "Ethan",
-    "Emily",
-    "Alexander",
-    "Sofia",
-    "Henry",
-    "Charlotte",
-    "Sebastian",
-    "Ella",
-    "Matthew",
-    "Scarlett",
-    "Aiden",
-    "Grace",
-    "Jack",
-    "Zoey",
-    "Michael",
-    "Aria",
-    "Daniel",
-    "Chloe",
-    "Logan",
-    "Penelope",
-    "Jackson",
-    "Layla",
-    "David",
-    "Nora",
-    "Owen",
-    "Lily",
-    "Samuel",
-    "Victoria",
-    "Carter",
-    "Riley",
-    "Isaac",
-    "Eleanor",
-    "Wyatt",
-    "Mila",
+    "Olivia", "Liam", "Emma", "Noah", "Ava", "Elijah", "Isabella", "Lucas", "Mia", "James",
+    "Amelia", "Benjamin", "Harper", "Mason", "Evelyn", "Jackson", "Abigail", "Ethan", "Emily", "Alexander", "Sofia",
+    "Henry", "Charlotte", "Sebastian", "Ella", "Matthew", "Scarlett", "Aiden", "Grace", "Jack", "Zoey",
+    "Michael", "Aria", "Daniel", "Chloe", "Logan", "Penelope", "Jackson", "Layla", "David", "Nora",
+    "Owen", "Lily", "Samuel", "Victoria", "Carter", "Riley", "Isaac", "Eleanor", "Wyatt", "Mila"
   ];
 
   const lastNames = [
-    "Smith",
-    "Johnson",
-    "Williams",
-    "Jones",
-    "Brown",
-    "Davis",
-    "Miller",
-    "Wilson",
-    "Moore",
-    "Taylor",
-    "Anderson",
-    "Thomas",
-    "Jackson",
-    "White",
-    "Harris",
-    "Martin",
-    "Thompson",
-    "Garcia",
-    "Martinez",
-    "Roberts",
-    "Gonzalez",
-    "Clark",
-    "Rodriguez",
-    "Lewis",
-    "Lee",
-    "Walker",
-    "Young",
-    "Hall",
-    "Allen",
-    "King",
-    "Wright",
-    "Scott",
-    "Green",
-    "Adams",
-    "Baker",
-    "Nelson",
-    "Carter",
-    "Mitchell",
-    "Perez",
-    "Robinson",
-    "Hernandez",
-    "Gomez",
-    "Sanchez",
-    "Morris",
-    "Murphy",
-    "Cameron",
-    "Collins",
-    "Reed",
-    "Stewart",
-    "Mason",
+    "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor",
+    "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Roberts",
+    "Gonzalez", "Clark", "Rodriguez", "Lewis", "Lee", "Walker", "Young", "Hall", "Allen", "King",
+    "Wright", "Scott", "Green", "Adams", "Baker", "Nelson", "Carter", "Mitchell", "Perez", "Robinson",
+    "Hernandez", "Gomez", "Sanchez", "Morris", "Murphy", "Cameron", "Collins", "Reed", "Stewart", "Mason"
   ];
+  
+  
+  
+  
 
-  // Create Users in Firebase Authentication & MongoDB
+// Create Users in Firebase Authentication & MongoDB
   const userList = [];
   for (let i = 0; i < 25; i++) {
     const selectedLanguages = [
@@ -336,36 +151,37 @@ const main = async () => {
       languages[(i + 5) % languages.length],
     ];
 
-    const email = `user${i + 1}@example.com`;
-    const password = "Test123$";
+  const email = `user${i + 1}@example.com`;
+  const password = "Test123$";
 
-    // Create user in Firebase Authentication
-    const firebaseUser = await adminAuth.createUser({
-      email,
-      password,
-      displayName: `${firstNames[i]} ${lastNames[i]}`,
-    });
+  // Create user in Firebase Authentication
+  const firebaseUser = await adminAuth.createUser({
+    email,
+    password,
+    displayName: `${firstNames[i]} ${lastNames[i]}`,
+  });
 
-    const token = await adminAuth.createCustomToken(firebaseUser.uid);
+  const token = await adminAuth.createCustomToken(firebaseUser.uid);
 
-    // Push user to MongoDB
-    userList.push({
-      _id: new ObjectId(),
-      firebaseUID: firebaseUser.uid, // Firebase UID
-      firstName: firstNames[i],
-      lastName: lastNames[i],
-      email: firebaseUser.email,
-      bio: `Bio for User${i + 1}`,
-      password: await bcrypt.hash(password, 10), // Hashed password (for MongoDB if needed)
-      projects: [],
-      favoriteProjects: [],
-      profLanguages: selectedLanguages,
-      token,
-    });
-  }
+  // Push user to MongoDB
+  userList.push({
+    _id: new ObjectId(),
+    firebaseUID: firebaseUser.uid, // Firebase UID
+    firstName: firstNames[i],
+    lastName: lastNames[i],
+    email: firebaseUser.email,
+    bio: `Bio for User${i + 1}`,
+    password: await bcrypt.hash(password, 10), // Hashed password (for MongoDB if needed)
+    projects: [],
+    favoriteProjects: [],
+    profLanguages: selectedLanguages,
+    token
+  });
+}
 
-  const insertedUsers = await users.insertMany(userList);
-  const userIds = Object.values(insertedUsers.insertedIds);
+const insertedUsers = await users.insertMany(userList);
+const userIds = Object.values(insertedUsers.insertedIds);
+
 
   // Create Projects
   const projectList = [];
@@ -416,10 +232,7 @@ const main = async () => {
     });
     await projects.updateOne(
       { _id: projectIds[projectIndex1] },
-      {
-        $inc: { numOfFavorites: 1 },
-        $push: { favoritedBy: userIds[userIndex] },
-      }
+      { $inc: { numOfFavorites: 1 }, $push: { favoritedBy: userIds[userIndex] } }
     );
 
     // Comment and favorite project 2
@@ -431,16 +244,14 @@ const main = async () => {
     });
     await projects.updateOne(
       { _id: projectIds[projectIndex2] },
-      {
-        $inc: { numOfFavorites: 1 },
-        $push: { favoritedBy: userIds[userIndex] },
-      }
+      { $inc: { numOfFavorites: 1 }, $push: { favoritedBy: userIds[userIndex] } }
     );
   }
 
   await comments.insertMany(commentList);
 
   // const testUserToken = await adminAuth.createCustomToken(testUserFirebase.uid);
+
 
   // // Add a Test User
   // const testUser = {
