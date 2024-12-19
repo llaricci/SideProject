@@ -8,6 +8,7 @@ RUN npm install
 
 COPY . .
 
+ENV GRAPHQL_URL=http://server:4000/graphql
 RUN npm run build
 
 EXPOSE 3000
