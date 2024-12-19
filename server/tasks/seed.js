@@ -34,9 +34,9 @@ const main = async () => {
   const projects = await Projects();
   const comments = await Comments();
 
-  console.log("Deleting existing Firebase users...");
-  await deleteAllFirebaseUsers(); // Clear all Firebase users before seeding
-  console.log("Firebase users cleared.");
+  // console.log("Deleting existing Firebase users...");
+  // await deleteAllFirebaseUsers(); 
+  // console.log("Firebase users cleared.");
 
   // Predefined list of programming languages
   const languages = [
