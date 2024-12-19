@@ -4,9 +4,10 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "fire
 import { auth } from "@/lib/config/firebaseAuth";
 import { useMutation } from "@apollo/client";
 import queries from "../queries";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 function SignupPage() {
+  const router = useRouter(); // Initialize router
   const [error, setError] = useState("");
   const [technologies, setTechnologies] = useState([
     "JavaScript",
@@ -98,7 +99,7 @@ function SignupPage() {
       });
 
       setError("");
-      redirect("/users");
+      router.push("/login");
     } catch (error) {
       console.log(error.message);
       if (error.message === "Firebase: Error (auth/email-already-in-use).") {
