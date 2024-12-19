@@ -75,6 +75,7 @@ function ProjectList({projectList, user, isOwner, currentUser, favorites}) {
       <div
         style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}
       >
+        {projectList.length === 0 ? <div>No Projects yet</div> : null}
         {projectList.map((project) => (
           <Card key={project._id} sx={{ width: "75%", marginBottom: "20px" }}>
             <CardContent>
