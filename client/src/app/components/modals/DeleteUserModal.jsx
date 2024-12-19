@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import "../../globals.css";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import ReactModal from "react-modal";
 import queries from "../../queries";
-
 import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/config/firebaseAuth";
 
 ReactModal.setAppElement("#__next");
 
@@ -46,17 +47,19 @@ function DeleteUserModal(props) {
     e.preventDefault();
 
     try {
+      // Delete user from the database
       await deleteUser({
         variables: {
           id: user._id,
         },
       });
 
-      // alert("Project successfully deleted");
+      // Sign out the user if they're logged in
+      await signOut(auth);
 
       setError("");
       props.handleClose();
-      router.push("/users");
+      router.push("/users"); 
     } catch (e) {
       setError(e.message);
       return;

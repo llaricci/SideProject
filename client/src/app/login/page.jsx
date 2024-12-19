@@ -35,7 +35,7 @@ function LoginPage() {
             .catch((error) => {
               console.log(error);
             });
-          redirect("/users");
+          redirect("/");
         }}
       >
         <h1 className="text-2xl font-bold text-center">Login Form</h1>

@@ -22,7 +22,7 @@ export default function FavoritesList() {
         setCurrentUser(user);
         if (user.uid !== id) {
           console.warn("Unauthorized access attempt!");
-          router.push("/login"); // Redirect to an unauthorized page or login
+          router.push("/unauthorized"); // Redirect to an unauthorized page or login
         }
       } else {
         router.push("/login"); // Redirect to login if not logged in

@@ -4,6 +4,7 @@ import { Projects, Users, Comments } from "../config/mongoCollections.js";
 import validation from "./validation.js";
 import validator from "validator";
 import bcrypt from "bcrypt";
+import { adminAuth } from '../config/firebaseAdmin.js'; // Import your Firebase Admin instance
 
 const saltRounds = 10;
 
@@ -1020,6 +1021,20 @@ export const resolvers = {
             $inc: { numOfFavorites: -1 },
           }
         );
+
+            // Delete the user from Firebase Authentication
+        if (userToDelete.firebaseUID) {
+          try {
+            await adminAuth.deleteUser(userToDelete.firebaseUID);
+            console.log(`Firebase user with UID ${userToDelete.firebaseUID} deleted.`);
+          } catch (firebaseError) {
+            console.error(`Error deleting Firebase user: ${firebaseError.message}`);
+            throw new GraphQLError(
+              `Error deleting Firebase user: ${firebaseError.message}`,
+              { extensions: { code: "INTERNAL_SERVER_ERROR" } }
+            );
+          }
+        }
 
         // Delete user's projects
         const userProjects = await projects
