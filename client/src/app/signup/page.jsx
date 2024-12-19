@@ -51,6 +51,7 @@ function SignupPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
     firstName: "",
     lastName: "",
     bio: "",
@@ -68,6 +69,11 @@ function SignupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("formData", formData);
+
+    if (formData.confirmPassword !== formData.password) {
+      setError("Passwords don't match");
+      return;
+    }
 
     const selectedTechnologies = new FormData(e.target).getAll("technologies");
     if (selectedTechnologies.length <= 0) {
@@ -145,6 +151,16 @@ function SignupPage() {
           <input
             type="password"
             name="password"
+            className="p-2 border border-gray-300 rounded"
+            required
+            onChange={onChange}
+          />
+        </label>
+        <label className="grid grid-cols-3 items-center">
+          <span className="text-right pr-4">Confirm Password:</span>
+          <input
+            type="password"
+            name="confirmPassword"
             className="p-2 border border-gray-300 rounded"
             required
             onChange={onChange}
