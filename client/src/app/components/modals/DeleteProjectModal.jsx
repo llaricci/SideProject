@@ -3,8 +3,8 @@ import "../../globals.css";
 import { useMutation, useQuery } from "@apollo/client";
 import ReactModal from "react-modal";
 import queries from "../../queries";
-
-// ReactModal.setAppElement("#__next");
+import { useEffect } from "react";
+//ReactModal.setAppElement("#__next");
 
 const customStyles = {
   content: {
