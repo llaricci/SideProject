@@ -1,19 +1,13 @@
 import * as React from "react";
-
 import Card from "@mui/material/Card";
-
-import {useState} from 'react';
-
+import {useState, useEffect} from 'react';
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-
 import Image from "next/image";
 import logo from "./images/logo.png";
-
 import HeartBrokenIcon from '@mui/icons-material/HeartBroken';
-
 import DeleteFavoriteModal from "./modals/DeleteFavoriteModal";
 
 

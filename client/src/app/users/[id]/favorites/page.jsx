@@ -1,48 +1,67 @@
-"use client"
+"use client";
 
 import Favorites from "@/app/components/Favorites";
 import { useQuery } from "@apollo/client";
-import { useParams, redirect } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/config/firebaseAuth";
 
 import queries from "../../../queries";
 
+export default function FavoritesList() {
+  const { id } = useParams(); // Firebase UID from URL
+  const router = useRouter();
 
-export default function FavoritesList()
-{
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
-    let { id } = useParams();
-    const { loading, error, data } = useQuery(queries.GetUserByFirebaseUID, 
-    {
-        fetchPolicy: "cache-and-network",
-        variables: { firebaseUID: id },
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+        if (user.uid !== id) {
+          console.warn("Unauthorized access attempt!");
+          router.push("/login"); // Redirect to an unauthorized page or login
+        }
+      } else {
+        router.push("/login"); // Redirect to login if not logged in
+      }
+      setAuthLoading(false);
     });
 
+    return () => unsubscribe();
+  }, [id, router]);
 
-    if (loading) 
-    {
-        return <div>Loading...</div>;
-    }
+  const { loading, error, data } = useQuery(queries.GetUserByFirebaseUID, {
+    fetchPolicy: "cache-and-network",
+    variables: { firebaseUID: id },
+    skip: !currentUser || currentUser.uid !== id, // Skip query if unauthorized
+  });
 
-    if (error) 
-    {
-        redirect("/error");
-    } 
-    
-    else if (data) 
-    {
-        
-        
-        let user = data.getUserByFirebaseUID;
+  if (authLoading || loading) {
+    return <div>Loading...</div>;
+  }
 
-        console.log(user);
-        let projects = user.favoriteProjects;
-        console.log(projects);
-        
-        return (
-            <div className="flex justify-center min-h-screen bg-white">
-            <Favorites favorites = {projects} user = {user} />
-            </div>
-        )
-    }
+  if (error) {
+    console.error("GraphQL Error:", error);
+    router.push("/error");
+    return null;
+  }
+
+  if (data) {
+    const user = data.getUserByFirebaseUID;
+    const projects = user.favoriteProjects;
+
+    console.log("User data:", user);
+    console.log("Favorite projects:", projects);
+
+    return (
+      <div className="flex justify-center min-h-screen bg-white">
+        <Favorites favorites={projects} user={user} />
+      </div>
+    );
+  }
+
+  return null;
 }
-
