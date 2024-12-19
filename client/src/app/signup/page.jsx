@@ -111,7 +111,7 @@ function SignupPage() {
           );
           const user = userCredential.user;
           console.log(user);
-          redirect("/users");
+          router.push("/users");
         } catch (signInError) {
           setError(signInError.message);
         }
