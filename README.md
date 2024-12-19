@@ -4,6 +4,9 @@ Welcome to **SideProject!**
 ## Overview
 SideProject is a portfolio app for programmers to list and show off their projects and technologies. Projects have their relevant technologies listed. Projects are able to be filtered by specific technologies. Photos and links to source/demos can be attached. Descriptions of projects are in a Markdown-like format. Users are also able to search for other users and projects. The goal of this project is to allow recruiters to quickly see projects relevant to their position, and whether or not the candidate has adequate experience.
 
+## Live Website 
+<a href="https://sideproject.slackow.com">https://sideproject.slackow.com</a>
+
 ## Tech Stack: 
 
 **Frontend:** NextJS + React, TailwindCSS\
@@ -11,7 +14,7 @@ SideProject is a portfolio app for programmers to list and show off their projec
 **Authentication:** Firebase Auth\
 **Database:** MongoDB\
 **Containerization:** Docker\
-**Cloud:** Oracle Cloud
+**Site Hosting:** Oracle Cloud
 
 ## Installation
 ### With Docker:
@@ -47,6 +50,7 @@ npm run dev
 ```
 
 ## Notes
+- **Test the website before running the seed script**
 - Passwords for all test-users is `Test123$`
 - Duplicate emails arent allows `ex: user${1-25}@example.com`
 
