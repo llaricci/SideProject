@@ -150,7 +150,7 @@ ${projectFavorites}
         lineHeight: "1.6",
       }}
     >
-      <div className="w-1/2 bg-gray-300 shadow-2xl text-black rounded-xl shadow-black/50">
+      <div className="w-1/2 bg-gray-300 shadow-2xl text-black rounded-xl shadow-black/50 p-4">
         <ReactMarkdown className="markdown-content prose lg:prose-lg">
           {markdownContent}
         </ReactMarkdown>
