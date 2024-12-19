@@ -10,6 +10,7 @@ const projects = gql`
       images
       creator {
         _id
+        firebaseUID
         firstName
         lastName
       }
@@ -17,6 +18,7 @@ const projects = gql`
         _id
         user {
           _id
+          firebaseUID
           firstName
           lastName
           email
@@ -25,6 +27,7 @@ const projects = gql`
       }
       favoritedBy {
         _id
+        firebaseUID
         firstName
         lastName
         email
@@ -44,6 +47,7 @@ const GetProjectById = gql`
       images
       creator {
         _id
+        firebaseUID
         firstName
         lastName
       }
@@ -51,6 +55,7 @@ const GetProjectById = gql`
         _id
         user {
           _id
+          firebaseUID
           firstName
           lastName
           email
@@ -59,6 +64,7 @@ const GetProjectById = gql`
       }
       favoritedBy {
         _id
+        firebaseUID
         firstName
         lastName
         email
@@ -77,6 +83,7 @@ export const GetProjectsbyTechnology = gql`
       images
       creator {
         _id
+        firebaseUID
         firstName
         lastName
       }
@@ -99,6 +106,7 @@ export const searchProjectByName = gql`
       description
       creator {
         _id
+        firebaseUID
         firstName
         lastName
       }
@@ -130,6 +138,7 @@ const users = gql`
         images
         creator {
           _id
+          firebaseUID
           firstName
           lastName
           email
@@ -156,6 +165,7 @@ const GetUserByFirebaseUID = gql`
         _id
         favoritedBy {
           _id
+          firebaseUID
           firstName
           lastName
         }
@@ -165,6 +175,7 @@ const GetUserByFirebaseUID = gql`
           _id
           user {
             _id
+            firebaseUID
             firstName
             lastName
           }
@@ -184,6 +195,7 @@ const GetUserByFirebaseUID = gql`
         images
         creator {
           _id
+          firebaseUID
           firstName
           lastName
         }
@@ -196,6 +208,7 @@ const getUserById = gql`
   query GetUserById($id: String!) {
     getUserById(_id: $id) {
       _id
+      firebaseUID
       firstName
       lastName
       email
@@ -205,6 +218,7 @@ const getUserById = gql`
         _id
         favoritedBy {
           _id
+          firebaseUID
           firstName
           lastName
         }
@@ -214,6 +228,7 @@ const getUserById = gql`
           _id
           user {
             _id
+            firebaseUID
             firstName
             lastName
           }
@@ -233,6 +248,7 @@ const getUserById = gql`
         images
         creator {
           _id
+          firebaseUID
           firstName
           lastName
         }
@@ -246,6 +262,7 @@ export const searchUserByName = gql`
   query SearchUserByName($searchTerm: String!) {
     searchUserByName(searchTerm: $searchTerm) {
       _id
+      firebaseUID
       firstName
       lastName
       email
@@ -356,6 +373,7 @@ const addProject = gql`
       images
       creator {
         _id
+        firebaseUID
         firstName
         lastName
       }
@@ -450,6 +468,7 @@ const deleteUser = gql`
   mutation DeleteUser($id: String!) {
     deleteUser(_id: $id) {
       _id
+      firebaseUID
       firstName
       lastName
       email
@@ -490,6 +509,7 @@ const editProject = gql`
       images
       creator {
         _id
+        firebaseUID
         firstName
         lastName
       }
@@ -524,6 +544,7 @@ const editUser = gql`
       profLanguages: $profLanguages
     ) {
       _id
+      firebaseUID
       firstName
       lastName
       email
