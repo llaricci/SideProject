@@ -14,14 +14,17 @@ import PersonIcon from '@mui/icons-material/Person';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 import Link from "next/link";
 import { auth } from "@/lib/config/firebaseAuth";
 
 function Header() {
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const router = useRouter();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -101,7 +104,9 @@ function Header() {
                 <Button
                   color="inherit"
                   onClick={() => {
-                    signOut(auth);
+                    signOut(auth).then(() => {
+                      router.push('/');
+                    });
                   }}
                 >
                   <p className="text-[16px] font-bold text-gray-800">
