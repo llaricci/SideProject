@@ -1,7 +1,44 @@
+"use client";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation"; 
+import { auth } from "@/lib/config/firebaseAuth";
 import Image from "next/image";
 import logo from "./logo.png";
 
+
 export default function Landing() {
+
+  const [authLoading, setAuthLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => 
+  {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => 
+    {
+      if (currentUser) 
+      {
+        setUser({ uid: currentUser.uid });
+        router.push(`/users`); 
+      } 
+      
+      else 
+      {
+        setUser(null);
+      }
+
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe(); 
+  }, [router]);
+
+  if (authLoading) 
+  {
+    return <div>Loading...</div>
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
       <Image src={logo} width={100} height={100} alt="Project Logo" />
