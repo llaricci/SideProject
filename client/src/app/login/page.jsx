@@ -2,12 +2,12 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/config/firebaseAuth";
-import { createUserWithEmailAndPassword } from "@firebase/auth";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 function LoginPage() {
   let [formData, setFormData] = useState({ email: "", password: "" });
-
+  let [error, setError] = useState("");
+  let router = useRouter();
   const onChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -26,7 +26,7 @@ function LoginPage() {
           signInWithEmailAndPassword(auth, formData.email, formData.password)
             .then((user) => {
               console.log(user);
-
+              router.push(`/`);
               // use their firebase ID to access the graphql user, (that needs to be a new field)
               
               // if user matches, redirect to their profile page
@@ -34,12 +34,15 @@ function LoginPage() {
             })
             .catch((error) => {
               console.log(error);
+              setError("Email or Password is incorrect");
             });
-          redirect("/");
         }}
       >
         <h1 className="text-2xl font-bold text-center">Login Form</h1>
         <label className="grid grid-cols-3 items-center text-black">
+          <div></div>
+          <div className="bg-red-700 text-white p-5 rounded-2xl" style={{visibility: !error ? "hidden" : ""}}>{error}</div>
+          <div></div>
           <span className="text-right pr-4">Email:</span>
           <input
             type="email"
