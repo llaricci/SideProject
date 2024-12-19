@@ -56,8 +56,8 @@ function AddProjectModal(props) {
     "JavaScript",
     "Python",
     "Java",
-    "C#",
-    "C++",
+    "CSharp",
+    "CPlusPlus",
     "Ruby",
     "PHP",
     "TypeScript",
@@ -69,17 +69,17 @@ function AddProjectModal(props) {
     "CSS",
     "SQL",
     "GraphQL",
-    "Node.js",
+    "NodeJS",
     "React",
     "Angular",
     "Vue",
-    "Next.js",
+    "NextJS",
     "Svelte",
-    "Tailwind CSS",
+    "TailwindCSS",
     "Bootstrap",
     "AWS",
-    "Google Cloud",
-    "Oracle Cloud",
+    "GoogleCloud",
+    "OracleCloud",
     "Docker",
     "Kubernetes",
     "MongoDB",
@@ -90,6 +90,7 @@ function AddProjectModal(props) {
     "GitHub",
     "Other",
   ]);
+
   const handleChangeTechnologies = (i, technology) => {
     const newTechnology = [...technologies];
     newTechnology[i] = technology;
