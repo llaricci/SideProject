@@ -96,6 +96,8 @@ export const resolvers = {
         }
         // Cache the user in Redis
         await client.json.set(cacheKey, "$", user);
+        await client.json.set(`user_${user._id}`, "$", user);
+        await client.expire(`user_${user._id}`, 3600);
         await client.expire(cacheKey, 3600);
 
         return user;
@@ -531,7 +533,7 @@ export const resolvers = {
           projects: [],
           favoriteProjects: [],
           profLanguages: args.profLanguages,
-          token: args.token
+          token: args.token,
         };
         let insertedUser = await users.insertOne(newUser);
         if (!insertedUser.acknowledged || !insertedUser.insertedId) {
@@ -542,6 +544,7 @@ export const resolvers = {
         // Add to cache
         await client.del(`users`, "$");
         await client.json.set(`user_${newUser._id}`, "$", newUser);
+        await client.json.set(`user_${newUser.firebaseUID}`, "$", newUser);
         return newUser;
       } catch (e) {
         if (e instanceof GraphQLError) {
@@ -759,8 +762,10 @@ export const resolvers = {
         });
 
         await client.del(`user_${args.userId}`, "$");
+        await client.del(`user_${user.firebaseUID}`, "$");
         await client.del(`project_${args.projectId}`, "$");
         await client.json.set(`user_${args.userId}`, "$", updatedUser);
+        await client.json.set(`user_${user.firebaseUID}`, "$", updatedUser);
         await client.json.set(`project_${args.projectId}`, "$", updatedProject);
 
         return updatedProject;
@@ -980,8 +985,11 @@ export const resolvers = {
 
         // Update Redis cache
         await client.del(cacheKey, "$");
+        await client.del(`user_${userToUpdate.firebaseUID}`, "$");
         await client.flushAll();
         await client.json.set(cacheKey, "$", newUser);
+        await client.json.set(`user_${newUser.firebaseUID}`, "$", newUser);
+        await client.expire(`user_${newUser.firebaseUID}`, 3600);
         await client.expire(cacheKey, 3600);
 
         return newUser;
@@ -1045,6 +1053,7 @@ export const resolvers = {
 
         // Clear Redis cache
         await client.del(`user_${args._id}`, "$");
+        await client.del(`user_${userToDelete.firebaseUID}`, "$");
         await client.del("users", "$");
         await client.del(`projects`, "$");
         await client.del(`comments`, "$");
@@ -1104,6 +1113,7 @@ export const resolvers = {
         // Clear Redis cache
         await client.del(`project_${args._id}`, "$");
         await client.json.del(`user_${projectToDelete.creatorId}`, "$");
+        await client.json.del(`user_${projectToDelete.firebaseUID}`, "$");
         await client.flushAll();
         return projectToDelete;
       } catch (e) {
@@ -1217,8 +1227,10 @@ export const resolvers = {
           _id: new ObjectId(args.projectId),
         });
         await client.del(`user_${args.userId}`, "$");
+        await client.del(`user_${user.firebaseUID}`, "$");
         await client.del(`project_${args.projectId}`, "$");
         await client.json.set(`user_${args.userId}`, "$", updatedUser);
+        await client.json.set(`user_${user.firebaseUID}`, "$", updatedUser);
         await client.json.set(`project_${args.projectId}`, "$", updatedProject);
 
         return updatedProject;
